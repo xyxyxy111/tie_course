@@ -1,0 +1,60 @@
+.content {
+  display: flex;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.login-form {
+  flex: 1;
+  padding: 20px;
+  margin: auto;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  height: 50px;
+}
+
+
+button {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: none;
+  height: 50px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: rgb(22, 92, 145);
+  color: white;
+}
+
+.signup-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  color: rgb(4, 35, 59);
+  background-color: rgba(22, 92, 145, 0.1);
+  height: 40px;
+  border-radius: 10px;
+}
+
+.signup-link a:hover {
+  color: rgb(22, 92, 145);
+}
+
+button .icon {
+  display: flex;
+  height: 100%;
+}
+
+svg {
+  margin: 0px 10px;
+}

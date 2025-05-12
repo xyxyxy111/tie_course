@@ -1,0 +1,128 @@
+.what-you-will-learn {
+  border: 1px gainsboro solid;
+  padding: 20px;
+}
+
+.what-you-will-learn ul {
+  list-style: none;
+}
+
+.other-theme {
+  margin-top: 30px;
+  padding: 10px;
+}
+
+.other-theme button {
+  margin: 10px 5px;
+  padding: 5px 20px;
+  font-weight: 600;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px gainsboro solid;
+}
+
+.other-theme button:hover {
+  border: 1px rgb(22, 92, 145) solid;
+  color: rgb(22, 92, 145);
+}
+
+.course-content ul {
+  padding-left: 0px;
+  border: 1px rgb(4, 35, 58) solid;
+  list-style: none
+}
+
+.course-content ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 10px 20px;
+  border-bottom: 0.5px rgb(200, 230, 255) solid;
+}
+
+.course-content ul li:hover {
+  background-color: rgba(22, 92, 145, 0.1);
+}
+
+.course-content .curriculum-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 1.2em;
+}
+
+.course-content .lecture-duration {
+  white-space: nowrap;
+  text-align: right;
+  font-weight: 300;
+}
+
+.course-descrpition {
+  margin-top: 40px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.course-descrpition button {
+  border: none;
+  padding: 10px;
+  color: rgb(22, 92, 145);
+}
+
+.course-descrpitionbtn {
+  border: none;
+  background-color: white;
+  color: rgb(22, 92, 145);
+  font-weight: 700;
+  padding: 10px 20px;
+  margin: 10px 20px;
+  border-radius: 8px;
+}
+
+.course-descrpitionbtn:hover {
+  background-color: rgba(200, 230, 255, 0.2);
+}
+
+.comment-container {
+  height: 340px;
+  width: 100%;
+  overflow: scroll;
+}
+
+.comment {
+  display: flex;
+  width: fit-content;
+  height: 290px;
+}
+
+.ones-comment {
+  border: 1px gainsboro solid;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
+  width: 240px;
+}
+
+.user {
+  align-items: center;
+  display: flex;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}.user span {
+  font-size: 1.2em;
+  font-weight: 500;
+  padding-left: 10px;
+}
+
+.user-picture {
+  width: 60px;
+  height: 60px;
+}
+
+.comment-content {
+  height: 160px;
+}
+
+.comment-datetime {
+  text-align: right;
+}

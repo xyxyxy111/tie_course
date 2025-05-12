@@ -1,0 +1,28 @@
+.course-item {
+  padding: 20px;
+  border-top: 1px gainsboro solid;
+  display: flex;
+}
+
+.course-item button {
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  color: rgb(22, 92, 145);
+  background-color: white;
+}
+
+.course-item button:hover {
+  background-color: rgba(22, 92, 145, 0.1);
+}
+
+.checkout-section button {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  background-color: rgb(22, 92, 145);
+  border: none;
+  border-radius: 10px;
+}

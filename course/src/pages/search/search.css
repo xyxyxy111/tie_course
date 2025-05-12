@@ -1,0 +1,37 @@
+.title {
+  min-width: fit-content;
+  font-size: 40px;
+  text-align: left;
+  font-weight: 600;
+  padding-top: 20px;
+  padding-left: 10%;
+  font-family: 'Times New Roman', Times, serif
+}
+
+.content {
+  display: flex;
+  margin: 0 auto;
+  border-radius: 10px;
+  padding: 0px 20px;
+  border: none;
+  margin-bottom: 100px;
+}
+
+.course-item {
+  padding: 20px;
+  border-top: 1px gainsboro solid;
+  display: flex;
+}
+
+.icon-demo {
+  display: inline-block;
+  color: white;
+  background-color: rgb(22, 92, 145);
+  border-radius: 25px;
+}
+
+.icon-course {
+  width: 48px;
+  height: 48px;
+  padding: 7px 8px;
+}
