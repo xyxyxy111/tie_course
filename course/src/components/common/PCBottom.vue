@@ -32,15 +32,16 @@
 import { useWindowSize } from '@/useWindowSize'
 
 const { width, height } = useWindowSize()
+
+
+const bottomSpacewidth = (width.value - 1200) / 2000
+const bottomButtonPadding = (width.value - 800) / 1700
 const bottomSpaceStyle = () => ({
-  width: width.value > 4500 ? '8%' :
-  width.value>3000?'6%':
-    width.value > 2200 ? '4%' :
-    width.value>2000?'2%':'0%'
+  width: `calc( 8vw * ${bottomSpacewidth})`
 });
 
 const bottomButtonStyle = () => ({
-  padding:width.value>960?'2%':'1%'
+  paddingInline: (bottomButtonPadding > 1) ? `calc( 2vw * ${bottomButtonPadding})` : '2vw'
 });
 
 </script>

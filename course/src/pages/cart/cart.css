@@ -1,28 +1,54 @@
-.course-item {
+.shopping-cart-container .course-item {
   padding: 20px;
   border-top: 1px gainsboro solid;
   display: flex;
 }
 
-.course-item button {
+.shopping-cart-container .course-item button {
   margin-top: 10px;
   padding: 10px;
   border: none;
   color: rgb(22, 92, 145);
+  font-weight: 600;
+  border-radius: 5px;
   background-color: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+    white-space: nowrap;
 }
 
-.course-item button:hover {
+.shopping-cart-container .course-item button:hover {
   background-color: rgba(22, 92, 145, 0.1);
 }
 
-.checkout-section button {
+.shopping-cart-container .checkout-section button {
   width: 100%;
   padding: 10px;
+  margin-top: 10px;
+  white-space: nowrap;
   font-size: 18px;
   font-weight: 800;
   color: white;
   background-color: rgb(22, 92, 145);
   border: none;
   border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  max-width: 400px;
+}
+
+.shopping-cart-container .checkout-summary button:hover {
+  background-color: rgba(22, 92, 145, 0.8);
+}
+
+.shopping-cart-container .cart-buttons {
+  width: 110px;
+}
+
+.shopping-cart-container .course-price {
+  width: 80px;
+  padding: 0px 5px;
+  font-size: 20px;
+  font-weight: 600;
 }

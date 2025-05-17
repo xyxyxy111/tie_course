@@ -13,12 +13,14 @@
 }
 
 .other-theme button {
+  width: fit-content;
   margin: 10px 5px;
   padding: 5px 20px;
   font-weight: 600;
   background-color: white;
   border-radius: 6px;
   border: 1px gainsboro solid;
+  transition: all 0.3s;
 }
 
 .other-theme button:hover {
@@ -39,6 +41,7 @@
   position: relative;
   padding: 10px 20px;
   border-bottom: 0.5px rgb(200, 230, 255) solid;
+  transition: all 0.3s;
 }
 
 .course-content ul li:hover {
@@ -70,6 +73,7 @@
 }
 
 .course-descrpitionbtn {
+  width: fit-content;
   border: none;
   background-color: white;
   color: rgb(22, 92, 145);
@@ -84,9 +88,12 @@
 }
 
 .comment-container {
-  height: 340px;
+  overflow: auto;
+  scrollbar-color: white;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  height: 360px;
   width: 100%;
-  overflow: scroll;
 }
 
 .comment {
@@ -126,3 +133,4 @@
 .comment-datetime {
   text-align: right;
 }
+

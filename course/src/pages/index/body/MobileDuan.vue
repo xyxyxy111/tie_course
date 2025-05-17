@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { RouterView, RouterLink } from 'vue-router';
-import { toRef, ref, onMounted, defineComponent} from 'vue';
+import '../index.css';
+import { toRef, ref, onMounted, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { NavigationButton } from '../components/widget/NavigateButton';
@@ -10,7 +10,6 @@ import MobileBottom from '@/components/common/MobileBottom.vue';
 import {
   courseTitles, projectTitles, courseQuickViews,
   projectQuickViews, CommunityVoices
-  
 } from '../components/content.ts';
 
 
@@ -27,33 +26,25 @@ const voiceCommentStyle = (index: number) => ({
   height: '1' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
 })
 
-//title   font-size: 36px;  )
+const FontSize = computed(() => {
+  const calculatedValue = (width.value - 200) / 50;
+  return Math.min(16, Math.max(0, calculatedValue));
+});
+
 const titleStyle = () => ({
-  fontSize:
-    (width.value < 200) ? '12px' :
-      (width.value < 260) ? '16px' :
-        (width.value < 500) ? '20px' : '32px'
+  fontSize: `calc(12px + 2px * ${FontSize.value})`,
+  transition: 'none'
 })
 
 
-//navigator    height: 30px;
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   backgroundColor: (activeFlag && hoverFlag) ? 'rgba(22,92,145,0.7)' :
     (hoverFlag ? 'rgba(22,92,145,0.3)' : (activeFlag ? 'rgb(22,92,145)' : 'gainsboro')),
   color: activeFlag ? 'gainsboro' : 'rgb(22,92,145)',
-  fontSize:
-    (width.value < 200) ? '6px' :
-      (width.value < 260) ? '8px' :
-        (width.value < 500) ? '12px' : '16px',
-  height:
-    (width.value < 200) ? '12px' :
-      (width.value < 260) ? '18px' :
-        (width.value < 500) ? '26px' : '30px',
-  padding:
-    (width.value < 200) ? '0 12px' :
-      (width.value < 260) ? '0 16px' :
-        (width.value < 500) ? '0 20px' :
-          '0 24px'
+  fontSize: `calc(8px + 0.8px * ${FontSize.value})`,
+  height: `calc(24px + 0.8px * ${FontSize.value})`,
+  paddingInline: `calc(8px + 1.2px * ${FontSize.value})`,
+  transition: 'background-color 0.3s'
 });
 
 //切换主题
@@ -86,7 +77,7 @@ const projectImgStyle = (flag: boolean) => ({
 });
 
 const projectBtnStyle = (flag: boolean) => ({
-  top: (flag) ? '-100%' : '50%'
+  top: (flag) ? '-65%' : '20%'
 });
 
 
@@ -109,19 +100,19 @@ function toComment() {
 <template>
   <IconSprite />
   <main>
+    {{ FontSize }}+
     <MoblieHeader />
-    <!-- PC -->
     <div>
 
 
       <div class="title" :style="titleStyle()">Software Engineering Courses</div>
-      <div class="navigate">
+      <div class="navigate .container-scroll-x">
         <button v-for="(title, index) in courseTitles" :key="index" @click="changeCourseTheme(title)"
           @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
           :style="navigaterBtnStyle(title.activeFlag, title.hoverFlag)">
           {{ title.text }}</button>
       </div>
-      <div class="container">
+      <div class="container container-scroll-x">
         <div class="content">
           <div v-for="(courseQuickView, index) in courseQuickViews" :key="index" @click="toCourse()" class="course"
             @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
@@ -141,21 +132,23 @@ function toComment() {
       </div>
 
       <div class="title" :style="titleStyle()">Software Engineering Projects</div>
-      <div class="navigate">
+      <div class="navigate  container-scroll-x">
         <button v-for="(title, index) in projectTitles" :key="index" @click="changeProjectTheme(title)"
           @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
           :style="navigaterBtnStyle(title.activeFlag, title.hoverFlag)">
           {{ title.text }}</button>
       </div>
-      <div class="container">
+      <div class="container container-scroll-x">
         <div class="content">
           <div v-for="(projectQuickView, index) in projectQuickViews" @click="toProject()" class="project"
             @mouseenter="projectQuickView.mouseEnter()" @mouseleave="projectQuickView.mouseLeave()">
-            <img :src="projectQuickView.imgpath" alt="" :style="projectImgStyle(projectQuickView.hoverFlag)">
+            <img :src="projectQuickView.imgpath" 
+            alt="" 
+            :style="projectImgStyle(projectQuickView.hoverFlag)">
             <div class="project-title">
               {{ projectQuickView.title }}
             </div>
-            <div class="project-introduction">
+            <div class="project-introduction container-scroll-y">
               {{ projectQuickView.text }}
             </div>
             <button :style="projectBtnStyle(projectQuickView.hoverFlag)">
@@ -176,13 +169,13 @@ function toComment() {
       </div>
 
       <div class="title" :style="titleStyle()">Voices across Commnities</div>
-      <div class="voice-container">
+      <div class="voice-container container-scroll-x">
         <div class="inContainer">
 
           <div v-for="(communityVoice, index) in CommunityVoices" @click="toComment()" class="comment"
             :style="voiceStyle(index)">
             <div>
-              <svg width="80" height="40" viewBox="0 -10 48 48" fill="#35495e">
+              <svg width="70" height="35" viewBox="0 -10 48 48" fill="#35495e">
                 <use href="#raphael--quote" />
               </svg>
             </div>
@@ -203,106 +196,48 @@ function toComment() {
 <!-- css -->
 <style scoped>
 .title {
-  min-width: fit-content;
   overflow: hidden;
-  text-align: center;
+  min-width: 400px;
   width: 100%;
-  font-weight: 600;
-  padding-top: 20px;
-  font-family: 'Times New Roman', Times, serif
 }
 
 .navigate {
-  display: flex;
   width: 100%;
+  min-width: 400px;
   height: 50px;
-  overflow: scroll;
-  justify-items: center;
   margin-top: 30px;
 }
 
 .navigate button,
 .project button {
-  font-size: 16px;
-  display: inline-block;
   margin: 0px 0.6rem;
-  padding: 0px 24px;
-  min-width: fit-content;
-  border-radius: 25px;
-  background-color: gainsboro;
-  text-decoration: none;
-  color: rgb(22, 92, 145);
-  letter-spacing: 1px;
-  border: 0;
-  cursor: pointer;
-  font-family: 微软雅黑;
-  font-weight: bolder
+  height: 32px;
 }
 
-.navigate button:hover {
-  background-color: rgba(128, 128, 128, 0.5);
-  color: rgb(22, 92, 145);
+.project button {
+  margin: 8px auto;
 }
 
-.container,
-.voice-container {
-  width: 100%;
-  height: 300%;
-  overflow: scroll;
-  margin-bottom: 50px;
-}
 
 .content {
-  margin: 0 auto;
-  border-radius: 10px;
   width: 2000px;
   height: 300px;
   display: inline-flex;
   overflow: scroll;
-  /* grid-auto-columns: calc((100% -(2)* 1.6rem) / 3);
-  grid-template-columns: repeat(3, 1fr); */
   grid-gap: 0.6rem;
-  border: none;
   padding-inline: 1%;
 }
 
 .course,
 .project,
 .comment {
-  display: inline-block;
   height: 280px;
   padding: 10px;
   width: 240px;
-  margin: 10px;
-  margin-left: 0px;
-  overflow: hidden;
-  border: rgba(22, 92, 145, 0.1) 2px solid;
-  border-radius: 20px;
+  margin-left: 10px;
 }
 
 
-.course:hover {
-  background-color: rgba(22, 92, 145, 0.03);
-}
-
-.icon-demo {
-  display: inline-block;
-  color: white;
-  background-color: rgb(22, 92, 145);
-  border-radius: 25px;
-}
-
-.icon-course {
-  width: 48px;
-  height: 48px;
-  padding: 7px 8px;
-}
-
-.course .course-title {
-  height: 30px;
-  font-size: 18px;
-  font-weight: 500;
-}
 
 .course .course-introduction {
   color: gray;
@@ -346,62 +281,12 @@ function toComment() {
   font-weight: 500;
 }
 
-.project button {
-  margin: 50px;
-  position: relative;
-  left: 10%;
-  justify-content: center;
-  display: inline-flex;
-  width: 80%;
-  min-width: fit-content;
-  margin: 0 auto;
-  padding: 4px 20px;
-  background-color: rgb(22, 92, 145);
-  color: white;
-  font-weight: 500;
-  border: none;
-  transition: top 0.5s ease;
+.project .project-introduction{
+  height: 100px;
 }
 
 .inContainer {
   display: inline-flex;
   overflow: scroll;
 }
-
-.voice-comment {
-  margin: 15px;
-  overflow: hidden;
-  color: rgba(22, 92, 145, 0.7);
-}
-
-.voice-img {
-  height: 70px;
-  margin-left: 10px;
-}
-
-.voice-link {
-  padding-left: 20px;
-  color: gray;
-  font-size: 24px;
-}
-
-.voice-link:hover {
-  color: rgb(22, 92, 145);
-}
 </style>
-
-<!--
-改变透明度
-img {
- 
-}
-坐标在1秒内逐渐增大
-img {
-  transform: translateX(0);
-  transition: transform 1s ease;
-}
-
-img:hover {
-  transform: translateX(100px); /* 向右移动100像素 */
-}
--->

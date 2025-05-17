@@ -14,8 +14,8 @@
     }" :style="{ width: `${width}px` }">
       <div class="sidebar-body">
         <ul class="sidebar-content">
-          <li><a href="/login.html" style="width: 100%;"><button>Log in</button></a></li>
-          <li><a href="/signup.html" style="width: 100%;"><button>Sign up</button></a> </li>
+          <li><button @click="goToLogin">Log in</button></li>
+          <li><button @click="goToSignup">Sign up</button></li>
         </ul>
 
 
@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import { watch, ref } from 'vue'
 
+import { goToSignup, goToLogin } from './header.ts';
 const PopularContent = ref<string[]>([
   'Web Development',
   'Mobile Development',

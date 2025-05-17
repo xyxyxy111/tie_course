@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { RouterView, RouterLink} from 'vue-router';
+import { RouterView, RouterLink } from 'vue-router';
+import '../index.css'
 import { toRef, ref, onMounted, defineComponent } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
@@ -178,74 +179,41 @@ function toComment() {
 
 <!-- css -->
 <style scoped>
-.demo-container {
-  display: flex;
-  gap: 20px;
-  padding: 40px;
-}
 .title{
-  min-width: fit-content;
   font-size: 40px;
-  text-align: center;
   min-width: 1000px;
-  font-weight: 600;
   padding-top: 20px;
-  font-family:'Times New Roman', Times, serif
 }
 
 .navigate {
-  display: flex;
-  max-width: 1400px; /* 但不超过最大值 */
-  min-width: 1000px; /* 不小于最小值 */
-  justify-items: center;
-  justify-content:center;
+  max-width: 1400px; 
+  min-width: 1000px; 
   margin: 0 auto;
 }
 
 .navigate button,.project button {
-  font-size: 16px;
-  display: inline-block;
   margin: 0px 18px;
-  padding: 0px 24px;
   height: 30px;
-  min-width: fit-content;
-  border-radius: 25px ;
-  background-color: gainsboro;
-  text-decoration: none;
-  color: rgb(22,92,145);
-  letter-spacing: 1px;
-  border: 0;
-  cursor: pointer;
-  font-family: 微软雅黑;
-  font-weight:bolder;
-  transition: all 0.3s ease;
 }
 
-.navigate button:hover{
-  background-color: rgba(128, 128, 128, 0.5);
-  color: rgb(22,92,145);
-  box-shadow: 0 4px 4px rgb(22,92,145,0.1);
+.project button {
+  font-size: 16px;
 }
 
 .content {
-  margin: 0 auto;
-  border-radius: 10px;
   width: 80%;         
   max-width: 1400px; 
   min-width: 1000px; 
   padding:20px 0px;
-  border: none;
   margin-bottom: 100px;
 }
 
 
 .container, .voice-container{
    margin: 0 auto;
-  width: 100%;
   max-width: 1400px; 
   height: 500px;
-  overflow: scroll;
-  margin-bottom: 50px;
+  overflow-x: scroll;
 }
 
 .inContainer{
@@ -272,12 +240,8 @@ function toComment() {
 }
 
 .course , .project , .comment{
-  display: inline-block;
   margin: 10px 0.5%;
   width: 23%;
-  border: rgba(22, 92, 145, 0.1) 2px solid;
-  border-radius: 20px;
-  overflow: hidden;
 }
 
 .course{
@@ -296,28 +260,6 @@ function toComment() {
   margin: 20px 10px;
 }
 
-.course:hover{
-  background-color: rgba(22, 92, 145, 0.03);
-}
-
-.icon-demo{
-  display: inline-block;
-  color: white;
-  background-color: rgb(22,92,145);
-  border-radius: 25px;
-}
-
-.icon-course{
-  width: 48px;
-  height: 48px;
-  padding: 7px 8px;
-}
-
-.course .course-title{
-  height: 30px;
-  font-size: 18px;
-  font-weight: 500;
-}
 
 .course .course-introduction{ 
   color: gray;
@@ -363,58 +305,10 @@ function toComment() {
   height: 120px;
 }
 
-.project button{
-  position: relative;
-justify-content:center;
-display: flex;
-width: 80%;
-min-width: fit-content;
-margin: 0 auto;
-padding: 4px 24px;
-background-color: rgb(22,92,145);
-color: white;
-font-weight: 500;
-border: none;
-transition: all 0.5s ease;
-}
 
 .inContainer{
   display: inline-flex;
 }
 
-.voice-comment{
-  margin: 15px;
- overflow: hidden; 
- color: rgba(22, 92, 145, 0.7);
-}
 
-.voice-img{
-  height: 70px;
-  margin-left: 10px;
-}
-
-.voice-link{
-  padding-left: 20px;
-  color: gray;
-  font-size: 24px;
-}
-.voice-link:hover{
-color: rgb(22,92,145);
-}
 </style>
-
-<!--
-改变透明度
-img {
- 
-}
-坐标在1秒内逐渐增大
-img {
-  transform: translateX(0);
-  transition: transform 1s ease;
-}
-
-img:hover {
-  transform: translateX(100px); /* 向右移动100像素 */
-}
--->

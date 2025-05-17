@@ -43,30 +43,37 @@ const checkout = () => {
   <IconSprite />
   <MoblieHeader />
   <div>
-    <div class="title">Shopping Cart</div>
-    <div class="content">
-      <div class="course-list">
-        <h1>{{ courses.length }} Courses in Cart</h1>
-        <div v-for="course in courses" :key="course.id" class="course-item">
-          <img :src="course.image" alt="">
-          <div>
-            <h3>{{ course.title }}</h3>
-            <p>By {{ course.instructor }}</p>
+    <div class="shopping-cart-container">
+      <div class="title">Shopping Cart</div>
+      <div class="content">
+        <div class="course-list">
+          <h1>{{ courses.length }} Courses in Cart</h1>
+          <div v-for="course in courses" :key="course.id" class="course-item">
+            <img :src="course.image" alt="">
+            <div>
+              <h3 class="course-title">{{ course.title }}</h3>
+              <p v-if="width>500">By {{ course.instructor }}</p>
+            </div>
+            <div>
+              <div class="course-price">${{ course.price }}</div>
+              <div>
+                <button class="cart-buttons">Remove</button>
+              </div>
+              <div>
+                <button class="cart-buttons">Save for Later</button>
+              </div>
+            </div>
           </div>
-          <div>
-            <button>Remove</button>
-            <button>Save for Later</button>
-          </div>
-          <p>${{ course.price }}</p>
-        </div>
-      </div>
 
-      <!-- 结算区域现在会在下方显示 -->
-      <div class="checkout-section">
-        <div class="checkout-summary">
-          <div>Total:</div>
-          <div id="totalPrice">${{ totalPrice }}</div>
-          <button @click="checkout">Proceed to checkout →</button>
+        </div>
+
+        <!-- 结算区域现在会在下方显示 -->
+        <div class="checkout-section">
+          <div class="checkout-summary">
+            <div>Total:</div>
+            <div id="totalPrice">${{ totalPrice }}</div>
+            <button @click="checkout">Proceed to checkout →</button>
+          </div>
         </div>
       </div>
     </div>
@@ -75,61 +82,63 @@ const checkout = () => {
 </template>
 
 <style scoped>
-/* 修改布局为上下排列 */
-.content {
+.shopping-cart-container .content {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
   border-radius: 10px;
   width: 100%;
+  min-width:400px;
   padding: 20px 0px;
   border: none;
   margin-bottom: 100px;
 }
 
-/* 移除原来的flex:2和flex:1设置 */
-.course-list {
+.shopping-cart-container .course-list {
   width: 100%;
 }
 
-.checkout-section {
-  width: 100%;
-  margin-top: 40px;
-  /* 增加与课程列表的间距 */
+.shopping-cart-container .checkout-section {
+  margin: 0 auto;
+  width: 90%;
 }
 
-/* 保持其他样式不变 */
-.title {
+.shopping-cart-container .title {
   min-width: fit-content;
   font-size: 36px;
   text-align: left;
   font-weight: 600;
   padding-top: 10px;
   padding-left: 10%;
+  white-space: nowrap;
   font-family: 'Times New Roman', Times, serif
 }
 
 
-.course-item img {
-  width: 200px;
+.shopping-cart-container .course-item img {
+  width: 35%;
+  max-width: 180px;
   height: 120px;
   margin-right: 20px;
 }
 
-
-
-.checkout-summary {
-  border: none;
-  padding: 15px;
+.shopping-cart-container .course-title{
+  margin-bottom: 10px;
+overflow: hidden;
 }
 
-.checkout-summary div {
+.shopping-cart-container .checkout-summary {
+  border: none;
+  margin: 0 auto;
+}
+
+.shopping-cart-container .checkout-summary div {
   font-weight: 700;
   font-size: 16px;
-  padding-inline: 10px;
+  padding-inline: 20px;
 }
 
-.checkout-summary #totalPrice {
+.shopping-cart-container .checkout-summary #totalPrice {
   font-size: 36px;
 }
 

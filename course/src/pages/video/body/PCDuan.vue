@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import '../video.css'
 import { RouterView, RouterLink } from 'vue-router';
-import { toRef, ref, onMounted } from 'vue';
+import { toRef, ref, onMounted,computed } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
@@ -13,8 +13,10 @@ import Tooltip from '@/components/common/Tooltip.vue';
 const { width, height } = useWindowSize()
 
 import { otherThemes,courseCurriculums,Comments}from '../components/content.ts'
-
 const CourseDescriptionFlag = ref(false)
+const CourseDescription = computed(() => {
+  return CourseDescriptionFlag.value ? "收起" : "显示更多"
+})
 
 const CourseDescriptionStyle = () => ({
   height: (CourseDescriptionFlag.value) ? 'fit-content' : '400px'
@@ -177,9 +179,9 @@ const CourseDescriptionStyle = () => ({
     </div>
     <button @click="CourseDescriptionFlag = !CourseDescriptionFlag" class="course-descrpitionbtn">显示更多</button>
 
+    <h1>评论</h1>
+    <div class="comment-container .container-scroll-x">
 
-    <div class="comment-container">
-      <h1>评论</h1>
       <div class="comment">
         <div v-for="(comment, index) in Comments" class="ones-comment">
           <div class="user">
@@ -227,6 +229,7 @@ const CourseDescriptionStyle = () => ({
   background-color: #e1e1e1;
   margin: 10px 20px 10px 0px ;
 }
+
 #course-detail {
   margin: 0 auto;
   height: fit-content;

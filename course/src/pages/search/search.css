@@ -1,4 +1,4 @@
-.title {
+.search-result-container .title {
   min-width: fit-content;
   font-size: 40px;
   text-align: left;
@@ -9,6 +9,7 @@
 }
 
 .content {
+  min-width: 100%;
   display: flex;
   margin: 0 auto;
   border-radius: 10px;
@@ -17,20 +18,40 @@
   margin-bottom: 100px;
 }
 
-.course-item {
+.search-result .course-item {
   padding: 20px;
+  position: relative;
   border-top: 1px gainsboro solid;
   display: flex;
 }
 
-.icon-demo {
+.search-result-container .course-title{
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.search-result-container .price {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0px 20px;
+  text-align: left;
+}
+
+.search-result-container .arrToCartBtn {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+}
+
+.search-result .icon-demo {
   display: inline-block;
   color: white;
   background-color: rgb(22, 92, 145);
   border-radius: 25px;
 }
 
-.icon-course {
+.search-result .icon-course {
   width: 48px;
   height: 48px;
   padding: 7px 8px;

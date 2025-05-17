@@ -12,6 +12,13 @@ import Tooltip from '@/components/common/Tooltip.vue';
 const { width, height } = useWindowSize()
 
 
+const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
+
+const headerSpaceStyle = computed(() => ({
+  padding: `calc(3vw * ${headerSpaceWidth.value})`
+}));
+
+
 const courses = ref([
   {
     id: 1,
@@ -37,38 +44,71 @@ const checkout = () => {
   console.log('Proceeding to checkout')
 }
 
+const CourseInstructorStyle = () => ({})
+
+const CourseTitleStyle = () => ({})
+
+const CourseIncartStyle = () => ({
+
+})
+
 </script>
 
 <!-- html -->
 <template>
   <IconSprite />
-
   <PCHeader />
-  <div>
+
+  <div class="shopping-cart-container" :style="headerSpaceStyle">
+
     <div class="title">Shopping Cart</div>
     <div class="content">
+
       <div class="course-list">
         <h1>{{ courses.length }} Courses in Cart</h1>
 
-        <div v-for="course in courses" :key="course.id" class="course-item">
-          <img :src="course.image" alt="">
-          <div>
-            <h2>{{ course.title }}</h2>
-            <p>By {{ course.instructor }}</p>
-          </div>
-          <div> <button>Remove</button>
-            <button>Save for Later</button>
-          </div>
+        <table>
+          <tr v-for="course in courses" :key="course.id" class="course-item">
+            <td> <img :src="course.image" alt=""></td>
+            <td>
+              <div class="course-incart" :style="CourseIncartStyle()">
+                <h2 :style="CourseTitleStyle()">{{ course.title }}</h2>
+                <p :style="CourseInstructorStyle()" v-if="width >= 1200">By {{ course.instructor }}</p>
+              </div>
+            </td>
+            <!-- 宽度<1200 -->
+            <td v-if="width < 1200">
+              <div class="course-price">${{ course.price }}</div>
+              <div>
+                <button class="cart-buttons">Remove</button>
+              </div>
+              <div>
+                <button class="cart-buttons">Save for Later</button>
+              </div>
+            </td>
+            <!-- 宽度>=1200 -->
 
-          <p>${{ course.price }}</p>
-        </div>
-        
+            <td v-if="width >= 1200">
+              <div>
+                <button class="cart-buttons">Remove</button>
+              </div>
+              <div>
+                <button class="cart-buttons">Save for Later</button>
+              </div>
+            </td>
+            <td v-if="width >= 1200" class="course-price">
+              <div>${{ course.price }}</div>
+            </td>
+          </tr>
+        </table>
+
+
       </div>
 
       <!-- 右侧结算区域 -->
       <div class="checkout-section">
         <div class="checkout-summary">
-          <div>Total:</div>
+          <div class="total-label">Total:</div>
           <div id="totalPrice"> ${{ totalPrice }}</div>
           <button @click="checkout">Proceed to checkout →</button>
         </div>
@@ -81,72 +121,82 @@ const checkout = () => {
 
 </template>
 
-<!-- css -->
 <style scoped>
+.shopping-cart-container {
+  width: 100%;
+  min-width: 850px;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding-inline: 2%;
+}
 
-.title {
+
+.shopping-cart-container .title {
   min-width: fit-content;
   font-size: 40px;
   text-align: left;
-  min-width: 1000px;
+  min-width: 800px;
   font-weight: 600;
   padding-top: 20px;
-  padding-left: 10%;
   font-family: 'Times New Roman', Times, serif
 }
 
-.content {
+.shopping-cart-container .content {
   display: flex;
   margin: 0 auto;
   border-radius: 10px;
-  width: 80%;
+  width: 90%;
   max-width: 1400px;
-  min-width: 1000px;
+  min-width: 850px;
   padding: 20px 0px;
   border: none;
   margin-bottom: 100px;
 }
 
-.course-list {
+.shopping-cart-container .course-list {
   flex: 2;
 }
 
 
-.course-item img {
+.shopping-cart-container .course-item img {
   width: 240px;
   height: 140px;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
-
-.checkout-section {
+.shopping-cart-container .checkout-section {
   flex: 1;
 }
 
-.checkout-summary {
+.shopping-cart-container .checkout-summary {
   border: none;
   padding: 15px;
   margin-bottom: 20px;
 }
 
-.checkout-summary div {
-  font-weight: 700;
+.shopping-cart-container .checkout-summary div {
+  font-weight: 500;
   font-size: 20px;
   padding-inline: 10px;
 }
 
-.checkout-summary #totalPrice {
+.shopping-cart-container .checkout-summary #totalPrice {
   font-size: 40px;
 }
 
-.icon-demo {
+.shopping-cart-container .checkout-summary button {
+  font-weight: 600;
+}
+
+
+.shopping-cart-container .icon-demo {
   display: inline-block;
   color: white;
   background-color: rgb(22, 92, 145);
   border-radius: 25px;
 }
 
-.icon-course {
+.shopping-cart-container .icon-course {
   width: 48px;
   height: 48px;
   padding: 7px 8px;

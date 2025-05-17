@@ -1,32 +1,44 @@
-.content {
+.login-container .content {
   display: flex;
   margin: 0 auto;
   border-radius: 10px;
+  padding: 20px 0px;
+  border: none;
+  margin-bottom: 100px;
 }
 
-.login-form {
+.login-container h1 {
+  font-weight: 500;
+}
+
+.login-container h2 {
+  margin: 5px 0px 10px 20px;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.login-container .login-form {
   flex: 1;
+  width: 50%;
+  max-width: 600px;
   padding: 20px;
   margin: auto;
 }
 
-.input-group {
-  margin-bottom: 1rem;
-}
-
-input {
+.login-container input {
+  margin: 10px 0px;
   width: 100%;
-  padding: 0.75rem;
+  padding: 5px;
   border: 1px solid #ddd;
   border-radius: 10px;
   height: 50px;
 }
 
 
-button {
+.login-container button {
   width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
+  padding: 10px;
+  margin: 5px 0;
   border: none;
   height: 50px;
   border-radius: 10px;
@@ -35,26 +47,26 @@ button {
   color: white;
 }
 
-.signup-link {
+.login-container .signup-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: 10px;
   color: rgb(4, 35, 59);
   background-color: rgba(22, 92, 145, 0.1);
-  height: 40px;
+  height: 50px;
   border-radius: 10px;
 }
 
-.signup-link a:hover {
+.login-container .signup-link a:hover {
   color: rgb(22, 92, 145);
 }
 
-button .icon {
+.login-container button .icon {
   display: flex;
   height: 100%;
 }
 
-svg {
+.login-container svg {
   margin: 0px 10px;
 }

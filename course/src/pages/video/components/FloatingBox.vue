@@ -10,8 +10,8 @@
       <div class="time-left" v-if="timeLeft">{{ timeLeft }}</div>
     </div>
     <div class="action-buttons">
-      <button class="add-to-cart" @click="emit('addToCart')">{{ addToCartText }}</button>
-      <button class="buy-now" @click="emit('buyNow')">{{ buyNowText }}</button>
+      <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
+      <button class="buy-now" @click="emit('buyNow')">立即购买</button>
     </div>
 
     <div class="divider"></div>
@@ -72,16 +72,6 @@ const props = defineProps({
   timeLeft: {
     type: String,
     default: '此优惠价格仅剩1天！'
-  },
-
-  // 按钮文本
-  addToCartText: {
-    type: String,
-    default: '添加至购物车'
-  },
-  buyNowText: {
-    type: String,
-    default: '立即购买'
   },
   // 特性列表
   featuresTitle: {
@@ -172,6 +162,9 @@ const floatingBoxStyle = () => ({
   font-weight: bold;
   cursor: pointer;
   border: none;
+   width: 100%;
+  margin: 0 auto;
+  transition: all 0.3s;
 }
 
 .add-to-cart {

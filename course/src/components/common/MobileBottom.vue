@@ -56,6 +56,7 @@ const headerButtonStyle = () => ({
   position: relative;
   overflow: hidden;
   margin: 0 auto;
+  min-width: 400px;
   width: 100%;
   font-size: 20px;
   margin-top: 10px;

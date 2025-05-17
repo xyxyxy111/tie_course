@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import '../video.css'
-import { RouterView, RouterLink} from 'vue-router';
-import { toRef,ref,onMounted } from 'vue';
+import { RouterView, RouterLink } from 'vue-router';
+import { computed, toRef, ref, onMounted } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
@@ -10,8 +10,11 @@ import MoblieHeader from '@/components/common/MoblieHeader.vue';
 import MobileBottom from '@/components/common/MobileBottom.vue';
 const { width, height } = useWindowSize()
 
-import { otherThemes,courseCurriculums,Comments}from '../components/content.ts'
-
+import { otherThemes, courseCurriculums, Comments } from '../components/content.ts'
+const CourseDescriptionFlag = ref(false)
+const CourseDescription = computed(() => {
+  return CourseDescriptionFlag.value ? "收起" : "显示更多"
+})
 
 const props = defineProps({
   courseVideo: {
@@ -33,16 +36,6 @@ const props = defineProps({
   timeLeft: {
     type: String,
     default: '此优惠价格仅剩1天！'
-  },
-
-  // 按钮文本
-  addToCartText: {
-    type: String,
-    default: '添加至购物车'
-  },
-  buyNowText: {
-    type: String,
-    default: '立即购买'
   },
   // 特性列表
   featuresTitle: {
@@ -73,10 +66,6 @@ const props = defineProps({
 
 const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon', 'couponApplied']);
 
-
-
-const CourseDescriptionFlag = ref(false)
-
 const CourseDescriptionStyle = () => ({
   height: (CourseDescriptionFlag.value) ? 'fit-content' : '400px'
 })
@@ -90,11 +79,11 @@ const CourseDescriptionStyle = () => ({
     <MoblieHeader />
     <div id="top-container">
       <div class="content">
-        <div class="course-theme">
+        <div class="course-theme" v-if="width > 540">
           <h6> 开发 数据科学 R（编程语言）</h6>
         </div>
 
-        <div class="divider"></div>
+        <div class="divider" v-if="width > 540"></div>
 
         <div class="course-title">
           <h3> R Programming A-Z™: R For Data Science With Real Exercises!
@@ -102,20 +91,20 @@ const CourseDescriptionStyle = () => ({
 
         </div>
 
-        <div class="course-introduction">
+        <div class="course-introduction" v-if="width > 480">
           <h5>Learn Programming In R And R Studio. Data Analytics, Data Science, Statistical Analysis, Packages,
             Functions,
             GGPlot2</h5>
 
         </div>
 
-        <div class="divider"></div>
+        <div class="divider" v-if="width > 500"></div>
 
-        <div class="update-time">
+        <div class="update-time" v-if="width > 500">
           <h6>上次更新时间：2025年1月</h6>
         </div>
 
-        <div class="language">
+        <div class="language" v-if="width > 520">
           <h6> 中文 , 英语</h6>
         </div>
 
@@ -130,8 +119,8 @@ const CourseDescriptionStyle = () => ({
         <span class="discount">{{ discount }}</span>
         <div class="time-left" v-if="timeLeft">{{ timeLeft }}</div>
         <div class="action-buttons">
-          <button class="add-to-cart" @click="emit('addToCart')">{{ addToCartText }}</button>
-          <button class="buy-now" @click="emit('buyNow')">{{ buyNowText }}</button>
+          <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
+          <button class="buy-now" @click="emit('buyNow')">立即购买</button>
         </div>
 
       </div>
@@ -252,11 +241,11 @@ const CourseDescriptionStyle = () => ({
 
         </h4>
       </div>
-      <button @click="CourseDescriptionFlag = !CourseDescriptionFlag" class="course-descrpitionbtn">显示更多</button>
+      <button @click="CourseDescriptionFlag = !CourseDescriptionFlag;" class="course-descrpitionbtn">{{
+        CourseDescription }}</button>
 
-
-      <div class="comment-container">
-        <h1>评论</h1>
+      <h1>评论</h1>
+      <div class="comment-container .container-scroll-x">
         <div class="comment">
           <div v-for="(comment, index) in Comments" class="ones-comment">
             <div class="user">
@@ -284,8 +273,8 @@ const CourseDescriptionStyle = () => ({
   padding: 10px;
 }
 
-.video-picture{
-width: 80%;
+.video-picture {
+  width: 80%;
 }
 
 .current-price {
@@ -320,23 +309,25 @@ width: 80%;
 }
 
 .action-buttons button {
+  width: fit-content;
   padding: 12px;
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
-  border: none; 
+  border: none;
   margin: 10px 20px;
+  transition: all 0.3s;
 }
 
 
-.add-to-cart:hover,.buy-now:hover{
-  background-color: rgba(22, 92, 145, 0.2);
-  font-weight: bolder;
-  border: 1px solid rgb(22, 92, 145);
-  padding: 11px;
+.add-to-cart:hover,
+.buy-now:hover {
+  background-color: white;
+  color: rgb(22, 92, 145);
 }
 
-.add-to-cart , .buy-now {
+.add-to-cart,
+.buy-now {
   background-color: rgb(22, 92, 145);
   color: white;
 }
@@ -352,9 +343,11 @@ width: 80%;
   background-color: rgb(4, 35, 58);
   color: rgb(200, 230, 255);
   width: 100%;
-  padding: 20px 0px 20px 10px;
+  min-width: 400px;
+  padding: 0px 0px 20px 10px;
   font-size: 16px;
   height: 400px;
+  overflow: hidden;
 }
 
 .content {
@@ -364,7 +357,7 @@ width: 80%;
   padding: 10px;
 }
 
-.content h3{
+.content h3 {
   color: white;
   font-weight: bold;
 }
@@ -378,7 +371,7 @@ width: 80%;
   min-width: 500px;
 }
 
-h1{
+h1 {
   padding-left: 20px;
   margin-block: 10px;
 }

@@ -1,0 +1,154 @@
+.title {
+  min-width: fit-content;
+  text-align: center;
+  font-weight: 600;
+  font-family: 'Times New Roman', Times, serif
+}
+
+.navigate {
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+}
+
+.container,
+.voice-container {
+  width: 100%;
+  margin-bottom: 50px;
+}
+
+.navigate button {
+  font-size: 16px;
+  display: inline-block;
+  padding: 0px 24px;
+  min-width: fit-content;
+  border-radius: 25px;
+  background-color: gainsboro;
+  text-decoration: none;
+  color: rgb(22, 92, 145);
+  letter-spacing: 1px;
+  border: 0;
+  cursor: pointer;
+  font-family: 微软雅黑;
+  font-weight: bolder;
+  transition: all 0.3s ease;
+}
+
+.project button {
+  position: relative;
+  justify-content: center;
+  display: flex;
+  width: 80%;
+  min-width: fit-content;
+  margin: 0 auto;
+  padding: 4px 24px;
+  background-color: rgb(22, 92, 145);
+  color: white;
+  font-weight: 500;
+  border: none;
+  transition: all 0.5s ease;
+  border-radius: 25px;
+  text-decoration: none;
+  letter-spacing: 1px;
+  border: 0;
+  cursor: pointer;
+  font-family: 微软雅黑;
+  font-weight: bolder;
+}
+
+.navigate button:hover,.project button:hover {
+  
+  color: rgb(22, 92, 145);
+  box-shadow: 0 4px 4px rgb(22, 92, 145, 0.1);
+}
+
+.navigate button:hover{
+  background-color: rgba(128, 128, 128, 0.5);
+}
+
+.project button:hover{
+  background-color: rgb(255, 255, 255);
+}
+
+.content {
+  margin: 0 auto;
+  border-radius: 10px;
+  border: none;
+}
+
+.title{
+  margin-bottom: 20px;
+}
+
+.course,
+.project,
+.comment {
+  display: inline-block;
+  overflow: hidden;
+  border: rgba(22, 92, 145, 0.1) 2px solid;
+  border-radius: 20px;
+}
+
+.course .course-title {
+  height: 30px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.course:hover {
+  background-color: rgba(22, 92, 145, 0.03);
+}
+
+.icon-demo {
+  display: inline-block;
+  color: white;
+  background-color: rgb(22, 92, 145);
+  border-radius: 25px;
+}
+
+.icon-course {
+  width: 48px;
+  height: 48px;
+  padding: 7px 8px;
+}
+
+.voice-comment {
+  margin: 15px;
+  overflow: hidden;
+  color: rgba(22, 92, 145, 0.7);
+}
+
+.voice-img {
+  height: 70px;
+  margin-left: 10px;
+}
+
+.voice-link {
+  padding-left: 20px;
+  color: gray;
+  font-size: 24px;
+}
+
+.voice-link:hover {
+  color: rgb(22, 92, 145);
+}
+
+.container-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-color: white;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.container-scroll-y {
+  overflow-y: auto;
+overflow-x: hidden;
+scrollbar-color: white;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.container-scroll-x::-webkit-scrollbar,.container-scroll-y::-webkit-scrollbar{
+  display: none;
+}

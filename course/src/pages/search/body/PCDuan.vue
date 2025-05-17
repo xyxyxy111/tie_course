@@ -1,50 +1,40 @@
 <script lang="ts" setup>
-import { toRef,ref,onMounted ,watch, defineComponent} from 'vue';
+import { toRef, ref, onMounted, watch, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
+import Filter from '../components/Filter.vue';
+import { useFilterStore } from '../components/filterStore'
 import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
+import { useWindowSize } from '@/useWindowSize';
+const { width, height } = useWindowSize()
 import '../search.css'
 
 
 const searchQuery = ref('');
+const filterStore = useFilterStore()
+const showFilter = ref(true)
 
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   searchQuery.value = urlParams.get('q') || '';
 });
-// 主题数据
-const themes = ["JavaScript", "React JS", "Angular", "Java", "CSS", "Android", "iOS"];
-const selectedThemes = ref([]);
-
-const levels = [
-  { value: "all", label: "所有级别" },
-  { value: "beginner", label: "初级" },
-  { value: "intermediate", label: "中级" },
-  { value: "expert", label: "专家" },
-];
-const selectedLevel = ref("all"); // 默认选中"所有级别"
-
-const prices = [
-  { value: "paid", label: "付费" },
-  { value: "free", label: "免费" },
-];
-const selectedPrice = ref("free"); // 默认选中"免费"
-
-const sortBy = ref('relevance')
-
-
-const emit = defineEmits(['update:isOpen','filter-change'])
 
 
 
-// 监听筛选条件变化
-watch([sortBy,  selectedThemes], () => {
-  emit('filter-change', {
-    sortBy: sortBy.value,
-    themes: selectedThemes.value // 加入主题筛选
-  })
-}, { deep: true })
+const SearchResultWidth = computed(() => {
+  const calculatedValue = (width.value - 900);
+  return Math.min(600, Math.max(0, calculatedValue));
+});
+
+const SearchResultStyle = computed(() => ({
+  width: `calc( 640px + 1px * ${SearchResultWidth.value})`
+}));
+
+const SearchResultCourseTitleStyle = computed(() => ({
+  width: `calc( 200px + 1px * ${SearchResultWidth.value})`
+}));
+
 
 
 const courses = ref([
@@ -64,6 +54,27 @@ const courses = ref([
   }
 ])
 
+
+watch(
+  () => [
+    filterStore.sortBy,
+    filterStore.selectedThemes,
+    filterStore.selectedLanguage,
+    filterStore.selectedLevel,
+    filterStore.selectedPrice
+  ],
+  () => {
+    console.log('筛选条件变化:', {
+      sortBy: filterStore.sortBy,
+      themes: filterStore.selectedThemes,
+      languages: filterStore.selectedLanguage,
+      level: filterStore.selectedLevel,
+      price: filterStore.selectedPrice
+    })
+  },
+  { deep: true }
+)
+
 </script>
 
 
@@ -71,167 +82,67 @@ const courses = ref([
   <IconSprite />
 
   <PCHeader />
+  <div class="search-result-container">
+    <div class="content">
+      <Filter @close="showFilter = true" />
 
-  <div class="title">“{{ searchQuery }}”的1000个结果</div>
+      <div class="search-result" :style="SearchResultStyle">
+        <div class="title">“{{ searchQuery }}”的1000个结果</div>
+        <div v-for="course in courses" :key="course.id" class="course-item">
+          <img :src="course.image" alt="" class="course-img">
+          <div>
+            <div class="course-title" :style="SearchResultCourseTitleStyle">{{ course.title }}</div>
+            <div class="course-instruction">By {{ course.instructor }}</div>
+          </div>
+          <div class="course-price">
+            <div class="price"> ${{ course.price }}</div>
+            <button class="arrToCartBtn">Add to Cart</button>
+          </div>
 
-  <div class="content">
-
-    <div class="sidebar-body">
-      <div class="sidebar-header">
-        <h3>筛选</h3>
-      </div>
-
-      <!-- 排序方式 -->
-      <ul class="sidebar-content">
-        <li class="sidebar-title">排序方式</li>
-        <li><button :class="{ active: sortBy === 'relevance' }" @click="sortBy = 'relevance'">相关度最高</button></li>
-        <li><button :class="{ active: sortBy === 'newest' }" @click="sortBy = 'newest'">最新</button></li>
-        <li><button :class="{ active: sortBy === 'highest-rated' }" @click="sortBy = 'highest-rated'">评分最高</button>
-        </li>
-      </ul>
-
-
-      <ul class="sidebar-content">
-        <li class="sidebar-title">语言</li>
-        <li><button>中文</button></li>
-        <li><button>English</button></li>
-      </ul>
-
-      <ul class="sidebar-content">
-        <li class="sidebar-title">主题</li>
-        <li v-for="(theme, index) in themes" :key="index">
-          <label>
-            <input type="checkbox" v-model="selectedThemes" :value="theme">
-            {{ theme }}
-          </label>
-        </li>
-      </ul>
-
-
-      <ul class="sidebar-content">
-        <li class="sidebar-title">级别</li>
-        <li v-for="level in levels" :key="level.value">
-          <label>
-            <input type="radio" v-model="selectedLevel" :value="level.value"> {{ level.label }}
-          </label>
-        </li>
-      </ul>
-
-      <ul class="sidebar-content">
-        <li class="sidebar-title">价格</li>
-        <li v-for="price in prices" :key="price.value">
-          <label>
-            <input type="radio" v-model="selectedPrice" :value="price.value"> {{ price.label }}
-          </label>
-        </li>
-      </ul>
-
-    </div>
-
-    <div class="search-result">
-
-      <div v-for="course in courses" :key="course.id" class="course-item">
-        <img :src="course.image" alt="">
-        <div>
-          <h3>{{ course.title }}</h3>
-          <p>By {{ course.instructor }}</p>
         </div>
-
-
-        <p class="price">${{ course.price }}
-          <button>Add to Cart</button>
-        </p>
       </div>
     </div>
+
   </div>
-
-
   <PCBottom />
 
 
 
 </template>
 
+
+
 <style scoped>
+.search-result-container {
+  margin: 0 auto;
+}
+
 .title {
-  min-width: 1000px;
+  min-width: fit-content;
+  white-space: nowrap;
 }
 
 .content {
-  width: 80%;
+  width: 90%;
   max-width: 1400px;
-  min-width: 900px;
-}
-
-.sidebar-body {
-  flex: 1;
-}
-
-.sidebar-body {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  padding: 15px;
-}
-
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.sidebar-header h3 {
-  margin: 0;
-}
-
-.sidebar-content {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border-bottom: 1px solid #eee;
-}
-
-.sidebar-title {
-  font-weight: 700;
-  padding: 15px 0 5px;
-  color: #35495e;
-}
-
-.sidebar-body button {
-  width: 100%;
-  padding: 10px 0;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  color: #35495e;
-  transition: background-color 0.2s;
-}
-
-.sidebar-body button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
-}
-
-.sidebar-body button.active {
-  color: rgb(22, 92, 145);
-  font-weight: bold;
+  min-width: 800px;
 }
 
 .search-result {
-  flex: 6;
+  width: 70%;
+  min-width: 620px;
 }
 
-.course-item img {
+.search-result .course-item img {
   width: 240px;
   height: 140px;
   margin-right: 20px;
 }
 
-.course-item button {
+.search-result .course-item button {
   margin-top: 80px;
+  width: fit-content;
+  height: 42px;
   padding: 10px;
   border: none;
   font-size: 20px;
@@ -240,14 +151,17 @@ const courses = ref([
   color: rgb(22, 92, 145);
   background-color: white;
   border-radius: 8px;
+
 }
 
-.course-item button:hover {
+.search-result .course-item button:hover {
   background-color: rgba(22, 92, 145, 0.1);
 }
 
-.course-item p{
-  text-align: left;
+.search-result .course-item .course-price {
+  width: 80px;
+  padding: 0px 5px;
+  font-size: 20px;
+  font-weight: 600;
 }
-
 </style>

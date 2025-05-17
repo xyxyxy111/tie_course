@@ -142,21 +142,15 @@ const projectQuickViews = ref<ProjectQuickView[]>([
 const CommunityVoices = ref<CommunityVoice[]>([
   new CommunityVoice(
     "Manus AI彻底改变了我的工作流程。相比ChatGPT等工具，它能完整执行从规划到交付的整个项目流程，就像拥有一个AI团队。",
-    '张伟',
-    '/src/images/userPic.jpg',
-    '项目管理'
+    'User', '/src/images/userPic.png', 'course'
   ),
   new CommunityVoice(
     "作为技术主管，我最欣赏Manus的结构化输出能力。它不仅能回答问题，还能提供可直接交付客户的专业报告。",
-    '李娜',
-    '/src/images/userPic.jpg',
-    '技术研发'
+    'User', '/src/images/userPic.png', 'course'
   ),
   new CommunityVoice(
     "在尝试了市面上所有主流AI工具后，Manus的端到端任务处理能力是独一无二的。特别是对复杂研究任务的拆解和执行令人惊艳。",
-    '王雷',
-    '/src/images/.userPicjpg',
-    '市场分析'
+    'User', '/src/images/userPic.png', 'course'
   ),
   new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a project manager in charge.It\'s not just another Al tool, it actually getsthings done.',
     'User', '/src/images/userPic.png', 'course'

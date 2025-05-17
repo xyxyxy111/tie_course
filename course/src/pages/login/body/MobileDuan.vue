@@ -18,31 +18,30 @@ const login = () => {
 <!-- html -->
 <template>
   <IconSprite />
-
   <MoblieHeader />
-  <div class="content">
+  <div class="login-container">
+    <div class="content">
+      <!-- 右侧表单 -->
+      <div class="login-form">
+        <h1>Log in</h1>
+        <h2> to continue your learning journey</h2>
 
-    <!-- 右侧表单 -->
-    <div class="login-form">
-      <h1>Log in to continue your learning journey</h1>
 
-      <form @submit.prevent="login">
-        <div class="input-group">
-          <input placeholder="Email">
-        </div>
-        <button type="submit">
-          <div class="icon">
-            <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
-              <use href="#ic--outline-email" />
-            </svg> Continue with email
+        <form @submit.prevent="login">
+          <div class="input-group">
+            <input placeholder="Email">
           </div>
-        </button>
-      </form>
-
-      <p class="signup-link">Don't have an account? <a href="/signup.html">Sign up</a></p>
+          <button type="submit">
+            <div class="icon">
+              <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
+                <use href="#ic--outline-email" />
+              </svg> Continue with email
+            </div>
+          </button>
+        </form>
+        <div class="signup-link">Don't have an account? <a href="/signup.html">Sign up</a></div>
+      </div>
     </div>
-
-
   </div>
   <MoblieBottom />
 
@@ -52,18 +51,12 @@ const login = () => {
 
 
 <style scoped>
-.content {
+.login-container .content {
   width: 70%;
 }
 
-.login-form {
+.login-container .login-form {
   width: 50%;
   max-width: 600px;
 }
-
-h1 {
-  margin-bottom: 2rem;
-  font-size: 1.5rem;
-}
-
 </style>
