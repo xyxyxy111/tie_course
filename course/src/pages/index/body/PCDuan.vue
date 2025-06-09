@@ -10,7 +10,7 @@ import { NavigationButton } from '../components/widget/NavigateButton';
 import { useWindowSize } from '@/useWindowSize';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
-
+import { goToCart, goToCourse } from '@/components/common/header.ts';
 const { width, height } = useWindowSize()
 import {
   courseTitles,
@@ -58,7 +58,6 @@ const cartTitle = ref('')
 function addToCart(course: string) {
   cartTitle.value = course;
   showCart.value = true;
-  console.log(cartTitle.value + "" + showCart.value)
 }
 
 
@@ -79,7 +78,7 @@ function addToCart(course: string) {
             <div class="product-info">
               来杯Java吧! 2025 Java 入門到精通課程
             </div>
-            <button class="go-to-cart-btn">前往购物车</button>
+            <button class="go-to-cart-btn" @click="goToCart">前往购物车</button>
           </div>
 
 
@@ -129,7 +128,7 @@ function addToCart(course: string) {
       </div>
 
       <div class="content">
-        <div v-for="(courseQuickView, index) in courseQuickViews" @click="tocourse()" class="course"
+        <div v-for="(courseQuickView, index) in courseQuickViews" @click="goToCourse" class="course"
           @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
           <img :src="courseQuickView.coverImgUrl" alt="">
           <div class="course-title">
@@ -230,7 +229,7 @@ function addToCart(course: string) {
 .content {
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(4, minmax(24%,280px));
+  grid-template-columns: repeat(4, minmax(24%, 280px));
   gap: 1%;
   width: 80%;
   max-width: fit-content;
@@ -253,8 +252,8 @@ function addToCart(course: string) {
 
 .exploreBtn {
   height: 36px;
-  margin: 0px  35% 100px;
-  width:30%;
+  margin: 0px 35% 0px;
+  width: 30%;
   font-size: 20px;
   background-color: rgb(22, 92, 145);
   color: white;

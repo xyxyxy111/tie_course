@@ -8,6 +8,8 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize';
 import MoblieHeader from '@/components/common/MoblieHeader.vue';
 import MobileBottom from '@/components/common/MobileBottom.vue';
+import { goToCart } from '@/components/common/header.ts';
+import { recommendedProducts, relatedTopics } from '@/pages/index/components/content.ts'; 
 const { width, height } = useWindowSize()
 
 import { otherThemes, courseCurriculums, Comments } from '../components/content.ts'
@@ -16,7 +18,24 @@ const CourseDescription = computed(() => {
   return CourseDescriptionFlag.value ? "收起" : "显示更多"
 })
 
+
+function goToCheckout() {
+  // 提取原始数据，不要直接使用响应式对象
+  const cartData = {
+    courses:{
+      image: props.courseVideo,
+      title: "course.title",
+      price:props.currentPrice}
+   ,
+    total: props.currentPrice, // 获取计算属性的值
+    userId: 'user123'
+  };
+
+  localStorage.setItem('tempCartData', JSON.stringify(cartData));
+  window.location.href = '/checkout.html';
+}
 const props = defineProps({
+  
   courseVideo: {
     type: String,
     default: '/src/images/image1.png'
@@ -70,12 +89,67 @@ const CourseDescriptionStyle = () => ({
   height: (CourseDescriptionFlag.value) ? 'fit-content' : '400px'
 })
 
+const showCart = ref(false);
+const cartTitle = ref('')
+
+function addToCart(course: string) {
+  cartTitle.value = course;
+  showCart.value = true;
+}
+
 </script>
 
 <!-- html -->
 <template>
   <IconSprite />
   <main>
+    <CartPopup v-model="showCart" :style="`width:${width};height:${height}`">
+      <template #content>
+        <div class="shopping-cart-container container-scroll-y">
+          <!-- 添加成功提示 -->
+          <h2>已添加至购物车</h2>
+          <div class="added-notification">
+            <img src="/src/images/image6.png" alt="">
+            <div class="product-info">
+              来杯Java吧! 2025 Java 入門到精通課程
+            </div>
+            <button class="go-to-cart-btn" @click="goToCart">前往购物车</button>
+          </div>
+
+
+          <div class="recommendations">
+            <h2>常见购买搭配</h2>
+
+            <div class="recommendation-list">
+              <div v-for="product in recommendedProducts" :key="product.id" class="product-card">
+                <img :src="product.coverImgUrl" alt="">
+                <div class="recommendationItem-detail">
+                  <h3>{{ product.name }}</h3>
+                  <div class="rating">
+                    <span class="stars">★★★★</span>
+                    <span class="rating-score">{{ product.rating }}</span>
+                    <span class="review-count">({{ product.reviewCount }})</span>
+                  </div>
+                  <p class="price">{{ product.price }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="total-section">
+              <p class="total-price">总计： US$204.97</p>
+              <button class="add-all-btn">全部添加至购物车</button>
+            </div>
+          </div>
+
+          <!-- 相关主题 -->
+          <div class="related-topics ">
+            <h2>相关主题</h2>
+            <div class="topic-tags">
+              <span v-for="topic in relatedTopics" :key="topic" class="topic-tag">{{ topic }}</span>
+            </div>
+          </div>
+        </div>
+      </template>
+    </CartPopup>
     <MoblieHeader />
     <div id="top-container">
       <div class="content">

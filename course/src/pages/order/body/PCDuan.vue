@@ -67,42 +67,26 @@ onMounted(() => {
   <IconSprite />
 
   <div class="payment-container">
-    
+
 
     <!-- 付款方式部分 -->
     <div class="section">
-      <h1>付款</h1>
+
       <h2>付款方式</h2>
 
-      <div class="payment-methods">
-        <div class="payment-method">
-          <input type="radio" id="credit-card" name="payment" checked>
-          <label for="credit-card">银行卡</label>
-          <div class="card-types">
-            <span class="card-type visa">VISA</span>
-            <!-- 可以添加其他卡类型 -->
-          </div>
-          <div class="secure-notice">安全日加密</div>
-        </div>
-
-        <div class="payment-method">
-          <input type="radio" id="paypal" name="payment">
-          <label for="paypal">PayPal</label>
-        </div>
+      <div class="payment-method">
+        <input type="radio" id="paypal" name="payment">
+        <label for="Alipay">支付宝</label>
       </div>
 
-
-      <!-- 订单详情 -->
       <div class="order-summary">
         <h3>订单详细信息 ( {{ orderList.length }} 个课程)</h3>
         <ul class="course-list">
           <li v-for="(course,index) in orderList" class="course-item">
             <img :src="course.image" alt="">
-            <span>{{course.title }}</span>
+            <span class="title">{{course.title }}</span>
             <span class="price">{{ course.price}}</span>
           </li>
-        
-          <!-- 其他课程项 -->
         </ul>
 
 
@@ -125,14 +109,6 @@ onMounted(() => {
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
-}
-
-
-h1,
-h2,
-h3,
-h4 {
-  color: #2d2f31;
 }
 
 .form-group {
@@ -167,21 +143,6 @@ flex:2
   ToCartground-color: rgba(22, 92, 145, 0.1);
 }
 
-
-.secure-notice {
-  color: #6a6f73;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.form-check {
-  margin-top: 15px;
-}
-
-.form-check-label {
-  margin-left: 5px;
-}
-
 .order-summary {
   padding: 20px;
   border: 1px solid #e0e0e0;
@@ -199,6 +160,10 @@ flex:2
   justify-content: space-between;
   padding: 10px 0;
   border-bottom: 1px solid #e0e0e0;
+}
+
+.title{
+  padding: 5px;
 }
 
 .price {

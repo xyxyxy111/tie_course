@@ -218,9 +218,7 @@ height:typeof props.height==='number'?`${props.height}px`:props.height,
 }
 
 .position-bottom {
-  top: -100%;
-  left: -50%;
-  transform: translateY(60px);
+  transform: translateY(5px);
 }
 
 /* 动画效果 */

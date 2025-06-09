@@ -55,6 +55,7 @@ export default defineConfig({
         signup: resolve(__dirname, 'public/signup.html'),
         search: resolve(__dirname, 'public/search.html'),
         course: resolve(__dirname, 'public/course.html'),
+        video: resolve(__dirname, 'public/video.html'),
         checkout: resolve(__dirname, 'public/checkout.html'),
         learning: resolve(__dirname, 'public/learning.html'),
         myinfo: resolve(__dirname, 'public/my-info.html')

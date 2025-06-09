@@ -1,7 +1,5 @@
 import { ref } from 'vue';
-
 export let searchQuery = ref('');
-
 export function Search() {
   if (searchQuery.value.trim()) {
     console.log("搜索词:", searchQuery.value);
@@ -28,4 +26,13 @@ export const goToLogin = () => {
 
 export const goToCourse = () => {
   window.location.href = "/course.html";
+};
+
+export const goToLearning = () => {
+  window.location.href = "/learning.html";
+};
+
+
+export const goToMyInfo = () => {
+  window.location.href = "/my-info.html";
 };

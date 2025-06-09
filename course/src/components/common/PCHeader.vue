@@ -1,4 +1,5 @@
 <template>
+  <IconSprite />
   <div class="header">
     <div class=""></div>
     <div :style="headerSpaceStyle"></div>
@@ -6,18 +7,18 @@
     <div :style="headerSpaceStyle"></div>
     <div class="explore">
       <button :style="headerButtonStyle" @mouseenter="exploreHoverFlag = true" @mouseleave="exploreHoverFlag= false"
-        class="explore-button">Explore
-        <HoverPopup v-model="exploreHoverFlag" width="270px" height="340px" transition="slide" :show-delay="200"
-          position="bottom" :hide-delay="300" class="custom-popup-bottom">
-          <template #trigger>
-            <div class="popup-trigger-area">
-            </div>
-          </template>
-          <template #content>
-            kkkkkkkkk
-          </template>
-        </HoverPopup>
-      </button>
+        class="explore-button">Explore</button>
+      <HoverPopup v-model="exploreHoverFlag" width="270px" height="340px" transition="slide" :show-delay="200"
+        position="bottom" :hide-delay="300" class="custom-popup-bottom">
+        <template #trigger>
+          <div class="popup-trigger-area">
+          </div>
+        </template>
+        <template #content>
+          kkkkkkkkk
+        </template>
+      </HoverPopup>
+
     </div>
     <input v-model="searchQuery" type="text" placeholder="Find your course by skill,topic,or instructor"
       :style="headerSearchInputStyle" @keyup.enter="Search">
@@ -28,7 +29,22 @@
         </svg>
       </div>
     </button>
-    <button :style="headerButtonStyle">Teach on Here</button>
+
+    <button v-if="userId.length!=0" :style="headerButtonStyle" @click="goToLearning">
+      我的学习
+    </button>
+    <button v-if="userId.length != 0" @click="goToWishlist">
+     
+        <div class="icon">
+        <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
+          <use href="#line-md--heart-filled" />
+        </svg>
+      </div>
+     
+      
+    </button>
+
+    <div :style="headerSpaceStyle" v-if="userId.length == 0"></div>
     <button @click="goToCart">
       <div class="icon">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
@@ -36,10 +52,22 @@
         </svg>
       </div>
     </button>
+    <button v-if="userId.length != 0">
+      <div class="icon">
+        <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
+          <use href="#mdi--bell-outline" />
+        </svg>
+      </div>
+    </button>
 
-    <button :style="headerButtonStyle" @click="goToLogin"> Login</button>
-    <button :style="headerButtonStyle" @click="goToSignup">Sign up</button>
-    <button style="padding-inline:0% ;">
+
+    <button v-if="userId.length == 0" :style="headerButtonStyle" @click="goToLogin">Login</button>
+
+    <div v-if="userId.length != 0" :style="headerButtonStyle">
+      <img src="/src/images/userPic.png" alt="" @click="goToMyInfo">
+    </div>
+
+    <button style="padding-inline:0% ;" v-if="userId.length == 0">
       <div class="icon">
         <svg width="50" height="50" viewBox="-1.3 -1 8 8" fill="#35495e">
           <use href="#mdi--web" />
@@ -49,20 +77,21 @@
 
   </div>
 
-
 </template>
 
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import { ref, computed } from 'vue'
+import IconSprite from '../Icon/IconSprite.vue';
 import HoverPopup from './HoverPopup.vue';
 import './header.css'
-import { searchQuery, Search, goToCart, goToIndex, goToSignup, goToLogin } from './header.ts';
+import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin,goToLearning,goToCourse} from './header.ts';
 
 const exploreHoverFlag = ref(false)
+const userId=ref('ll')
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
-const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 200));
+const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 300));
 const headerButtonPadding = computed(() => {
   const calculatedValue = (width.value - 800) / 1700;
   return Math.min(3, Math.max(1, calculatedValue)); 
@@ -82,7 +111,12 @@ const headerButtonStyle = computed(() => ({
      transition: 'none'
 }));
 
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
+const goToWishlist = () => {
+  router.push('/learning/wishlist');
+};
 
 </script>
 
@@ -136,5 +170,10 @@ button .icon {
   top: 0%;
   display: block;
   width: 105px;
+}
+
+img{
+  height: 50px;
+  cursor: pointer;
 }
 </style>

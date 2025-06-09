@@ -36,7 +36,7 @@
 
 <script setup>
 import { ref,onMounted } from 'vue';
-
+import { goToCart } from '@/components/common/header';
 import { useWindowSize } from '@/useWindowSize'
 
 const { width, height } = useWindowSize()
@@ -118,6 +118,11 @@ const floatingBoxStyle = () => ({
   padding: 20px;
   box-sizing: border-box;
   z-index: 100;
+}
+
+.floating-box img{
+  width: 100%;
+  height: 140px;
 }
 
 .price-section {

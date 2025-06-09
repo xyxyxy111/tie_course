@@ -7,6 +7,58 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import MoblieHeader from '@/components/common/MoblieHeader.vue'
 import MoblieBottom from '@/components/common/MobileBottom.vue';
 import '../order.css'
+import { OrderItem } from '@/types/types';
+
+interface Course {
+  id: number;
+  image: string;
+  title: string;
+  price: number;
+}
+
+interface CartData {
+  courses: Course[];
+  total: number;
+  userId: string;
+}
+
+// 响应式数据
+const orderList = ref<Course[]>([]);
+const totalPrice = ref(0);
+const courseCount = ref(0);
+
+onMounted(() => {
+  try {
+    // 1. 从localStorage获取数据
+    const rawData = localStorage.getItem('tempCartData');
+
+    // 2. 检查数据是否存在
+    if (!rawData) {
+      throw new Error('购物车数据不存在');
+    }
+
+    // 3. 解析数据
+    const cartData: CartData = JSON.parse(rawData);
+
+    // 4. 验证数据格式
+    if (!cartData.courses || !Array.isArray(cartData.courses)) {
+      throw new Error('购物车数据格式错误');
+    }
+
+    // 5. 赋值给响应式变量
+    orderList.value = cartData.courses;
+    totalPrice.value = cartData.total;
+    courseCount.value = cartData.courses.length;
+
+    // 6. 清除临时存储（可选）
+    localStorage.removeItem('tempCartData');
+
+  } catch (error) {
+    console.error('加载购物车数据失败:', error);
+    // 7. 出错时重定向回购物车页
+    window.location.href = '/cart.html';
+  }
+});
 
 </script>
 
@@ -15,56 +67,36 @@ import '../order.css'
   <IconSprite />
 
   <div class="payment-container">
-    <h1>付款</h1>
+
 
     <!-- 付款方式部分 -->
     <div class="section">
+
       <h2>付款方式</h2>
 
-      <div class="payment-methods">
-        <div class="payment-method">
-          <input type="radio" id="credit-card" name="payment" checked>
-          <label for="credit-card">银行卡</label>
-          <div class="card-types">
-            <span class="card-type visa">VISA</span>
-            <!-- 可以添加其他卡类型 -->
-          </div>
-          <div class="secure-notice">安全日加密</div>
-        </div>
-
-        <div class="payment-method">
-          <input type="radio" id="paypal" name="payment">
-          <label for="paypal">PayPal</label>
-        </div>
+      <div class="payment-method">
+        <input type="radio" id="paypal" name="payment">
+        <label for="Alipay">支付宝</label>
       </div>
 
-
-      <!-- 订单详情 -->
       <div class="order-summary">
-        <h3>订单详细信息 (9 个课程)</h3>
+        <h3>订单详细信息 ( {{ orderList.length }} 个课程)</h3>
         <ul class="course-list">
-          <li class="course-item">
-            <span>来杯Java吧! 2025 Java 入門到精通课程</span>
-            <span class="price">US$69.99</span>
+          <li v-for="(course, index) in orderList" class="course-item">
+            <img :src="course.image" alt="">
+            <span class="title">{{ course.title }}</span>
+            <span class="price">{{ course.price }}</span>
           </li>
-          <li class="course-item">
-            <span>2025 Python全攻略</span>
-            <span class="price">US$74.99</span>
-          </li>
-          <li class="course-item">
-            <span>ChatGPT：释放 AI 生产力的无限潜能</span>
-            <span class="price">US$74.99</span>
-          </li>
-          <!-- 其他课程项 -->
         </ul>
 
-        <div class="total-section">
-          <button class="pay-button">支付 US$524.91</button>
-        </div>
 
       </div>
     </div>
+    <div class="total-section">
+      <button class="pay-button">支付 US$524.91</button>
+    </div>
   </div>
+
 
 
 </template>
@@ -78,33 +110,6 @@ import '../order.css'
   font-family: Arial, sans-serif;
 }
 
-
-h1,
-h2,
-h3,
-h4 {
-  color: #2d2f31;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.tax-notice {
-  color: #6a6f73;
-  font-size: 14px;
-}
-
-.payment-methods {
-  margin-bottom: 20px;
-}
-
 .payment-method {
   padding: 15px;
   border: 1px solid #d1d7dc;
@@ -116,21 +121,6 @@ label {
 .payment-method.active {
   border-color: rgb(22, 92, 145);
   ToCartground-color: rgba(22, 92, 145, 0.1);
-}
-
-
-.secure-notice {
-  color: #6a6f73;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.form-check {
-  margin-top: 15px;
-}
-
-.form-check-label {
-  margin-left: 5px;
 }
 
 .order-summary {
@@ -162,7 +152,7 @@ label {
 }
 
 .pay-button {
-  ToCartground-color: rgb(22, 92, 145);
+  background-color: rgb(22, 92, 145);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -173,13 +163,6 @@ label {
 }
 
 .pay-button:hover {
-  ToCartground-color: rgba(22, 92, 145, 0.8);
-}
-
-.refund-policy {
-  margin-top: 20px;
-  padding: 15px;
-  ToCartground-color: #f7f9fa;
-  border-radius: 4px;
+  background-color: rgba(22, 92, 145, 0.8);
 }
 </style>

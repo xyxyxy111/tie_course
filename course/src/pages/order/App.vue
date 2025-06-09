@@ -69,16 +69,21 @@ const headerSpaceStyle = computed(() => ({
 
 .icon {
   color: rgb(22, 92, 145);
-  ToCartground-color: transparent;
+  background-color: transparent;
   border-radius: 25px;
 }
 
 .close-order-btn{
   border: none;
-margin-left: auto;
-  ToCartground-color: white;
+  margin-left: auto;
+  background-color: white;
   padding-top: 8px;
   margin-right: 20px;
+  border-radius: 8px;
+}
+
+.close-order-btn:hover{
+  background-color: rgb(22, 92, 145,0.1);
 }
 
 </style>

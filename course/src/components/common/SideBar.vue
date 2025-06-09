@@ -15,7 +15,7 @@
       <div class="sidebar-body">
         <ul class="sidebar-content">
           <li><button @click="goToLogin">Log in</button></li>
-          <li><button @click="goToSignup">Sign up</button></li>
+         
         </ul>
 
 
