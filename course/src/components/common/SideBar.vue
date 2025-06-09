@@ -208,21 +208,3 @@ watch(() => props.isOpen, (open) => {
   opacity: 0;
 }
 </style>
-
-<!-- 
-
-/* 侧边栏菜单项样式 */
-.sidebar-body {
-  padding: 15px;
-}
-
-
-.help-button {
-  width: 100%;
-  padding: 10px;
-  background-color: rgb(22, 92, 145);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-} -->

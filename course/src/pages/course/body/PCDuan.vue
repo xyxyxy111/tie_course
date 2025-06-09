@@ -9,7 +9,6 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize';
 import FloatingBox from '../components/FloatingBox.vue';
-import Tooltip from '@/components/common/Tooltip.vue';
 const { width, height } = useWindowSize()
 
 import { otherThemes,courseCurriculums,Comments}from '../components/content.ts'

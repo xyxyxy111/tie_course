@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { RouterView, RouterLink} from 'vue-router';
-import { toRef,ref,onMounted , watch,defineComponent} from 'vue';
+import { RouterView, RouterLink } from 'vue-router';
+import { toRef, ref, onMounted, watch, defineComponent } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
-import { useFilterStore } from '../components/filterStore'
+import { useFilterStore } from '../../../stores/filter'
 import MoblieHeader from '@/components/common/MoblieHeader.vue';
 import MobileBottom from '@/components/common/MobileBottom.vue';
 import '../search.css'
@@ -118,7 +118,7 @@ const handleBackdropClick = () => {
       </transition>
 
       <transition name="slide-right">
-        <aside v-if="showFilter" class="sidebar-panel" :style="{ width:'180px' }">
+        <aside v-if="showFilter" class="sidebar-panel" :style="{ width: '180px' }">
           <Filter @close="showFilter = false" />
         </aside>
       </transition>
@@ -128,7 +128,7 @@ const handleBackdropClick = () => {
 
 </template>
 <style scoped>
-.search-result-container{
+.search-result-container {
   margin: 0 auto;
 }
 
@@ -136,7 +136,7 @@ const handleBackdropClick = () => {
   min-width: fit-content;
   white-space: nowrap;
 }
- 
+
 
 .search-result-container .content {
   width: 100%;

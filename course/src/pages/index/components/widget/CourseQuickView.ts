@@ -1,12 +1,19 @@
-
-export class CourseQuickView {
+import { Course } from '@/types/types.ts';
+export class CourseQuickView extends Course{
   hoverFlag: boolean = false;
-
-  constructor(public title: string, public text: string,
-    public imgpath: string, public targetURL: string,
-    price: number // 参数不直接声明为public
+  
+  constructor(
+    public coverImgUrl : string,
+    public title: string,
+    public score: number,
+    public originalPrice: number,
+    public upDateTime: Date,
+    public totalMinutes:number,
+    public description: string,
+    public whatYouWillLearn: string
   ) {
-    this.price = parseFloat(price.toFixed(2)); // 强制保留2位小数
+    super();
+    // this.price = parseFloat(price.toFixed(2)); 
   }
 
   mouseEnter() {

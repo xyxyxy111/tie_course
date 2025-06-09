@@ -29,6 +29,8 @@ const ImgStyle = () => ({
     : 'none',
 })
 
+const sendMsgBtnText = ref('发送验证码')
+
 </script>
 
 <!-- html -->
@@ -45,17 +47,21 @@ const ImgStyle = () => ({
         <h1>Log in to continue your learning journey</h1>
         <form @submit.prevent="login">
           <div class="input-group">
-            <input placeholder="Email">
+            <input placeholder="电话号码" class="phone-number">
+            <input type="text" placeholder="验证码" class="captcha">
+            <button class="send-msg">
+              {{ sendMsgBtnText }}
+            </button>
           </div>
           <button type="submit">
             <div class="icon">
               <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
                 <use href="#ic--outline-email" />
-              </svg> Continue with email
+              </svg>登录
             </div>
           </button>
         </form>
-        <div class="signup-link">Don't have an account? <a href="/signup.html">Sign up</a></div>
+        <div class="signup-link">没有账号?  <a href="/signup.html">注册</a></div>
       </div>
     </div>
   </div>

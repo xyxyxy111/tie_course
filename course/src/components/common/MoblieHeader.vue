@@ -1,4 +1,4 @@
-<template>{{ width }}
+<template>
   <div class="header" :style="headerStyle">
     <button id="sideMenu" @click="showSidebar = true">
       <div class="icon">

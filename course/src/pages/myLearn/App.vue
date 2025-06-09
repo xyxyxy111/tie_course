@@ -1,0 +1,97 @@
+<script lang="ts" setup name="App">
+import { RouterView, RouterLink } from 'vue-router';
+import { toRef, ref, onMounted } from 'vue';
+import { defineComponent } from 'vue';
+import PCHeader from '@/components/common/PCHeader.vue'
+import MobileHeader from '@/components/common/MoblieHeader.vue'
+import { useWindowSize } from '@/useWindowSize'
+
+const { width, height } = useWindowSize()
+
+</script>
+
+<!-- html -->
+<template>
+
+  <main>
+    <PCHeader v-if="width > 800" />
+    <MobileHeader v-else />
+
+    <div class="my-learning-container">
+      <!-- 导航栏 -->
+      <h1>我的学习</h1>
+      <nav class="learning-nav">
+        <router-link to="/learning/all-courses" class="nav-link"
+          :class="{ active: $route.path.includes('all-courses') }">
+          所有课程
+        </router-link>
+        <router-link to="/learning/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
+          我的列表
+        </router-link>
+        <router-link to="/learning/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
+          心愿单
+        </router-link>
+        <router-link to="/learning/archived" class="nav-link" :class="{ active: $route.path.includes('archived') }">
+          已存档
+        </router-link>
+      </nav>
+
+
+    </div>
+    <!-- 内容区域 -->
+    <div class="learning-content">
+      <router-view />
+    </div>
+
+  </main>
+
+</template>
+
+<!-- css -->
+<style scoped>
+.my-learning-container {
+  max-width: 1200px;
+  position: relative;
+  top: -30px;
+  margin: 0 auto;
+  background-color: rgb(4, 35, 58);
+  font-family: '宋体';
+}
+
+.my-learning-container h1 {
+  color: white;
+  padding: 30px 40px;
+  font-weight: bolder;
+  font-size: 40px;
+}
+
+.learning-nav {
+  position: relative;
+  bottom: 15px;
+}
+
+.nav-link {
+  padding: 20px 20px 13px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  margin-inline: 5px;
+  transition: all 0.3s;
+}
+
+.nav-link.active {
+  color: white;
+  padding: 20px 43px 13px;
+  ;
+  margin-inline: 15px;
+  font-weight: bold;
+  border-bottom: 8px solid white;
+}
+
+.nav-link:hover {}
+
+.learning-content{
+  max-width: 1200px;
+  margin: 0 auto;
+}
+</style>

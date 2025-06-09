@@ -71,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useFilterStore } from './filterStore';
+import { useFilterStore } from '../../../stores/filter';
 
 const filterStore = useFilterStore()
 
@@ -81,7 +81,7 @@ const filterStore = useFilterStore()
 
 <style scoped>
 .sidebar-body {
-  width:180px;
+  width: 180px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;

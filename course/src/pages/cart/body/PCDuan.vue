@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { RouterView, RouterLink } from 'vue-router';
 import { toRef, ref, onMounted, computed } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
@@ -8,16 +7,28 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize';
 import '../cart.css';
-import Tooltip from '@/components/common/Tooltip.vue';
 const { width, height } = useWindowSize()
-
 
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 
 const headerSpaceStyle = computed(() => ({
   padding: `calc(3vw * ${headerSpaceWidth.value})`
 }));
+function goToCheckout() {
+  // 提取原始数据，不要直接使用响应式对象
+  const cartData = {
+    courses: courses.value.map(course => ({
+      image: course.image,
+      title: course.title,
+      price: course.price
+    })),
+    total: totalPrice.value, // 获取计算属性的值
+    userId: 'user123'
+  };
 
+  localStorage.setItem('tempCartData', JSON.stringify(cartData));
+  window.location.href = '/checkout.html';
+}
 
 const courses = ref([
   {
@@ -39,10 +50,6 @@ const courses = ref([
 const totalPrice = computed(() =>
   courses.value.reduce((sum, course) => sum + course.price, 0)
 )
-
-const checkout = () => {
-  console.log('Proceeding to checkout')
-}
 
 const CourseInstructorStyle = () => ({})
 
@@ -73,7 +80,6 @@ const CourseIncartStyle = () => ({
             <td>
               <div class="course-incart" :style="CourseIncartStyle()">
                 <h2 :style="CourseTitleStyle()">{{ course.title }}</h2>
-                <p :style="CourseInstructorStyle()" v-if="width >= 1200">By {{ course.instructor }}</p>
               </div>
             </td>
             <!-- 宽度<1200 -->
@@ -110,7 +116,7 @@ const CourseIncartStyle = () => ({
         <div class="checkout-summary">
           <div class="total-label">Total:</div>
           <div id="totalPrice"> ${{ totalPrice }}</div>
-          <button @click="checkout">Proceed to checkout →</button>
+          <button @click="goToCheckout()">Proceed to checkout →</button>
         </div>
       </div>
     </div>

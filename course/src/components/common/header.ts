@@ -24,3 +24,8 @@ export const goToSignup = () => {
 export const goToLogin = () => {
   window.location.href = "/login.html";
 };
+
+
+export const goToCourse = () => {
+  window.location.href = "/course.html";
+};

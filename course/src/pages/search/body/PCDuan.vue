@@ -3,7 +3,7 @@ import { toRef, ref, onMounted, watch, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
-import { useFilterStore } from '../components/filterStore'
+import { useFilterStore } from '../../../stores/filter'
 import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize';

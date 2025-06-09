@@ -34,40 +34,50 @@
   transition: all 0.3s ease;
 }
 
-.project button {
+.course button {
   position: relative;
   justify-content: center;
-  display: flex;
-  width: 80%;
-  min-width: fit-content;
+  display: inline-flex;
+  min-width: 32px;
   margin: 0 auto;
-  padding: 4px 24px;
   background-color: rgb(22, 92, 145);
   color: white;
-  font-weight: 500;
+  font-weight: 400;
   border: none;
-  transition: all 0.5s ease;
+  transition: all 0.4s ease;
   border-radius: 25px;
   text-decoration: none;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   border: 0;
   cursor: pointer;
   font-family: 微软雅黑;
-  font-weight: bolder;
 }
 
-.navigate button:hover,.project button:hover {
-  
+.navigate button:hover {
+  color: rgb(22, 92, 145);
+  box-shadow: 0 4px 4px rgb(22, 92, 145, 0.1);
+  background-color: rgba(128, 128, 128, 0.5);
+}
+
+.course button:hover {
+  background-color: rgb(255, 255, 255);
   color: rgb(22, 92, 145);
   box-shadow: 0 4px 4px rgb(22, 92, 145, 0.1);
 }
 
-.navigate button:hover{
-  background-color: rgba(128, 128, 128, 0.5);
+.course img {
+  position: relative;
+  box-shadow: 0 0 10px rgba(22, 92, 145, 0.3);
+  transition: all 0.5s ease;
+  margin: 0 auto;
+  width: 100%;
+  height: 50%;
+  border-radius: 18px 18px 0px 0px;
+  transition: all 0.3s;
 }
 
-.project button:hover{
-  background-color: rgb(255, 255, 255);
+.course:hover img {
+  opacity: 0.5;
 }
 
 .content {
@@ -76,27 +86,24 @@
   border: none;
 }
 
-.title{
+.custom-popup-right {
+  width: fit-content;
+  z-index: 100;
+  border-radius: 30px;
+  width: 100%;
+  height: 20%;
+}
+
+.title {
   margin-bottom: 20px;
 }
 
 .course,
-.project,
 .comment {
   display: inline-block;
   overflow: hidden;
   border: rgba(22, 92, 145, 0.1) 2px solid;
   border-radius: 20px;
-}
-
-.course .course-title {
-  height: 30px;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.course:hover {
-  background-color: rgba(22, 92, 145, 0.03);
 }
 
 .icon-demo {
@@ -133,6 +140,127 @@
   color: rgb(22, 92, 145);
 }
 
+.shopping-cart-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.added-notification {
+  display:flex;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.added-notification img {
+  width: 30%;
+  margin-top:3px ;
+  height: fit-content;
+}
+
+.product-info{
+  width: 45%;
+  font-size: 12px;
+  text-align: left;
+  margin: 5px;
+}
+
+.shopping-cart-container button,.topic-tag {
+  width: fit-content;
+  background-color: rgb(22, 92, 145);
+  color: white;
+  border: none;
+  padding: 2px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 30px;
+  font-size: 12px;
+  transition: all 0.3s;
+}
+
+.shopping-cart-container button:hover,.topic-tag:hover {
+  background-color:white;
+  color: rgb(22, 92, 145);
+}
+
+.recommendations {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.recommendations img{
+  width: 45%;
+}
+
+.recommendationItem-detail{
+  margin-left: 10px;
+}
+
+.shopping-cart-container h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.recommendation-list {
+  display:block;
+  margin-bottom: 5px;
+}
+
+.product-card {
+  height: 100px;
+  display: flex;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid rgba(22, 92, 145,0.2);
+  border-radius: 8px;
+  
+}
+
+.product-card h3 {
+  display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  height: 45px;
+  font-size: 16px;
+}
+
+.rating {
+  color: #6c757d;
+}
+
+.stars {
+  color: #ffc107;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 12px;
+  color: #dc3545;
+}
+
+.total-section {
+  display: flex;
+  text-align: right;
+}
+
+.total-price {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.add-all-btn {
+  position: absolute;
+ right: 30px;
+}
+
+.topic-tag {
+ margin: 10px;
+}
+
+
 .container-scroll-x {
   overflow-x: auto;
   overflow-y: hidden;
@@ -143,12 +271,13 @@
 
 .container-scroll-y {
   overflow-y: auto;
-overflow-x: hidden;
-scrollbar-color: white;
+  overflow-x: hidden;
+  scrollbar-color: white;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.container-scroll-x::-webkit-scrollbar,.container-scroll-y::-webkit-scrollbar{
+.container-scroll-x::-webkit-scrollbar,
+.container-scroll-y::-webkit-scrollbar {
   display: none;
 }

@@ -1,16 +1,30 @@
 <script lang="ts" setup>
-import { RouterView, RouterLink } from 'vue-router';
 import { toRef, ref, onMounted, computed } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize';
-import Tooltip from '@/components/common/Tooltip.vue';
 import MoblieHeader from '@/components/common/MoblieHeader.vue';
 import MobileBottom from '@/components/common/MobileBottom.vue';
 import '../cart.css';
 const { width, height } = useWindowSize()
 
+
+function goToCheckout() {
+  // 提取原始数据，不要直接使用响应式对象
+  const cartData = {
+    courses: courses.value.map(course => ({
+      image: course.image,
+      title: course.title,
+      price: course.price
+    })),
+    total: totalPrice.value, // 获取计算属性的值
+    userId: 'user123'
+  };
+
+  localStorage.setItem('tempCartData', JSON.stringify(cartData));
+  window.location.href = '/checkout.html';
+}
 
 const courses = ref([
   {
@@ -52,7 +66,6 @@ const checkout = () => {
             <img :src="course.image" alt="">
             <div>
               <h3 class="course-title">{{ course.title }}</h3>
-              <p v-if="width>500">By {{ course.instructor }}</p>
             </div>
             <div>
               <div class="course-price">${{ course.price }}</div>
@@ -67,12 +80,11 @@ const checkout = () => {
 
         </div>
 
-        <!-- 结算区域现在会在下方显示 -->
         <div class="checkout-section">
           <div class="checkout-summary">
             <div>Total:</div>
             <div id="totalPrice">${{ totalPrice }}</div>
-            <button @click="checkout">Proceed to checkout →</button>
+            <button @click="goToCheckout()">Proceed to checkout →</button>
           </div>
         </div>
       </div>
