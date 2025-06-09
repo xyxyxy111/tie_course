@@ -35,19 +35,3 @@ const { width, height } = useWindowSize()
 }
 
 </style>
-
-<!--
-改变透明度
-img {
- 
-}
-坐标在1秒内逐渐增大
-img {
-  transform: translateX(0);
-  transition: transform 1s ease;
-}
-
-img:hover {
-  transform: translateX(100px); /* 向右移动100像素 */
-}
--->

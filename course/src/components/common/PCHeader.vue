@@ -4,6 +4,21 @@
     <div :style="headerSpaceStyle"></div>
     <div id="logo" :style="headerButtonStyle" @click="goToIndex">Course</div>
     <div :style="headerSpaceStyle"></div>
+    <div class="explore">
+      <button :style="headerButtonStyle" @mouseenter="exploreHoverFlag = true" @mouseleave="exploreHoverFlag= false"
+        class="explore-button">Explore
+        <HoverPopup v-model="exploreHoverFlag" width="270px" height="340px" transition="slide" :show-delay="200"
+          position="bottom" :hide-delay="300" class="custom-popup-bottom">
+          <template #trigger>
+            <div class="popup-trigger-area">
+            </div>
+          </template>
+          <template #content>
+            kkkkkkkkk
+          </template>
+        </HoverPopup>
+      </button>
+    </div>
     <input v-model="searchQuery" type="text" placeholder="Find your course by skill,topic,or instructor"
       :style="headerSearchInputStyle" @keyup.enter="Search">
     <button style="margin-inline: 0;">
@@ -13,14 +28,13 @@
         </svg>
       </div>
     </button>
-    <button :style="headerButtonStyle">Business</button>
     <button :style="headerButtonStyle">Teach on Here</button>
     <button @click="goToCart">
-        <div class="icon">
-          <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
-            <use href="#mdi--cart-outline" />
-          </svg>
-        </div>
+      <div class="icon">
+        <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
+          <use href="#mdi--cart-outline" />
+        </svg>
+      </div>
     </button>
 
     <button :style="headerButtonStyle" @click="goToLogin"> Login</button>
@@ -41,10 +55,11 @@
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import { ref, computed } from 'vue'
+import HoverPopup from './HoverPopup.vue';
 import './header.css'
 import { searchQuery, Search, goToCart, goToIndex, goToSignup, goToLogin } from './header.ts';
 
-
+const exploreHoverFlag = ref(false)
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 200));
@@ -68,12 +83,13 @@ const headerButtonStyle = computed(() => ({
 }));
 
 
+
 </script>
 
 
 <style>
 .header {
-  overflow: hidden;
+  overflow: visible;
   margin-bottom: 30px;
   height: 80px;
   min-width: 1000px;
@@ -92,7 +108,7 @@ input {
 }
 
 button {
-  height: 100%;
+  height: 50px;
   font-size: 16px;
   width: 4%;
   font-weight: 600;
@@ -105,5 +121,20 @@ button .icon {
   justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.explore{
+  height: 50px;
+ display: block;
+ justify-items: center;
+  width: 155px;
+  line-height: 0px;
+}
+
+.explore-button{
+  position: relative;
+  top: 0%;
+  display: block;
+  width: 105px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-
+<!-- 
   <div id="desktop2-bottom">
     <hr>
     <div :style="headerSpaceStyle()"></div>
@@ -26,7 +26,7 @@
     </div>
     <hr>
 
-  </div>
+  </div> -->
 
 
 </template>

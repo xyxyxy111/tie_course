@@ -52,9 +52,6 @@ function toComment() {
 
 }
 
-
-
-// 
 const showCart = ref(false);
 const cartTitle = ref('')
 
@@ -63,6 +60,8 @@ function addToCart(course: string) {
   showCart.value = true;
   console.log(cartTitle.value + "" + showCart.value)
 }
+
+
 
 
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import '../video.css'
+import '../course.css'
 import { RouterView, RouterLink } from 'vue-router';
 import { computed, toRef, ref, onMounted } from 'vue';
 import { defineComponent } from 'vue'

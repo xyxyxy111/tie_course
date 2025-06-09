@@ -1,5 +1,5 @@
 <template>
-  
+<!--   
   <div id="desktop-bottom">
   <div :style="bottomSpaceStyle()"></div>
   
@@ -24,7 +24,7 @@
   
  
   </div>
-
+ -->
 
 </template>
 

@@ -8,7 +8,7 @@
     </router-link>
 
     <router-link to="/my-info/profile/photo" class="nav-link" active-class="active">
-      照片
+      个人资料照片
     </router-link>
 
     <router-link to="/my-info/profile/privacy" class="nav-link" active-class="active">
