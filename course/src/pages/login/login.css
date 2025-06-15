@@ -9,6 +9,7 @@
 
 .login-container h1 {
   font-weight: 500;
+  margin-bottom: 40px;
 }
 
 .login-container h2 {
@@ -21,13 +22,14 @@
   flex: 1;
   width: 50%;
   max-width: 600px;
+  min-width: 360px;
   padding: 20px;
-  margin: auto;
+  margin: 0 auto;
 }
 
 .login-container input {
   margin: 10px 0px;
-  width: 360px;
+  width: 100%;
   padding: 5px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -36,14 +38,14 @@
 
 
 .login-container .captcha {
-  width: 260px;
+  width: calc(100% - 100px);
   border-radius: 10px 0px 0px 10px;
 }
 
 .login-container button {
-  width: 360px;
+  width: 100%;
   padding: 10px;
-  margin: 5px 0;
+  margin: 15px 0;
   border: none;
   line-height: 20px;
   height: 50px;
@@ -82,4 +84,26 @@
 
 .login-container svg {
   margin: 0px 10px;
+}
+
+
+.error-message {
+  color: #ff4d4f;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: #fff2f0;
+  border-radius: 4px;
+}
+
+.success-message {
+  color: #52c41a;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: #f6ffed;
+  border-radius: 4px;
+}
+
+.login-btn:disabled {
+  background: #d9d9d9;
+  cursor: not-allowed;
 }

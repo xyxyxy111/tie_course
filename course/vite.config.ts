@@ -52,7 +52,6 @@ export default defineConfig({
         index: resolve(__dirname, 'public/index.html'),
         cart: resolve(__dirname, 'public/cart.html'),
         login: resolve(__dirname, 'public/login.html'),
-        signup: resolve(__dirname, 'public/signup.html'),
         search: resolve(__dirname, 'public/search.html'),
         course: resolve(__dirname, 'public/course.html'),
         video: resolve(__dirname, 'public/video.html'),

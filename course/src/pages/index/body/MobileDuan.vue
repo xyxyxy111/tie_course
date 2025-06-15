@@ -3,14 +3,13 @@ import '../index.css';
 import { toRef, ref, onMounted, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
-import { NavigationButton } from '../components/widget/NavigateButton';
 import { useWindowSize } from '@/useWindowSize';
 import MoblieHeader from '@/components/common/MoblieHeader.vue';
 import MobileBottom from '@/components/common/MobileBottom.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import {
-  courseTitles,
+  courseTitles, NavigationButton,
   courseQuickViews, communityVoices,
   recommendedProducts, relatedTopics
 } from '../components/content.ts';
@@ -378,19 +377,3 @@ function addToCart(course: string) {
 }
 
 </style>
-
-
-<!-- 
-/* Course Card Container */
-
-
-/* Slide Transition */
-.slide-enter-active, .slide-leave-active {
-  transition: all 0.3s ease;
-}
-.slide-enter-from, .slide-leave-to {
-  opacity: 0;
-  transform: translateX(10px);
-}
-
--->

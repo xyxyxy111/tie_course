@@ -1,73 +1,42 @@
 <script lang="ts" setup>
-import { toRef, ref, onMounted, computed } from 'vue';
-import { defineComponent } from 'vue'
-import IconSprite from '@/components/Icon/IconSprite.vue'
-import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize';
-import MoblieHeader from '@/components/common/MoblieHeader.vue';
-import MobileBottom from '@/components/common/MobileBottom.vue';
+import { ref, computed } from 'vue';
+import IconSprite from '@/components/Icon/IconSprite.vue';
+import PCHeader from '@/components/common/PCHeader.vue';
+import PCBottom from '@/components/common/PCBottom.vue';
+import { useCartLogic } from '../components/content';
 import '../cart.css';
-const { width, height } = useWindowSize()
 
+const { width } = useWindowSize();
+const { courses, totalPrice, goToCheckout } = useCartLogic();
 
-function goToCheckout() {
-  // 提取原始数据，不要直接使用响应式对象
-  const cartData = {
-    courses: courses.value.map(course => ({
-      image: course.image,
-      title: course.title,
-      price: course.price
-    })),
-    total: totalPrice.value, // 获取计算属性的值
-    userId: 'user123'
-  };
+const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
+const headerSpaceStyle = computed(() => ({
+  padding: `calc(3vw * ${headerSpaceWidth.value})`
+}));
 
-  localStorage.setItem('tempCartData', JSON.stringify(cartData));
-  window.location.href = '/checkout.html';
-}
-
-const courses = ref([
-  {
-    id: 1,
-    image: '/src/images/image1.png',
-    title: 'Ultimate AWS Certified Solutions Architect Associate 2025',
-    instructor: 'Shizhane Muresi',
-    price: 109.99
-  },
-  {
-    id: 2,
-    image: '/src/images/image2.png',
-    title: 'The Complete AI Guide: Learn ChatGPT, Generative AI & More',
-    instructor: 'Julian Melancon',
-    price: 79.99
-  }
-])
-
-const totalPrice = computed(() =>
-  courses.value.reduce((sum, course) => sum + course.price, 0)
-)
-
-const checkout = () => {
-  console.log('Proceeding to checkout')
-}
-
+const CourseInstructorStyle = () => ({});
+const CourseTitleStyle = () => ({});
+const CourseIncartStyle = () => ({});
 </script>
 
 <template>
   <IconSprite />
-  <MoblieHeader />
-  <div>
-    <div class="shopping-cart-container">
-      <div class="title">Shopping Cart</div>
-      <div class="content">
-        <div class="course-list">
-          <h1>{{ courses.length }} Courses in Cart</h1>
-          <div v-for="course in courses" :key="course.id" class="course-item">
-            <img :src="course.image" alt="">
-            <div>
-              <h3 class="course-title">{{ course.title }}</h3>
-            </div>
-            <div>
+  <PCHeader />
+  <div class="shopping-cart-container" :style="headerSpaceStyle">
+    <div class="title">Shopping Cart</div>
+    <div class="content">
+      <div class="course-list">
+        <h1>{{ courses.length }} Courses in Cart</h1>
+        <table>
+          <tr v-for="course in courses" :key="course.id" class="course-item">
+            <td><img :src="course.image" alt=""></td>
+            <td>
+              <div class="course-incart" :style="CourseIncartStyle()">
+                <h2 :style="CourseTitleStyle()">{{ course.title }}</h2>
+              </div>
+            </td>
+            <td v-if="width < 1200">
               <div class="course-price">${{ course.price }}</div>
               <div>
                 <button class="cart-buttons">Remove</button>
@@ -75,22 +44,32 @@ const checkout = () => {
               <div>
                 <button class="cart-buttons">Save for Later</button>
               </div>
-            </div>
-          </div>
+            </td>
+            <td v-if="width >= 1200">
+              <div>
+                <button class="cart-buttons">Remove</button>
+              </div>
+              <div>
+                <button class="cart-buttons">Save for Later</button>
+              </div>
+            </td>
+            <td v-if="width >= 1200" class="course-price">
+              <div>${{ course.price }}</div>
+            </td>
+          </tr>
+        </table>
+      </div>
 
-        </div>
-
-        <div class="checkout-section">
-          <div class="checkout-summary">
-            <div>Total:</div>
-            <div id="totalPrice">${{ totalPrice }}</div>
-            <button @click="goToCheckout()">Proceed to checkout →</button>
-          </div>
+      <div class="checkout-section">
+        <div class="checkout-summary">
+          <div class="total-label">Total:</div>
+          <div id="totalPrice"> ${{ totalPrice }}</div>
+          <button @click="goToCheckout">Proceed to checkout →</button>
         </div>
       </div>
     </div>
   </div>
-  <MobileBottom />
+  <PCBottom />
 </template>
 
 <style scoped>

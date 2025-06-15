@@ -1,9 +1,51 @@
-
-import { NavigationButton } from '../components/widget/NavigateButton';
-
-import { CourseQuickView } from './widget/CourseQuickView';
+import { Course } from "@/types/types.ts";
 import { toRef, ref, onMounted, defineComponent } from 'vue';
-import { CommunityVoice } from '../components/widget/CommunityVoices';
+
+class NavigationButton {
+  activeFlag: boolean = false;
+  hoverFlag: boolean = false;
+
+  constructor(public text: string) { }
+
+  mouseEnter() {
+    this.hoverFlag = true;
+  }
+
+  mouseLeave() {
+    this.hoverFlag = false;
+  }
+}
+class CourseQuickView extends Course {
+  hoverFlag: boolean = false;
+
+  constructor(
+    public coverImgUrl: string,
+    public title: string,
+    public score: number,
+    public originalPrice: number,
+    public upDateTime: Date,
+    public totalMinutes: number,
+    public description: string,
+    public whatYouWillLearn: string
+  ) {
+    super();
+    // this.price = parseFloat(price.toFixed(2)); 
+  }
+
+  mouseEnter() {
+    this.hoverFlag = true;
+  } mouseLeave() {
+    this.hoverFlag = false;
+  }
+}
+
+class CommunityVoice {
+  constructor(
+    public comment: string,
+    public user: string,
+    public userPictrue: string,
+    public course: string) { }
+}
 
 const courseTitles = ref<NavigationButton[]>([
   new NavigationButton('JavaScript'),
@@ -192,7 +234,7 @@ const relatedTopics = [
 
 
 export {
-courseTitles,
+  courseTitles, NavigationButton,
   courseQuickViews, communityVoices,
-recommendedProducts,relatedTopics
+  recommendedProducts, relatedTopics
 }

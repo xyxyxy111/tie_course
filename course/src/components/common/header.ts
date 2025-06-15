@@ -11,12 +11,14 @@ export const goToCart = () => {
   window.location.href = "/cart.html";
 };
 
-export const goToIndex = () => {
-  window.location.href = "/index.html";
-};
+export const goToIndex = (userId?: string | null) => {
+  const url = new URL('/index.html', window.location.origin);
 
-export const goToSignup = () => {
-  window.location.href = "/signup.html";
+  if (userId !== undefined && userId !== null && userId !== '') {
+    url.searchParams.set('userId', encodeURIComponent(userId.toString()));
+  }
+
+  window.location.href = url.toString();
 };
 
 export const goToLogin = () => {
@@ -33,6 +35,12 @@ export const goToLearning = () => {
 };
 
 
-export const goToMyInfo = () => {
-  window.location.href = "/my-info.html";
+export const goToMyInfo = (userId?: string | null) => {
+  const url = new URL('/my-info.html', window.location.origin);
+
+  if (userId !== undefined && userId !== null && userId !== '') {
+    url.searchParams.set('userId', encodeURIComponent(userId.toString()));
+  }
+
+  window.location.href = url.toString();
 };

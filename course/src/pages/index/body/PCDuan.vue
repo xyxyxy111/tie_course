@@ -6,14 +6,13 @@ import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
-import { NavigationButton } from '../components/widget/NavigateButton';
 import { useWindowSize } from '@/useWindowSize';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
 const { width, height } = useWindowSize()
 import {
-  courseTitles,
+  courseTitles, NavigationButton,
   courseQuickViews, communityVoices,
   recommendedProducts, relatedTopics
 } from '../components/content.ts';

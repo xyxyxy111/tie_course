@@ -9,7 +9,7 @@
     <transition :name="transitionName">
       <div v-if="shouldShow" class="popup-content" :class="[positionClass, contentClass]" :style="contentStyle"
         @mouseenter="handlePopupEnter" @mouseleave="handlePopupLeave">
-        <slot name="content" ></slot>
+        <slot name="content"></slot>
       </div>
     </transition>
   </div>
@@ -34,7 +34,7 @@ export default defineComponent({
       type: [String, Number],
       default: '300px'
     },
-    height:{
+    height: {
       type: [String, Number],
       default: '300px'
     },
@@ -75,7 +75,7 @@ export default defineComponent({
 
     const contentStyle = computed(() => ({
       width: typeof props.width === 'number' ? `${props.width}px` : props.width,
-height:typeof props.height==='number'?`${props.height}px`:props.height,
+      height: typeof props.height === 'number' ? `${props.height}px` : props.height,
       margin: typeof props.gap === 'number' ? `${props.gap}px` : props.gap
     }));
 
@@ -159,7 +159,7 @@ height:typeof props.height==='number'?`${props.height}px`:props.height,
 }
 
 .popup-content {
-  position:relative;
+  position: relative;
   display: inline-block;
   background-color: white;
   border-radius: 8px;

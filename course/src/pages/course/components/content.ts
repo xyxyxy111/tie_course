@@ -1,6 +1,58 @@
+// src/composables/content.ts
+import { ref, computed } from 'vue';
 
+// 课程描述相关逻辑
+function useCourseDescription() {
+  const CourseDescriptionFlag = ref(false);
+  const CourseDescription = computed(() =>
+    CourseDescriptionFlag.value ? "收起" : "显示更多"
+  );
 
+  const CourseDescriptionStyle = computed(() => ({
+    height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
+  }));
 
+  return {
+    CourseDescriptionFlag,
+    CourseDescription,
+    CourseDescriptionStyle
+  };
+}
+
+// 购物车相关逻辑
+function useCart() {
+  const showCart = ref(false);
+  const cartTitle = ref('');
+
+  const addToCart = (course: string) => {
+    cartTitle.value = course;
+    showCart.value = true;
+  };
+
+  const goToCheckout = (courseVideo: string, currentPrice: number) => {
+    const cartData = {
+      courses: {
+        image: courseVideo,
+        title: "course.title",
+        price: currentPrice
+      },
+      total: currentPrice,
+      userId: 'user123'
+    };
+
+    localStorage.setItem('tempCartData', JSON.stringify(cartData));
+    window.location.href = '/checkout.html';
+  };
+
+  return {
+    showCart,
+    cartTitle,
+    addToCart,
+    goToCheckout
+  };
+}
+
+// 相关主题数据
 const otherThemes = [
   { title: '主题1', url: 'url1' },
   { title: '主题2', url: 'url2' },
@@ -8,6 +60,7 @@ const otherThemes = [
   { title: '主题2', url: 'url2' },
 ];
 
+// 课程大纲数据
 const courseCurriculums = [
   { title: '第一章：入门基础', lectures: 5, duration: 120 },
   { title: '第二章：核心概念', lectures: 8, duration: 180 },
@@ -21,6 +74,7 @@ const courseCurriculums = [
   { title: '第十章：总结回顾', lectures: 2, duration: 45 }
 ];
 
+// 评论数据
 const Comments = [
   {
     username: '张三',
@@ -84,5 +138,49 @@ const Comments = [
   }
 ];
 
+// 推荐产品和相关主题
+const recommendedProducts = [
+  {
+    id: 1,
+    name: 'Python 数据分析',
+    coverImgUrl: '/src/images/python-course.jpg',
+    rating: 4.8,
+    reviewCount: 1245,
+    price: 'US$89.99'
+  },
+  {
+    id: 2,
+    name: '机器学习实战',
+    coverImgUrl: '/src/images/ml-course.jpg',
+    rating: 4.9,
+    reviewCount: 987,
+    price: 'US$99.99'
+  },
+  {
+    id: 3,
+    name: 'Web 开发全栈课程',
+    coverImgUrl: '/src/images/web-course.jpg',
+    rating: 4.7,
+    reviewCount: 1567,
+    price: 'US$79.99'
+  }
+];
 
-export{ otherThemes,courseCurriculums,Comments}
+const relatedTopics = [
+  '数据科学',
+  'R语言',
+  '统计分析',
+  '机器学习',
+  '编程基础',
+  '数据可视化'
+];
+
+export{
+  useCourseDescription,
+  useCart,
+  otherThemes,
+  courseCurriculums,
+  Comments,
+  recommendedProducts,
+  relatedTopics
+};
