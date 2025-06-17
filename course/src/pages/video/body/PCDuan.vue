@@ -107,7 +107,7 @@
 
 <script>
 export default {
-  name: 'CoursePage',
+  name: 'PCDuan',
   data() {
     return {
       currentLesson: null,

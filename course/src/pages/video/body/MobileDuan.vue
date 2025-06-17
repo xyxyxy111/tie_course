@@ -45,7 +45,7 @@
 
 <script>
 export default {
-  name: 'CoursePage',
+  name: 'MobileDuan',
   data() {
     return {
       currentLesson: null,

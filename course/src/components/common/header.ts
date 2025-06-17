@@ -11,10 +11,24 @@ export const goToCart = () => {
   window.location.href = "/cart.html";
 };
 
-export const goToIndex = (userId?: string | null) => {
+//molidis
+//before
+// export const goToIndex = (userId?: string | null) => {
+//   const url = new URL('/index.html', window.location.origin);
+
+//   if (userId !== undefined && userId !== null && userId !== '') {
+//     url.searchParams.set('userId', encodeURIComponent(userId.toString()));
+//   }
+
+//   window.location.href = url.toString();
+// };
+
+export const goToIndex = (e: MouseEvent) => {
+  e.preventDefault(); // 可选：阻止默认行为
+  const userId = 1;
   const url = new URL('/index.html', window.location.origin);
 
-  if (userId !== undefined && userId !== null && userId !== '') {
+  if (userId !== undefined && userId !== null) {
     url.searchParams.set('userId', encodeURIComponent(userId.toString()));
   }
 
@@ -34,13 +48,32 @@ export const goToLearning = () => {
   window.location.href = "/learning.html";
 };
 
+//molidis
+//before
+// export const goToMyInfo = (userId?: string | null) => {
+//   const url = new URL('/my-info.html', window.location.origin);
 
-export const goToMyInfo = (userId?: string | null) => {
+//   if (userId !== undefined && userId !== null && userId !== '') {
+//     url.searchParams.set('userId', encodeURIComponent(userId.toString()));
+//   }
+
+//   window.location.href = url.toString();
+// };
+
+export const goToMyInfo = (e: MouseEvent) => {
+  e.preventDefault(); // 可选：阻止默认行为
+  const userId = 1;
   const url = new URL('/my-info.html', window.location.origin);
 
-  if (userId !== undefined && userId !== null && userId !== '') {
+  if (userId !== undefined && userId !== null) {
     url.searchParams.set('userId', encodeURIComponent(userId.toString()));
   }
 
   window.location.href = url.toString();
 };
+
+//molidis
+//add
+export const goToSignup = (e: MouseEvent) => {
+    e.preventDefault(); // 可选：阻止默认行为
+}

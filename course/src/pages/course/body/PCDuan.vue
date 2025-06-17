@@ -9,7 +9,9 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
-import FloatingBox from '../components/FloatingBox.vue';
+//molidis
+//before
+// import FloatingBox from '../components/FloatingBox.vue';
 import { goToCart } from '@/components/common/header.ts';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription, useCart, otherThemes, courseCurriculums, Comments } from '../components/content';

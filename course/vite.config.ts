@@ -12,15 +12,15 @@ const knownPages = ['cart', 'login', 'signup', 'search', 'video', 'checkout', 'l
 // 改进的重定向插件，使用更严格的类型定义
 const redirectPlugin = () => ({
   name: 'html-redirect',
-  configureServer(server) {
-    server.middlewares.use((req, res, next) => {
+  configureServer(server:any) {
+    server.middlewares.use((req:any, res:any, next:any) => {
       try {
         const url = req.url || ''
         if (url === '/' || url === '/index') {
           res.writeHead(302, { Location: '/index.html' })
           return res.end()
         }
-        const pathParts = url.split('/').filter(part => part.length > 0)
+        const pathParts = url.split('/').filter( (part : string)=> part.length > 0)
         const lastPart = pathParts[pathParts.length - 1] || ''
         if (knownPages.includes(lastPart) && !url.includes('.') && !url.endsWith('/')) {
           res.writeHead(302, { Location: `${url}.html` })
