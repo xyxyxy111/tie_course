@@ -21,17 +21,17 @@ const { width, height } = useWindowSize()
       <!-- 导航栏 -->
       <h1>我的学习</h1>
       <nav class="learning-nav">
-        <router-link to="/learning/all-courses" class="nav-link"
+        <router-link to="/all-courses" class="nav-link"
           :class="{ active: $route.path.includes('all-courses') }">
           所有课程
         </router-link>
-        <router-link to="/learning/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
+        <router-link to="/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
           我的列表
         </router-link>
-        <router-link to="/learning/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
+        <router-link to="/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
           心愿单
         </router-link>
-        <router-link to="/learning/archived" class="nav-link" :class="{ active: $route.path.includes('archived') }">
+        <router-link to="/archived" class="nav-link" :class="{ active: $route.path.includes('archived') }">
           已存档
         </router-link>
       </nav>

@@ -65,6 +65,10 @@ const CourseIncartStyle = () => ({});
           <div class="total-label">Total:</div>
           <div id="totalPrice"> ${{ totalPrice }}</div>
           <button @click="goToCheckout">Proceed to checkout →</button>
+          <hr>
+          <div class="promotion-label">Promotions</div>
+          <input type="text" name="couponId" id="coupon">
+          <button class="coupon-btn">Apply</button>
         </div>
       </div>
     </div>
@@ -107,7 +111,7 @@ const CourseIncartStyle = () => ({});
 
 
 .shopping-cart-container .course-item img {
-  width: 35%;
+  width: 100%;
   max-width: 180px;
   height: 120px;
   margin-right: 20px;
@@ -124,6 +128,7 @@ overflow: hidden;
 }
 
 .shopping-cart-container .checkout-summary div {
+  margin: 0 auto;
   font-weight: 700;
   font-size: 16px;
   padding-inline: 20px;

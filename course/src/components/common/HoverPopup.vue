@@ -218,6 +218,7 @@ export default defineComponent({
 }
 
 .position-bottom {
+  left: -20%;
   transform: translateY(5px);
 }
 

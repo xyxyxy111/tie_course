@@ -6,6 +6,7 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
+import { goToIndex } from '@/components/common/header';
 const { width, height } = useWindowSize()
 
 </script>
@@ -15,9 +16,9 @@ const { width, height } = useWindowSize()
     <!-- 侧边栏直接写在父组件中 -->
     <div class="my-info-sidebar">
       <!-- Logo - 跳转到首页 -->
-      <router-link to="/index.html" class="sidebar-icon" active-class="active" exact>
+      <div class="sidebar-icon" active-class="active" exact @click="goToIndex()">
         T
-      </router-link>
+      </div>
 
       <!-- User - 跳转到个人信息 -->
       <router-link to="/my-info/profile" class="sidebar-icon" active-class="active">

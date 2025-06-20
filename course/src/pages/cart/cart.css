@@ -4,6 +4,7 @@
   display: flex;
 }
 
+
 .shopping-cart-container .course-item button {
   margin-top: 10px;
   padding: 10px;
@@ -51,4 +52,8 @@
   padding: 0px 5px;
   font-size: 20px;
   font-weight: 600;
+}
+
+hr{
+  margin: 30px 10px;
 }

@@ -3,24 +3,28 @@
   <div class="photo-container">
     <h1>图像预览</h1>
     <h3>最低 200x200 像素，最高 6000x6000 像素 </h3>
-
-
-
     <img src="/src/images/userPic.png" alt="">
 
-    <input type="file" id="avatarUpload" class="upload-btn" accept="image/*" >
-   
+    <input type="file" id="avatarUpload" class="upload-btn" accept="image/*">
+
     <button type="submit" class="submit-btn" id="submitBtn" disabled>保存头像</button>
 
   </div>
+
+    
 
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+
+
 export default defineComponent({
   name: 'Photo',
+  avatar: ''
+ 
+  
 });
 </script>
 

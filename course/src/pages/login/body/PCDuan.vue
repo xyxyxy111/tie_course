@@ -9,9 +9,9 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize'
 import '../login.css'
+import axios from 'axios';
 const { width, height } = useWindowSize()
 
-const email = ref('')
 const formData = ref({
   phone: '',
   captcha: ''
@@ -45,7 +45,6 @@ const sendCaptcha = async () => {
   try {
     captchaBtn.value.disabled = true;
     await authApi.sendCaptcha(formData.value.phone);
-
     // 倒计时逻辑
     const timer = setInterval(() => {
       captchaBtn.value.countdown--;
@@ -84,7 +83,6 @@ const handleLogin = async () => {
       phone: formData.value.phone,
       captcha: formData.value.captcha
     });
-
     localStorage.setItem('token', res.data.token);
     loginStatus.value = {
       loading: false,
@@ -93,7 +91,7 @@ const handleLogin = async () => {
     };
 
     // 替代路由跳转的方案
-    window.location.href = '/dashboard.html'; // 或使用其他页面控制逻辑
+    window.location.href = '/index.html'; // 或使用其他页面控制逻辑
   } catch (error) {
     loginStatus.value = {
       loading: false,
@@ -115,7 +113,19 @@ const ImgStyle = () => ({
     : 'none',
 })
 
-const sendMsgBtnText = ref('发送验证码')
+const logout = async () => {
+  try {
+    await axios.delete('/auth/sessions', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`
+      }
+    });
+    localStorage.clear();
+    
+  } catch (error) {
+    alert(`登出失败`);
+  }
+};
 
 </script>
 

@@ -1,14 +1,13 @@
 <template>
   <IconSprite />
   <div class="header">
-    <div class=""></div>
     <div :style="headerSpaceStyle"></div>
-    <div id="logo" :style="headerButtonStyle" @click="goToIndex">Course</div>
+    <div id="logo" :style="headerButtonStyle" @click="goToIndex()">Course</div>
     <div :style="headerSpaceStyle"></div>
     <div class="explore">
-      <button :style="headerButtonStyle" @mouseenter="exploreHoverFlag = true" @mouseleave="exploreHoverFlag= false"
+      <button  @mouseenter="exploreHoverFlag = true" @mouseleave="exploreHoverFlag= false"
         class="explore-button">Explore</button>
-      <HoverPopup v-model="exploreHoverFlag" width="270px" height="340px" transition="slide" :show-delay="200"
+        <HoverPopup v-model="exploreHoverFlag" width="270px" height="340px" transition="slide" :show-delay="200"
         position="bottom" :hide-delay="300" class="custom-popup-bottom">
         <template #trigger>
           <div class="popup-trigger-area">
@@ -18,8 +17,8 @@
           kkkkkkkkk
         </template>
       </HoverPopup>
-
-    </div>
+          </div>
+         
     <input v-model="searchQuery" type="text" placeholder="Find your course by skill,topic,or instructor"
       :style="headerSearchInputStyle" @keyup.enter="Search">
     <button style="margin-inline: 0;">
@@ -64,7 +63,7 @@
     <button v-if="userId.length == 0" :style="headerButtonStyle" @click="goToLogin">Login</button>
 
     <div v-if="userId.length != 0" :style="headerButtonStyle">
-      <img src="/src/images/userPic.png" alt="" @click="goToMyInfo">
+      <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
     </div>
 
     <button style="padding-inline:0% ;" v-if="userId.length == 0">
@@ -90,7 +89,7 @@ import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin,goToLea
 const exploreHoverFlag = ref(false)
 const userId=ref('ll')
 const { width, height } = useWindowSize()
-const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
+const headerSpaceWidth = computed(() => Math.max(0, (width.value - 200) / 2800));
 const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 300));
 const headerButtonPadding = computed(() => {
   const calculatedValue = (width.value - 800) / 1700;
@@ -107,7 +106,7 @@ const headerSearchInputStyle = computed(() => ({
 }));
 
 const headerButtonStyle = computed(() => ({
-  paddingInline:`calc(2vw * ${headerButtonPadding.value})`,
+  paddingInline:`calc(3vw * ${headerButtonPadding.value})`,
      transition: 'none'
 }));
 
@@ -115,7 +114,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const goToWishlist = () => {
-  router.push('/learning/wishlist');
+  router.push('/wishlist');
 };
 
 </script>
@@ -161,7 +160,7 @@ button .icon {
   height: 50px;
  display: block;
  justify-items: center;
-  width: 155px;
+ width:155px;
   line-height: 0px;
 }
 
@@ -169,7 +168,7 @@ button .icon {
   position: relative;
   top: 0%;
   display: block;
-  width: 105px;
+  width:105px;
 }
 
 img{

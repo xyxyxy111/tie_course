@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import MyLearning from '@/pages/myLearn/App.vue';
 import AllCourse from '@/pages/myLearn/views/AllCourse.vue';
 import MyList from '@/pages/myLearn/views/MyList.vue';
@@ -58,12 +58,12 @@ const router = createRouter({
     },
     {
       name: 'AllCourse',
-      path: '/learning/all-courses', // 使用带连字符的路径
+      path: '/learning/all-courses', 
       component: AllCourse
     },
     {
       name: 'MyList',
-      path: '/learning/my-list', // 使用带连字符的路径
+      path: '/learning/my-list', 
       component: MyList
     },
     {

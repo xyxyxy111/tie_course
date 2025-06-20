@@ -9,7 +9,7 @@
     </button>
     <div id="header-space"></div>
 
-      <div id="logo" @click="goToIndex">Course</div>
+      <div id="logo" @click="goToIndex()">Course</div>
     
     <button @click="searchFlag= !searchFlag">
       <div class="icon">
@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import './header.css'
-import { searchQuery, Search, goToCart, goToIndex, goToSignup, goToLogin } from './header.ts';
+import { searchQuery, Search, goToCart, goToIndex,  goToLogin } from './header.ts';
 import SideBar from '@/components/common/SideBar.vue'
 import { ref, computed } from 'vue'
 

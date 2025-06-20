@@ -10,7 +10,6 @@ import MoblieBottom from '@/components/common/MobileBottom.vue';
 import { authApi, userApi } from '@/api/user';
 import '../login.css'
 
-const email = ref('')
 const formData = ref({
   phone: '',
   captcha: ''

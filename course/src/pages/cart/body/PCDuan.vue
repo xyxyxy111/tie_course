@@ -65,6 +65,10 @@ const CourseIncartStyle = () => ({});
           <div class="total-label">Total:</div>
           <div id="totalPrice"> ${{ totalPrice }}</div>
           <button @click="goToCheckout">Proceed to checkout →</button>
+          <hr>
+          <div class="promotion-label">Promotions</div>
+          <input type="text" name="couponId" id="coupon">
+          <button class="coupon-btn">Apply</button>
         </div>
       </div>
     </div>

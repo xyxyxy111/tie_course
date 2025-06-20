@@ -1,21 +1,24 @@
 <template>
-  <div class="profile-title">
-    个人资料与设置
-  </div>
-  <div v-if="$route.path.includes('/profile')" class="profile-sub-nav">
-    <router-link to="/my-info/profile/basic-infomation" class="nav-link" active-class="active" exact>
-      基本信息
-    </router-link>
+  <div class="profile-container">
+    <div class="profile-title">
+      个人资料与设置
+    </div>
+    <div v-if="$route.path.includes('/profile')" class="profile-sub-nav">
+      <router-link to="/my-info/profile/basic-infomation" class="nav-link" active-class="active" exact>
+        基本信息
+      </router-link>
 
-    <router-link to="/my-info/profile/photo" class="nav-link" active-class="active">
-      个人资料照片
-    </router-link>
+      <router-link to="/my-info/profile/photo" class="nav-link" active-class="active">
+        个人资料照片
+      </router-link>
 
-    <router-link to="/my-info/profile/privacy" class="nav-link" active-class="active">
-      隐私设置
-    </router-link>
+      <router-link to="/my-info/profile/privacy" class="nav-link" active-class="active">
+        隐私设置
+      </router-link>
+    </div>
+    <router-view />
   </div>
-  <router-view />
+
 </template>
 
 <script lang="ts">
@@ -27,6 +30,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.profile-container{
+  margin: 0 auto;
+  width: 70%;
+}
+
 .profile-title{
   font-size: 36px;
   margin: 20px 50px;

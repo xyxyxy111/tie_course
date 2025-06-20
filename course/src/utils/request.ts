@@ -1,12 +1,19 @@
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
-import type { ApiResponse } from '@/types/user';
+
+export interface ApiResponse<T = any> {
+  code: number;
+  message: string;
+  data: T;
+}
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: 'http://localhost:8080',
   timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// 请求拦截器（添加JWT）
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
