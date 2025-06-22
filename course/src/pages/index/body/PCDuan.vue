@@ -157,7 +157,7 @@ function handleCourseWishlisted(event: any) {
           </div>
           <!-- HoverPopup 组件 -->
           <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="340px" transition="slide"
-            :show-delay="200" :hide-delay="300" class="custom-popup-right" :userId="userId || undefined"
+            :show-delay="150" :hide-delay="150" class="custom-popup-right" :userId="userId || undefined"
             :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded"
             @course-wishlisted="handleCourseWishlisted">
             <template #trigger>

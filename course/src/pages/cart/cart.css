@@ -16,7 +16,7 @@
   transition: all 0.3s ease;
   cursor: pointer;
   text-align: center;
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .shopping-cart-container .course-item button:hover {
@@ -54,7 +54,7 @@
   font-weight: 600;
 }
 
-hr{
+hr {
   margin: 30px 10px;
 }
 
@@ -75,4 +75,44 @@ hr{
   min-width: 70px;
   border-radius: 8px;
   margin: 10px 5px;
+}
+
+/* 添加缺失的样式 */
+.shopping-cart-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.shopping-cart-container .course-incart h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.shopping-cart-container .promotion-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.shopping-cart-container .total-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.shopping-cart-container .checkout-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shopping-cart-container .course-list h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  padding: 0 20px;
 }

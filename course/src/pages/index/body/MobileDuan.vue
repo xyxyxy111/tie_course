@@ -166,7 +166,7 @@ function addToCart(course: string) {
 
             <!-- HoverPopup 组件 -->
             <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="310px" transition="slide"
-              :show-delay="200" :hide-delay="300" class="custom-popup-right">
+              :show-delay="150" :hide-delay="150" class="custom-popup-right">
               <template #trigger>
                 <!-- 空触发区域（由父元素控制） -->
                 <div class="popup-trigger-area"></div>

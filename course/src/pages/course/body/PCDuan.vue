@@ -21,8 +21,6 @@ const { width, height } = useWindowSize()
 const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();
 const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
 
-courseTitles.value[0].activeFlag = true
-
 // 获取userId
 const userId = ref<string | null>(null);
 
