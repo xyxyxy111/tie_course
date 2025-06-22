@@ -6,10 +6,11 @@ import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import PCHeader from '@/components/common/PCHeader.vue'
-import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize'
+import { goToIndex } from '@/components/common/header.ts'
 import '../login.css'
 import axios from 'axios';
+import { successCodes } from '@/utils/request';
 const { width, height } = useWindowSize()
 
 const formData = ref({
@@ -34,22 +35,24 @@ const captchaBtn = ref({
   disabled: false,
   countdown: 60
 });
-
-// 发送验证码
 const sendCaptcha = async () => {
   if (!formData.value.phone) {
     alert('请输入手机号');
     return;
   }
-
+  captchaBtn.value.disabled = true;
   try {
-    captchaBtn.value.disabled = true;
-    await authApi.sendCaptcha(formData.value.phone);
-    // 倒计时逻辑
+    const res = await authApi.sendCaptcha(formData.value.phone);
+    if (!successCodes.includes(res.status)) {  // 改成 status
+      console.log(res.status)
+      alert(res.message || '发送验证码失败');
+      captchaBtn.value.disabled = false;
+      return;
+    }
+    // 成功，开始倒计时
     const timer = setInterval(() => {
       captchaBtn.value.countdown--;
       captchaBtn.value.text = `${captchaBtn.value.countdown}s后重新获取`;
-
       if (captchaBtn.value.countdown <= 0) {
         clearInterval(timer);
         captchaBtn.value = {
@@ -61,7 +64,7 @@ const sendCaptcha = async () => {
     }, 1000);
   } catch (error) {
     captchaBtn.value.disabled = false;
-    alert('验证码发送失败，请重试');
+    alert(error || '发送验证码失败');
   }
 };
 
@@ -83,19 +86,45 @@ const handleLogin = async () => {
       phone: formData.value.phone,
       captcha: formData.value.captcha
     });
-    localStorage.setItem('token', res.data.token);
+    console.log('登录响应:', res);
+    console.log('响应状态:', res.status);
+    console.log('响应数据:', res.data);
+
+    if (!successCodes.includes(res.status)) {
+      loginStatus.value = {
+        loading: false,
+        error: res.message || '登录失败，请检查验证码',
+        success: false
+      };
+      return;
+    }
+
+    // 修复：token直接是res.data，而不是res.data.token
+    if (res.data && typeof res.data === 'string') {
+      localStorage.setItem('token', res.data);
+      console.log('Token已保存:', res.data);
+    } else {
+      console.error('登录响应中没有有效的token');
+      loginStatus.value = {
+        loading: false,
+        error: '登录失败：未获取到token',
+        success: false
+      };
+      return;
+    }
+
     loginStatus.value = {
       loading: false,
       error: null,
       success: true
     };
-
-    // 替代路由跳转的方案
-    window.location.href = '/index.html'; // 或使用其他页面控制逻辑
-  } catch (error) {
+    console.log('登录成功，用户手机号:', formData.value.phone);
+    goToIndex(formData.value.phone);
+  } catch (error: any) {
+    console.error('登录错误:', error);
     loginStatus.value = {
       loading: false,
-      error: '登录失败，请检查验证码',
+      error: error?.message || '登录失败，请检查验证码',
       success: false
     };
   }
@@ -115,15 +144,21 @@ const ImgStyle = () => ({
 
 const logout = async () => {
   try {
-    await axios.delete('/auth/sessions', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`
-      }
-    });
-    localStorage.clear();
-    
+    const token = localStorage.getItem('token');
+    if (token) {
+      await authApi.logout();
+      console.log('登出成功');
+    }
+    localStorage.removeItem('token');
+    console.log('本地token已清除');
+
+    // 重定向到登录页面
+    window.location.href = '/login.html';
   } catch (error) {
-    alert(`登出失败`);
+    console.error('登出失败:', error);
+    // 即使API调用失败，也要清除本地token
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
   }
 };
 
@@ -133,7 +168,7 @@ const logout = async () => {
 <template>
   <IconSprite />
 
-  <PCHeader />
+  <PCHeader :userId="null" />
   <div class="login-container">
     <div class="content">
       <div class="login-image" :style="LImgStyle()">
@@ -169,7 +204,6 @@ const logout = async () => {
       </div>
     </div>
   </div>
-  <PCBottom />
 
 
 
@@ -189,7 +223,7 @@ const logout = async () => {
   place-items: center;
 }
 
-.login-container .login-image img{
+.login-container .login-image img {
   width: 100%;
   height: fit-content;
 }
@@ -198,5 +232,4 @@ const logout = async () => {
   z-index: 200;
   min-width: 450px;
 }
-
 </style>

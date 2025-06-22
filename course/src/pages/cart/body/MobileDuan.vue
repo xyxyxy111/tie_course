@@ -1,14 +1,25 @@
 <script lang="ts" setup>
+import { ref, computed, onMounted } from 'vue';
 import { useWindowSize } from '@/useWindowSize';
-import { ref, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue';
-import PCHeader from '@/components/common/PCHeader.vue';
-import PCBottom from '@/components/common/PCBottom.vue';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
 import { useCartLogic } from '../components/content';
 import '../cart.css';
 
-const { width } = useWindowSize();
-const { courses, totalPrice, goToCheckout } = useCartLogic();
+const { width, height } = useWindowSize();
+const { cart, totalPrice, goToCheckout } = useCartLogic();
+
+// 获取userId
+const userId = ref<string | null>(null);
+
+onMounted(() => {
+  // 从URL参数获取userId
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlUserId = searchParams.get('userId');
+  if (urlUserId) {
+    userId.value = decodeURIComponent(urlUserId);
+  }
+});
 
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 const headerSpaceStyle = computed(() => ({
@@ -22,14 +33,14 @@ const CourseIncartStyle = () => ({});
 
 <template>
   <IconSprite />
-  <PCHeader />
+  <MobileHeader :userId="userId" />
   <div class="shopping-cart-container" :style="headerSpaceStyle">
     <div class="title">Shopping Cart</div>
     <div class="content">
       <div class="course-list">
-        <h1>{{ courses.length }} Courses in Cart</h1>
+        <h1>{{ cart.length }} Courses in Cart</h1>
         <table>
-          <tr v-for="course in courses" :key="course.id" class="course-item">
+          <tr v-for="course in cart" :key="course.id" class="course-item">
             <td><img :src="course.image" alt=""></td>
             <td>
               <div class="course-incart" :style="CourseIncartStyle()">
@@ -67,8 +78,10 @@ const CourseIncartStyle = () => ({});
           <button @click="goToCheckout">Proceed to checkout →</button>
           <hr>
           <div class="promotion-label">Promotions</div>
-          <input type="text" name="couponId" id="coupon">
-          <button class="coupon-btn">Apply</button>
+          <div class="coupon-section">
+            <input type="text" name="couponId" id="coupon">
+            <button class="coupon-btn">Apply</button>
+          </div>
         </div>
       </div>
     </div>
@@ -83,7 +96,7 @@ const CourseIncartStyle = () => ({});
   margin: 0 auto;
   border-radius: 10px;
   width: 100%;
-  min-width:400px;
+  min-width: 400px;
   padding: 20px 0px;
   border: none;
   margin-bottom: 100px;
@@ -117,9 +130,9 @@ const CourseIncartStyle = () => ({});
   margin-right: 20px;
 }
 
-.shopping-cart-container .course-title{
+.shopping-cart-container .course-title {
   margin-bottom: 10px;
-overflow: hidden;
+  overflow: hidden;
 }
 
 .shopping-cart-container .checkout-summary {
@@ -137,5 +150,4 @@ overflow: hidden;
 .shopping-cart-container .checkout-summary #totalPrice {
   font-size: 36px;
 }
-
 </style>

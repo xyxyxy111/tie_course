@@ -4,30 +4,22 @@ import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import PCHeader from '@/components/common/PCHeader.vue'
-import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize'
 import '../order.css'
 import { OrderItem } from '@/types/types';
 const { width, height } = useWindowSize()
-interface Course {
-  id: number;
-  image: string;
-  title: string;
-  price: number;
-}
 
-interface CartData {
-  courses: Course[];
-  total: number;
-  userId: string;
-}
-
-// 响应式数据
-const orderList = ref<Course[]>([]);
-const totalPrice = ref(0);
-const courseCount = ref(0);
+// 获取userId
+const userId = ref<string | null>(null);
 
 onMounted(() => {
+  // 从URL参数获取userId
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlUserId = searchParams.get('userId');
+  if (urlUserId) {
+    userId.value = decodeURIComponent(urlUserId);
+  }
+
   try {
     // 1. 从localStorage获取数据
     const rawData = localStorage.getItem('tempCartData');
@@ -60,11 +52,36 @@ onMounted(() => {
   }
 });
 
+// 响应式数据
+const orderList = ref<Course[]>([]);
+const totalPrice = ref(0);
+const courseCount = ref(0);
+const selectedPayment = ref('alipay'); // 默认选择支付宝
+
+// 处理付款方式选择
+const handlePaymentChange = (paymentMethod: string) => {
+  selectedPayment.value = paymentMethod;
+};
+
+// 处理支付
+const handlePayment = () => {
+  if (!selectedPayment.value) {
+    alert('请选择付款方式');
+    return;
+  }
+
+  console.log(`使用${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付 US$${totalPrice.value.toFixed(2)}`);
+  // 这里可以添加实际的支付逻辑
+  alert(`正在跳转到${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付页面...`);
+};
+
 </script>
 
 <!-- html -->
 <template>
   <IconSprite />
+
+  <PCHeader :userId="userId" />
 
   <div class="payment-container">
 
@@ -74,18 +91,25 @@ onMounted(() => {
 
       <h2>付款方式</h2>
 
-      <div class="payment-method">
-        <input type="radio" id="paypal" name="payment">
-        <label for="Alipay">支付宝</label>
+      <div class="payment-method" :class="{ active: selectedPayment === 'alipay' }"
+        @click="handlePaymentChange('alipay')">
+        <input type="radio" id="alipay" name="payment" value="alipay" :checked="selectedPayment === 'alipay'">
+        <label for="alipay">支付宝</label>
+      </div>
+
+      <div class="payment-method" :class="{ active: selectedPayment === 'wechat' }"
+        @click="handlePaymentChange('wechat')">
+        <input type="radio" id="wechat" name="payment" value="wechat" :checked="selectedPayment === 'wechat'">
+        <label for="wechat">微信支付</label>
       </div>
 
       <div class="order-summary">
         <h3>订单详细信息 ( {{ orderList.length }} 个课程)</h3>
         <ul class="course-list">
-          <li v-for="(course,index) in orderList" class="course-item">
+          <li v-for="(course, index) in orderList" class="course-item">
             <img :src="course.image" alt="">
-            <span class="title">{{course.title }}</span>
-            <span class="price">{{ course.price}}</span>
+            <span class="title">{{ course.title }}</span>
+            <span class="price">{{ course.price }}</span>
           </li>
         </ul>
 
@@ -93,7 +117,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="total-section">
-      <button class="pay-button">支付 US$524.91</button>
+      <button class="pay-button" @click="handlePayment">支付 US${{ totalPrice.toFixed(2) }}</button>
     </div>
   </div>
 
@@ -121,8 +145,8 @@ label {
   font-weight: bold;
 }
 
-.section{
-flex:2
+.section {
+  flex: 2
 }
 
 
@@ -140,7 +164,7 @@ flex:2
 
 .payment-method.active {
   border-color: rgb(22, 92, 145);
-  ToCartground-color: rgba(22, 92, 145, 0.1);
+  background-color: rgba(22, 92, 145, 0.1);
 }
 
 .order-summary {
@@ -162,7 +186,7 @@ flex:2
   border-bottom: 1px solid #e0e0e0;
 }
 
-.title{
+.title {
   padding: 5px;
 }
 

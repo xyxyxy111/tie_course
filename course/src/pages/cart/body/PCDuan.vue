@@ -1,14 +1,13 @@
 <script lang="ts" setup>
-import {ref,computed} from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useWindowSize } from '@/useWindowSize';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import PCHeader from '@/components/common/PCHeader.vue';
-import PCBottom from '@/components/common/PCBottom.vue';
 import { useCartLogic } from '../components/content';
 import '../cart.css';
 
-const { width } = useWindowSize();
-const { courses, totalPrice, goToCheckout } = useCartLogic();
+const { width, height } = useWindowSize();
+const { cart, totalPrice, goToCheckout } = useCartLogic();
 
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 const headerSpaceStyle = computed(() => ({
@@ -18,154 +17,163 @@ const headerSpaceStyle = computed(() => ({
 const CourseInstructorStyle = () => ({});
 const CourseTitleStyle = () => ({});
 const CourseIncartStyle = () => ({});
+
+// 获取userId
+const userId = ref<string | null>(null);
+
+onMounted(() => {
+  // 从URL参数获取userId
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlUserId = searchParams.get('userId');
+  if (urlUserId) {
+    userId.value = decodeURIComponent(urlUserId);
+  }
+});
 </script>
 
 <template>
   <IconSprite />
-  <PCHeader />
-  <div class="shopping-cart-container" :style="headerSpaceStyle">
-    <div class="title">Shopping Cart</div>
-    <div class="content">
-      <div class="course-list">
-        <h1>{{ courses.length }} Courses in Cart</h1>
-        <table>
-          <tr v-for="course in courses" :key="course.id" class="course-item">
-            <td><img :src="course.image" alt=""></td>
-            <td>
-              <div class="course-incart" :style="CourseIncartStyle()">
-                <h2 :style="CourseTitleStyle()">{{ course.title }}</h2>
-              </div>
-            </td>
-            <td v-if="width < 1200">
-              <div class="course-price">${{ course.price }}</div>
-              <div>
-                <button class="cart-buttons">Remove</button>
-              </div>
-              <div>
-                <button class="cart-buttons">Save for Later</button>
-              </div>
-            </td>
-            <td v-if="width >= 1200">
-              <div>
-                <button class="cart-buttons">Remove</button>
-              </div>
-              <div>
-                <button class="cart-buttons">Save for Later</button>
-              </div>
-            </td>
-            <td v-if="width >= 1200" class="course-price">
-              <div>${{ course.price }}</div>
-            </td>
-          </tr>
-        </table>
+  <PCHeader :userId="userId" />
+  <div class="cart-container">
+    <div class="content" :style="headerSpaceStyle">
+      <div class="cart-title">
+        <h1>购物车</h1>
       </div>
 
-      <div class="checkout-section">
-        <div class="checkout-summary">
-          <div class="total-label">Total:</div>
-          <div id="totalPrice"> ${{ totalPrice }}</div>
-          <button @click="goToCheckout">Proceed to checkout →</button>
-          <hr>
-          <div class="promotion-label">Promotions</div>
-          <input type="text" name="couponId" id="coupon">
-          <button class="coupon-btn">Apply</button>
+      <div class="cart-items">
+        <div v-for="item in cart?.cartItemList" :key="item.id" class="cart-item">
+          <img :src="item.courseImage" :alt="item.courseName" class="course-image">
+          <div class="course-info">
+            <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
+            <p class="course-instructor" :style="CourseInstructorStyle()">讲师信息</p>
+            <div class="course-price">US${{ item.currentPrice.toFixed(2) }}</div>
+          </div>
+          <button class="remove-btn" @click="() => console.log('删除课程:', item.id)">删除</button>
         </div>
+      </div>
+
+      <div class="cart-summary">
+        <div class="total">
+          <span>总计:</span>
+          <span class="total-price">US${{ totalPrice.toFixed(2) }}</span>
+        </div>
+        <button class="checkout-btn" @click="goToCheckout">去结算</button>
       </div>
     </div>
   </div>
-  <PCBottom />
 </template>
 
 <style scoped>
-/* 保持原有PC端样式不变 */
-.shopping-cart-container {
-  width: 100%;
-  min-width: 850px;
-  max-width: 1600px;
+.cart-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.content {
+  max-width: 1200px;
   margin: 0 auto;
-  padding-inline: 2%;
+  padding: 20px;
 }
 
-/* 其他原有样式保持不变 */
-</style>
-<style scoped>
-.shopping-cart-container {
-  width: 100%;
-  min-width: 850px;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding-inline: 2%;
+.cart-title h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 30px;
 }
 
-
-.shopping-cart-container .title {
-  min-width: fit-content;
-  font-size: 40px;
-  text-align: left;
-  min-width: 800px;
-  font-weight: 600;
-  padding-top: 20px;
-  font-family: 'Times New Roman', Times, serif
-}
-
-.shopping-cart-container .content {
-  display: flex;
-  margin: 0 auto;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 1400px;
-  min-width: 850px;
-  padding: 20px 0px;
-  border: none;
-  margin-bottom: 100px;
-}
-
-.shopping-cart-container .course-list {
-  flex: 2;
-}
-
-
-.shopping-cart-container .course-item img {
-  width: 240px;
-  height: 140px;
-  margin-right: 10px;
-}
-
-.shopping-cart-container .checkout-section {
-  flex: 1;
-}
-
-.shopping-cart-container .checkout-summary {
-  border: none;
-  padding: 15px;
+.cart-items {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
-.shopping-cart-container .checkout-summary div {
-  font-weight: 500;
-  font-size: 20px;
-  padding-inline: 10px;
+.cart-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
 }
 
-.shopping-cart-container .checkout-summary #totalPrice {
-  font-size: 40px;
+.cart-item:last-child {
+  border-bottom: none;
 }
 
-.shopping-cart-container .checkout-summary button {
-  font-weight: 600;
+.course-image {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 20px;
 }
 
+.course-info {
+  flex: 1;
+}
 
-.shopping-cart-container .icon-demo {
-  display: inline-block;
+.course-title {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.course-instructor {
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.course-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #165c91;
+}
+
+.remove-btn {
+  background: #dc3545;
   color: white;
-  background-color: rgb(22, 92, 145);
-  border-radius: 25px;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.shopping-cart-container .icon-course {
-  width: 48px;
-  height: 48px;
-  padding: 7px 8px;
+.remove-btn:hover {
+  background: #c82333;
+}
+
+.cart-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.total-price {
+  font-weight: bold;
+  color: #165c91;
+  margin-left: 10px;
+}
+
+.checkout-btn {
+  background: #165c91;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.checkout-btn:hover {
+  background: #134a7a;
 }
 </style>

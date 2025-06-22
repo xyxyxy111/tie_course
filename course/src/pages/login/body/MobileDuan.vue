@@ -5,10 +5,8 @@ import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import MoblieHeader from '@/components/common/MoblieHeader.vue'
-import MoblieBottom from '@/components/common/MobileBottom.vue';
-
-import { authApi, userApi } from '@/api/user';
 import '../login.css'
+import { useWindowSize } from '@/useWindowSize';
 
 const formData = ref({
   phone: '',
@@ -83,16 +81,44 @@ const handleLogin = async () => {
       captcha: formData.value.captcha
     });
 
-    localStorage.setItem('token', res.data.token);
+    console.log('登录响应:', res);
+    console.log('响应状态:', res.status);
+    console.log('响应数据:', res.data);
+
+    if (!successCodes.includes(res.status)) {
+      loginStatus.value = {
+        loading: false,
+        error: res.message || '登录失败，请检查验证码',
+        success: false
+      };
+      return;
+    }
+
+    // 修复：token直接是res.data，而不是res.data.token
+    if (res.data && typeof res.data === 'string') {
+      localStorage.setItem('token', res.data);
+      console.log('Token已保存:', res.data);
+    } else {
+      console.error('登录响应中没有有效的token');
+      loginStatus.value = {
+        loading: false,
+        error: '登录失败：未获取到token',
+        success: false
+      };
+      return;
+    }
+
     loginStatus.value = {
       loading: false,
       error: null,
       success: true
     };
 
+    console.log('登录成功，用户手机号:', formData.value.phone);
     // 替代路由跳转的方案
     window.location.href = '/dashboard.html'; // 或使用其他页面控制逻辑
   } catch (error) {
+    console.error('登录错误:', error);
     loginStatus.value = {
       loading: false,
       error: '登录失败，请检查验证码',
@@ -111,7 +137,7 @@ const handleLogin = async () => {
     <div class="content">
       <div class="login-form">
         <h1>Log in to continue your learning journey</h1>
-         <div v-if="loginStatus.error" class="error-message">
+        <div v-if="loginStatus.error" class="error-message">
           {{ loginStatus.error }}
         </div>
         <div v-if="loginStatus.success" class="success-message">
@@ -135,10 +161,10 @@ const handleLogin = async () => {
               {{ loginStatus.loading ? '登录中...' : '登录' }}
             </div>
           </button>
-        </form></div>
+        </form>
+      </div>
     </div>
   </div>
-  <MoblieBottom />
 
 
 
@@ -153,6 +179,6 @@ const handleLogin = async () => {
 
 .login-container .login-form {
   width: 100%;
- 
+
 }
 </style>

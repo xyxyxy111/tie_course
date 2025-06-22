@@ -57,3 +57,22 @@
 hr{
   margin: 30px 10px;
 }
+
+.shopping-cart-container .coupon-section {
+  display: flex;
+}
+
+.shopping-cart-container .coupon-section input {
+  width: 70%;
+  height: 50px;
+  border-radius: 8px;
+  margin: 10px 0px;
+}
+
+.shopping-cart-container .coupon-section button {
+  width: 20%;
+  height: 50px;
+  min-width: 70px;
+  border-radius: 8px;
+  margin: 10px 5px;
+}

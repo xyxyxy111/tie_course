@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API配置测试</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 3px;
+      overflow-x: auto;
+    }
+
+    .config-info {
+      background-color: #e9ecef;
+      padding: 10px;
+      border-radius: 3px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>API配置测试页面</h1>
+
+  <div class="section">
+    <h2>当前配置信息</h2>
+    <div class="config-info">
+      <strong>API基础地址:</strong> http://localhost:8080<br>
+      <strong>Authorization格式:</strong> Bearer &lt;token&gt;<br>
+      <strong>Content-Type:</strong> application/json
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>测试验证码接口</h2>
+    <button onclick="testCaptchaAPI()">测试 /auth/captcha</button>
+    <div id="captchaResult"></div>
+  </div>
+
+  <div class="section">
+    <h2>测试登录接口</h2>
+    <button onclick="testLoginAPI()">测试 /auth/sessions/by-captcha</button>
+    <div id="loginResult"></div>
+  </div>
+
+  <div class="section">
+    <h2>测试Profile接口</h2>
+    <input type="text" id="testToken" placeholder="输入token进行测试" style="width: 300px; padding: 5px;">
+    <button onclick="testProfileAPI()">测试 /profile</button>
+    <div id="profileResult"></div>
+  </div>
+
+  <script>
+    function testCaptchaAPI() {
+      const resultDiv = document.getElementById('captchaResult');
+      resultDiv.innerHTML = '<p>正在测试验证码接口...</p>';
+
+      // 根据环境选择API地址
+      const apiUrl = window.location.hostname === 'localhost' && window.location.port === '5173'
+        ? '/api/auth/captcha?phone=13800138000'  // 开发环境使用代理
+        : 'http://localhost:8080/auth/captcha?phone=13800138000';  // 生产环境直接访问
+
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          console.log('验证码接口响应状态:', response.status);
+          return response.json();
+        })
+        .then(data => {
+          resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>验证码接口测试成功</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>验证码接口测试失败</strong><br>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+        });
+    }
+
+    function testLoginAPI() {
+      const resultDiv = document.getElementById('loginResult');
+      resultDiv.innerHTML = '<p>正在测试登录接口...</p>';
+
+      // 根据环境选择API地址
+      const apiUrl = window.location.hostname === 'localhost' && window.location.port === '5173'
+        ? '/api/auth/sessions/by-captcha'  // 开发环境使用代理
+        : 'http://localhost:8080/auth/sessions/by-captcha';  // 生产环境直接访问
+
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          phone: '13800138000',
+          captcha: '123456'
+        })
+      })
+        .then(response => {
+          console.log('登录接口响应状态:', response.status);
+          return response.json();
+        })
+        .then(data => {
+          resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>登录接口测试成功</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>登录接口测试失败</strong><br>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+        });
+    }
+
+    function testProfileAPI() {
+      const resultDiv = document.getElementById('profileResult');
+      const token = document.getElementById('testToken').value;
+
+      if (!token || token.trim() === '') {
+        resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>请输入有效的token</strong>
+                    </div>
+                `;
+        return;
+      }
+
+      resultDiv.innerHTML = '<p>正在测试Profile接口...</p>';
+
+      // 根据环境选择API地址
+      const apiUrl = window.location.hostname === 'localhost' && window.location.port === '5173'
+        ? '/api/profile'  // 开发环境使用代理
+        : 'http://localhost:8080/profile';  // 生产环境直接访问
+
+      fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(response => {
+          console.log('Profile接口响应状态:', response.status);
+          console.log('Profile接口响应头:', response.headers);
+          return response.json();
+        })
+        .then(data => {
+          resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>Profile接口测试成功</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>Profile接口测试失败</strong><br>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+        });
+    }
+  </script>
+</body>
+
+</html>

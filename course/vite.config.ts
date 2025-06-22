@@ -41,17 +41,18 @@ const redirectPlugin = () => ({
 })
 
 export default defineConfig({
-  plugins: [
+    plugins: [
     vue(),
     vueDevTools(),
     redirectPlugin()
-  ]
+  ]  
   ,
   server: {
     proxy: {
       '/api': {
         target: 'http://localhost:8080', // 后端地址
-        changeOrigin: true
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   }

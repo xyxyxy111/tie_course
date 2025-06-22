@@ -1,37 +1,68 @@
 <script lang="ts" setup name="App">
-import { RouterView, RouterLink } from 'vue-router';
-import { toRef, ref, onMounted } from 'vue';
+import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router';
+import { toRef, ref, onMounted, watch } from 'vue';
 import { defineComponent } from 'vue';
 import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize'
+import IconSprite from '@/components/Icon/IconSprite.vue';
+import AllCourse from './views/AllCourse.vue';
+import MyList from './views/MyList.vue';
+import Wishlist from './views/Wishlist.vue';
+import Archived from './views/Archived.vue';
+import './myLearn.css';
 
+const router = useRouter();
+const route = useRoute();
 const { width, height } = useWindowSize()
 
+// 获取userId
+const userId = ref<string | null>(null);
+
+onMounted(() => {
+  // 从URL参数获取userId
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlUserId = searchParams.get('userId');
+  if (urlUserId) {
+    userId.value = decodeURIComponent(urlUserId);
+  }
+
+  // 检查是否需要重定向
+  if (route.path === '/learning') {
+    router.push('/learning/all-courses');
+  }
+});
+
+// 监听路由变化
+watch(() => route.path, (newPath) => {
+  if (newPath === '/learning') {
+    router.push('/learning/all-courses');
+  }
+});
 </script>
 
 <!-- html -->
 <template>
 
   <main>
-    <PCHeader v-if="width > 800" />
-    <MobileHeader v-else />
+    <PCHeader :userId="userId" v-if="width > 800" />
+    <MobileHeader :userId="userId" v-else />
 
     <div class="my-learning-container">
       <!-- 导航栏 -->
       <h1>我的学习</h1>
       <nav class="learning-nav">
-        <router-link to="/all-courses" class="nav-link"
+        <router-link to="/learning/all-courses" class="nav-link"
           :class="{ active: $route.path.includes('all-courses') }">
           所有课程
         </router-link>
-        <router-link to="/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
+        <router-link to="/learning/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
           我的列表
         </router-link>
-        <router-link to="/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
+        <router-link to="/learning/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
           心愿单
         </router-link>
-        <router-link to="/archived" class="nav-link" :class="{ active: $route.path.includes('archived') }">
+        <router-link to="/learning/archived" class="nav-link" :class="{ active: $route.path.includes('archived') }">
           已存档
         </router-link>
       </nav>
@@ -90,7 +121,7 @@ const { width, height } = useWindowSize()
 
 .nav-link:hover {}
 
-.learning-content{
+.learning-content {
   max-width: 1200px;
   margin: 0 auto;
 }

@@ -2,6 +2,13 @@
   <div class="basic-information">
     <h1>个人信息</h1>
     <form>
+
+
+
+      <div class="form-group">
+        <label for="username">昵称</label>
+        <input type="text" id="username" name="username" v-model="form.username">
+      </div>
       <!-- 名字 -->
       <div class="form-group">
         <label for="firstName">名字</label>
@@ -16,20 +23,15 @@
 
       <!-- 头衔 -->
       <div class="form-group">
-        <label for="title">头衔</label>
-        <input type="text" id="title" name="title" v-model="form.title">
+        <label for="major">专业</label>
+        <input type="text" id="major" name="major" v-model="form.major">
       </div>
 
-      <!-- 个人简介 -->
-      <div class="form-group">
-        <label for="bio">个人简介</label>
-        <textarea id="bio" name="bio" v-model="form.bio"></textarea>
-      </div>
 
 
       <!-- 提交按钮 -->
       <div class="form-group">
-        <button type="submit" :disabled="isSubmitting">
+        <button  :disabled="isSubmitting" @click="submitForm">
           {{ isSubmitting ? '提交中...' : '保存信息' }}
         </button>
       </div>
@@ -46,11 +48,13 @@ export default defineComponent({
   setup() {
     const isSubmitting = ref(false);
     const form = reactive({
-      username:'123',
-      firstName: 'tie',
-      lastName: 'song',
-      title: '软件工程师',
-      bio: '博士，软件工程师，多年软件开发和项目架构经验，受聘于中南大学计算机学院，讲授《Web应用开发技术》、《Linux程序设计环境》和《软件开发架构》课程。',
+      username:'',
+      firstName: '',
+      lastName: '',
+      major: '',
+      avatarUrl: '',
+      allowEmailNotify: false,
+      allowSMSNotify:false
     })
     // 获取个人信息
     const fetchProfile = async () => {

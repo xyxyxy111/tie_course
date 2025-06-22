@@ -7,8 +7,27 @@ import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import { goToIndex } from '@/components/common/header';
+import BasicInformation from './views/BasicInformation.vue';
+import Communication from './views/Communication.vue';
+import Courses from './views/Courses.vue';
+import Photo from './views/Photo.vue';
+import Privacy from './views/Privacy.vue';
+import Profile from './views/Profile.vue';
+import './myInfo.css';
+
 const { width, height } = useWindowSize()
 
+// 获取userId
+const userId = ref<string | null>(null);
+
+onMounted(() => {
+  // 从URL参数获取userId
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlUserId = searchParams.get('userId');
+  if (urlUserId) {
+    userId.value = decodeURIComponent(urlUserId);
+  }
+});
 </script>
 <template>
   <IconSprite />
@@ -33,7 +52,7 @@ const { width, height } = useWindowSize()
       <router-link to="/my-info/courses" class="sidebar-icon" active-class="active">
         <i class="icon-courses">
           <svg width="30" height="30" viewBox="0 0 16 16" fill="#35495e">
-    <use href="#ph--video-fill" /> 
+            <use href="#ph--video-fill" />
           </svg>
         </i>
       </router-link>
@@ -42,7 +61,7 @@ const { width, height } = useWindowSize()
       <router-link to="/my-info/communication" class="sidebar-icon" active-class="active">
         <i class="icon-communication">
           <svg width="30" height="30" viewBox="0 0 16 16" fill="#35495e">
-                   <use href="#material-symbols--chat-rounded" />
+            <use href="#material-symbols--chat-rounded" />
           </svg>
         </i>
       </router-link>
@@ -50,7 +69,6 @@ const { width, height } = useWindowSize()
 
     <!-- 主要内容区 -->
     <div class="my-info-content">
-
       <router-view />
     </div>
   </div>
@@ -66,7 +84,7 @@ const { width, height } = useWindowSize()
 /* 侧边栏样式 */
 .my-info-sidebar {
   width: 80px;
-  background:rgb(4, 35, 58);
+  background: rgb(4, 35, 58);
   position: fixed;
   height: 100vh;
 }
@@ -84,7 +102,7 @@ const { width, height } = useWindowSize()
 }
 
 .sidebar-icon.active {
-  background: rgb(22,92,145);
+  background: rgb(22, 92, 145);
 }
 
 .sidebar-icon img {
@@ -103,5 +121,4 @@ const { width, height } = useWindowSize()
   /* 与侧边栏宽度一致 */
   padding: 20px;
 }
-
 </style>

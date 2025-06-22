@@ -25,14 +25,18 @@ interface PhoneAvailabilityParams {
 
 interface UserProfile {
   username: string;
-  lastName: string;
   firstName: string;
-  title: string;
-  bio: string;
+  lastName: string;
+  major: string;
+  avatarUrl: string;
+  allowEmailNotify?: boolean;
+  allowSMSNotify?: boolean;
 }
 
-// allowEmailNotify: boolean;
-//allowSMSNotify: boolean;
+interface UploadAvatarResponse {
+  avatarUrl: string;
+}
+
 //avatarUrl: string;
 
 interface WishListVO {
@@ -70,7 +74,7 @@ export const authApi = {
     return request({
       method: 'POST',
       url: '/auth/captcha',
-      data: {
+      params: {
         phone: phone.trim()
       }
     });
@@ -78,7 +82,7 @@ export const authApi = {
 
   // 手机号+验证码登录
   loginByCaptcha: (data: LoginByCaptchaParams) => {
-    return request<{ token: string }>({
+    return request<string>({
       method: 'POST',
       url: '/auth/sessions/by-captcha',
       data
@@ -87,7 +91,7 @@ export const authApi = {
 
   // 手机号+密码登录
   loginByPassword: (data: LoginByPasswordParams) => {
-    return request<{ token: string }>({
+    return request<string>({
       method: 'POST',
       url: '/auth/sessions/by-password',
       data
@@ -96,7 +100,7 @@ export const authApi = {
 
   // 手机号注册
   register: (data: RegisterParams) => {
-    return request<{ token: string }>({
+    return request<string>({
       method: 'POST',
       url: '/auth/registrations',
       data
@@ -119,6 +123,24 @@ export const authApi = {
     return request<{}>({
       method: 'DELETE',
       url: '/auth/sessions'
+    });
+  },
+
+  // 获取微信登录二维码
+  getWxLoginQrcode: () => {
+    return request({
+      method: 'GET',
+      url: '/auth/wxLogin-qrcode',
+      responseType: 'arraybuffer'
+    });
+  },
+
+  // 获取微信登录状态
+  getWxLoginStatus: (state: string) => {
+    return request({
+      method: 'GET',
+      url: '/auth/sessions/by-wx',
+      params: { state }
     });
   }
 };
@@ -148,14 +170,32 @@ export const userApi = {
       url: '/account/user'
     });
   },
+
+  // 获取微信绑定二维码
+  getWxBindQrcode: () => {
+    return request({
+      method: 'GET',
+      url: '/account/user/wxBind-qrcode',
+      responseType: 'arraybuffer'
+    });
+  },
+
+  // 获取微信绑定状态
+  getWxBindStatus: (state: string) => {
+    return request({
+      method: 'GET',
+      url: '/account/user/result/wxBind',
+      params: { state }
+    });
+  }
 };
 
 export const profileApi = {
-  //获取个人资料
+  // 获取个人资料
   getProfile: () => {
     return request({
       method: 'GET',
-      url: '/profile'
+      url: '/account/profile'
     });
   },
 
@@ -163,8 +203,20 @@ export const profileApi = {
   updateProfile: (data: UserProfile) => {
     return request({
       method: 'PUT',
-      url: '/profile',
+      url: '/account/profile',
       data
+    });
+  },
+
+  // 上传头像
+  uploadAvatar: (formData: FormData) => {
+    return request<UploadAvatarResponse>({
+      method: 'POST',
+      url: '/account/profile/avatar',
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     });
   }
 }

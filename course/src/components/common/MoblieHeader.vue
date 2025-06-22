@@ -18,7 +18,7 @@
         </svg>
       </div>
     </button>
-    <button @click="goToCart">
+    <button @click="goToCart(userId)">
       <div class="icon">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="#35495e">
           <use href="#mdi--cart-outline" />
@@ -69,7 +69,9 @@ const headerSearchStyle = () => ({
   top: (searchFlag.value) ? '-27px' :'-77px'
 })
 
-
+defineProps<{
+  userId?: string | null
+}>()
 
 </script>
 

@@ -5,7 +5,6 @@ import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize';
 import MoblieHeader from '@/components/common/MoblieHeader.vue';
-import MobileBottom from '@/components/common/MobileBottom.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import {
@@ -13,6 +12,7 @@ import {
   courseQuickViews, communityVoices,
   recommendedProducts, relatedTopics
 } from '../components/content.ts';
+import { useIndexLogic } from '../components/content';
 
 courseTitles.value[0].activeFlag = true
 const { width, height } = useWindowSize()
@@ -223,8 +223,6 @@ function addToCart(course: string) {
 
       </div>
     </div>
-
-    <MobileBottom />
   </main>
 
 </template>
@@ -375,5 +373,4 @@ function addToCart(course: string) {
   display: inline-flex;
   overflow: scroll;
 }
-
 </style>
