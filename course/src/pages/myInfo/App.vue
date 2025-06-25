@@ -19,11 +19,9 @@ import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const { width, height } = useWindowSize()
 
-// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从token获取userId
   const token = getValidToken();
   if (token) {
     userId.value = getCurrentUserId();
@@ -36,6 +34,7 @@ onMounted(() => {
 const handleLogout = async () => {
   try {
     await authApi.logout();
+    console.log('登出成功');
     localStorage.removeItem('token');
     window.location.href = '/login.html';
   } catch (error) {

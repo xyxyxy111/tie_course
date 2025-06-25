@@ -163,7 +163,7 @@ const handleLogin = async () => {
       success: true
     };
     console.log('登录成功，用户手机号:', formData.value.phone);
-    goToIndex(formData.value.phone);
+    goToIndex();
   } catch (error: any) {
     console.error('登录错误:', error);
     loginStatus.value = {

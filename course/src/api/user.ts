@@ -131,7 +131,7 @@ export const authApi = {
   logout: () => {
     return request<{}>({
       method: 'DELETE',
-      url: '/auth/sessions'
+      url: '/account/user/sessions'
     });
   },
 
@@ -243,7 +243,7 @@ export const wishlistApi = {
     return request({
       url: '/account/wishlist',
       method: 'POST',
-      data: { courseId }
+      params: { courseId }
     })
   },
 
@@ -288,7 +288,7 @@ export const logApi = {
 
   clearUserLogs: () => {
     return request({
-      url: '/account/log/all',
+      url: '/account/log',
       method: 'DELETE'
     })
   }

@@ -5,7 +5,7 @@ import { toRef, ref, onMounted, computed } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
-import MoblieHeader from '@/components/common/MoblieHeader.vue'
+import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';

@@ -115,12 +115,6 @@ function handleCourseAdded(event: any) {
   }
 }
 
-function handleCourseWishlisted(event: any) {
-  console.log('课程已添加到愿望单:', event);
-  // 可以显示成功提示
-  console.log(`课程 "${event.courseName}" 已添加到愿望单`);
-}
-
 </script>
 
 <template>
@@ -158,8 +152,7 @@ function handleCourseWishlisted(event: any) {
           <!-- HoverPopup 组件 -->
           <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="340px" transition="slide"
             :show-delay="150" :hide-delay="150" class="custom-popup-right" :userId="userId || undefined"
-            :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded"
-            @course-wishlisted="handleCourseWishlisted">
+            :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded">
             <template #trigger>
               <div class="popup-trigger-area"></div>
             </template>

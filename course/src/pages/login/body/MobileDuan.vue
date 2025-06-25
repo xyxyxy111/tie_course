@@ -5,7 +5,7 @@ import { authApi, userApi } from '@/api/user';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
-import MoblieHeader from '@/components/common/MoblieHeader.vue'
+import MobileHeader from '@/components/common/MoblieHeader.vue'
 import '../login.css'
 import { useWindowSize } from '@/useWindowSize';
 import { successCodes } from '@/utils/request';
@@ -182,7 +182,7 @@ const handleLogin = async () => {
 <!-- html -->
 <template>
   <IconSprite />
-  <MoblieHeader />
+  <MobileHeader :userId="userId"/>
   <div class="login-container">
     <div class="content">
       <div class="login-form">

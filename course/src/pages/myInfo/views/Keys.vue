@@ -52,7 +52,7 @@
 
 
 
-     
+
     </form>
 
   </div>
@@ -106,7 +106,7 @@ export default defineComponent({
       try {
         let res;
         if (changePhoneform.newPhone) { res = await authApi.sendCaptcha(changePhoneform.newPhone); }
-        else {  res = await authApi.sendCaptcha(changePhoneform.newPhone); }
+        else { res = await authApi.sendCaptcha(changePhoneform.newPhone); }
         if (!successCodes.includes(res.status)) {  // 改成 status
           console.log(res.status)
           alert(res.message || '发送验证码失败');
@@ -137,8 +137,9 @@ export default defineComponent({
         changePhoneform.phone = form.phone
         await userApi.changePhone(changePhoneform)
         alert('绑定信息保存成功!')
-      } catch (error) {
         console.log(changePhoneform)
+      } catch (error) {
+
         console.error('保存失败:', error)
         alert('保存失败，请重试')
       } finally {
@@ -151,9 +152,9 @@ export default defineComponent({
       changePasswordForm.captcha = changePhoneform.captcha
       changePasswordForm.phone = form.phone
       try {
-        
+
         await userApi.changePassword(changePasswordForm)
-        alert('绑定信息保存成功!'+changePasswordForm)
+        alert('绑定信息保存成功!' + changePasswordForm)
       } catch (error) {
         console.log(changePasswordForm)
         console.error('保存失败:', error)
@@ -211,6 +212,7 @@ label {
 input[type="text"],
 input[type="password"],
 select {
+  display: inline-block;
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
@@ -218,8 +220,10 @@ select {
   box-sizing: border-box;
 }
 
-input[type="text"].captcha, input[type="password"].newpassword, input[type="text"].newphone{
-display: inline-block;
+input[type="text"].captcha,
+input[type="password"].newpassword,
+input[type="text"].newphone {
+  display: inline-block;
   width: calc(100% - 140px);
   border-radius: 4px 0px 0px 4px;
 }
@@ -231,14 +235,16 @@ textarea {
 
 button {
   display: inline-block;
-   width: 130px;
-   height:50px;
+  position: relative;
+  top: 3px;
+  width: 130px;
+  height: 50px;
   background-color: rgb(22, 92, 145);
-    color: white;
-    border: none;
-   margin-top: 20px;
-   border-radius: 0px 4px 4px 0px;
- }
+  color: white;
+  border: none;
+  margin-top: 20px;
+  border-radius: 0px 4px 4px 0px;
+}
 
 .save-button {
   position: relative;
@@ -257,7 +263,8 @@ button {
   border: 1px rgb(22, 92, 145) solid;
 }
 
-.save-button:hover,.save-button:hover {
+.save-button:hover,
+.save-button:hover {
   background-color: rgba(22, 92, 145, 0.8);
 }
 </style>

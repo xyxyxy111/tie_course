@@ -15,41 +15,41 @@
 
         <!-- 否则显示默认的课程信息 -->
         <template v-else>
-        <!-- 课程标题 -->
-        <div class="course-title">{{ courseInfo?.title || courseName }}</div>
+          <!-- 课程标题 -->
+          <div class="course-title">{{ courseInfo?.title || courseName }}</div>
 
-        <!-- 课程信息 -->
-        <div>
-          <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
-          <span class="course-duration">
-            总共{{ courseInfo?.duration || '0' }}小时
-          </span>
-        </div>
+          <!-- 课程信息 -->
+          <div>
+            <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
+            <span class="course-duration">
+              总共{{ courseInfo?.duration || '0' }}小时
+            </span>
+          </div>
 
-        <!-- 课程描述 -->
-        <div class="course-description">
-          {{ courseInfo?.description || '课程描述加载中...' }}
-        </div>
+          <!-- 课程描述 -->
+          <div class="course-description">
+            {{ courseInfo?.description || '课程描述加载中...' }}
+          </div>
 
-        <!-- 学习要点 -->
-        <div class="course-learning-points">
-          <h4>你将学到：</h4>
-          <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
-        </div>
+          <!-- 学习要点 -->
+          <div class="course-learning-points">
+            <h4>你将学到：</h4>
+            <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
+          </div>
 
-        <!-- 操作按钮 -->
-        <div class="popupBtn">
-          <button class="addToCartBtn" @click="addToCart" :disabled="loading">
-            {{ loading ? '添加中...' : '添加到购物车' }}
-          </button>
-          <button class="addToWishlistBtn" @click="addToWishlist">
-            <div class="icon">
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
-                <use href="#line-md--heart-filled" />
-              </svg>
-            </div>
-          </button>
-        </div>
+          <!-- 操作按钮 -->
+          <div class="popupBtn">
+            <button class="addToCartBtn" @click="addToCart" :disabled="loading">
+              {{ loading ? '添加中...' : '添加到购物车' }}
+            </button>
+            <button class="addToWishlistBtn" @click="addToWishlist">
+              <div class="icon">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
+                  <use href="#line-md--heart-filled" />
+                </svg>
+              </div>
+            </button>
+          </div>
         </template>
       </div>
     </transition>
@@ -60,6 +60,7 @@
 import { defineComponent, ref, computed, watch, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import { cartApi } from '@/api/cart';
+import { userApi, wishlistApi } from '@/api/user';
 
 type Position = 'right' | 'left' | 'top' | 'bottom';
 type TransitionType = 'fade' | 'slide' | 'scale';
@@ -308,25 +309,37 @@ export default defineComponent({
     };
 
     // 添加到愿望单
-    const addToWishlist = () => {
+    const addToWishlist = async () => {
       if (!props.userId || !courseInfo.value?.courseId) {
         console.warn('缺少用户ID或课程ID');
+        alert('缺少用户ID或课程ID');
         return;
       }
-
-      // 这里可以调用愿望单API
-      console.log('添加到愿望单:', {
-        userId: props.userId,
-        courseId: courseInfo.value.courseId,
-        courseName: courseInfo.value.title
-      });
-
-      // 触发事件通知父组件
-      emit('course-wishlisted', {
-        courseId: courseInfo.value.courseId,
-        courseName: courseInfo.value.title,
-        userId: props.userId
-      });
+      try {
+        await wishlistApi.addToWishlist(courseInfo.value.courseId);
+        alert(`✅ "${courseInfo.value.title}" 已添加到心愿单！`);
+        emit('course-wishlisted', {
+          courseId: courseInfo.value.courseId,
+          courseName: courseInfo.value.title,
+          userId: props.userId,
+          success: true
+        });
+      } catch (err: any) {
+        let errorMessage = '添加到心愿单失败';
+        if (err && err.response && err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (err && err.message) {
+          errorMessage = err.message;
+        };
+        console.log(courseInfo.value);
+        emit('course-wishlisted', {
+          courseId: courseInfo.value.courseId,
+          courseName: courseInfo.value.title,
+          userId: props.userId,
+          success: false,
+          error: err
+        });
+      }
     };
 
     watch(() => props.modelValue, (newVal) => {

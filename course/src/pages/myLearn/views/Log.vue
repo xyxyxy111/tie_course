@@ -55,6 +55,14 @@
             <span class="label">位置：</span>
             <span class="value">{{ log.location }}</span>
           </div>
+          <div class="log-info">
+            <span class="label">IP地址：</span>
+            <span class="value">{{ log.action }}</span>
+          </div>
+          <div class="log-info">
+            <span class="label">位置：</span>
+            <span class="value">{{ log.time }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -88,6 +96,7 @@ export default defineComponent({
         if (response.data) {
           logs.value = response.data as UserLogVO[];
         }
+        console.log(response)
       } catch (err) {
         console.error('获取日志失败:', err);
         error.value = '获取日志失败，请重试';

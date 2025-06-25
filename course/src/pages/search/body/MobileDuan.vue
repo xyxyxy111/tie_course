@@ -5,10 +5,9 @@ import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
 import { useFilterStore } from '../../../stores/filter'
-import MoblieHeader from '@/components/common/MoblieHeader.vue';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
-import MobileHeader from '@/components/common/MoblieHeader.vue';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 const filterStore = useFilterStore()
 const showFilter = ref(true)

@@ -1,21 +1,14 @@
 <script lang="ts" setup name="App">
-import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router';
-import { toRef, ref, onMounted, watch } from 'vue';
-import { defineComponent } from 'vue';
+import { RouterView, RouterLink } from 'vue-router';
+import { ref, onMounted } from 'vue';
 import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import { goToIndex } from '@/components/common/header';
-import AllCourse from './views/AllCourse.vue';
-import MyList from './views/MyList.vue';
-import Wishlist from './views/Wishlist.vue';
-import Archived from './views/Archived.vue';
 import './myLearn.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
-const router = useRouter();
-const route = useRoute();
 const { width, height } = useWindowSize()
 
 // 获取userId - 从token中获取而不是URL
@@ -26,29 +19,14 @@ onMounted(() => {
   const token = getValidToken();
   if (token) {
     userId.value = getCurrentUserId();
-  } else {
-    // 如果没有token，重定向到登录页面
-    window.location.href = '/login.html';
   }
-
-  // 检查是否需要重定向
-  if (route.path === '/learning') {
-    router.push('/learning/all-courses');
-  }
+  // 暂时不重定向，让页面先能正常加载
 });
-
-// 监听路由变化
-watch(() => route.path, (newPath) => {
-  if (newPath === '/learning') {
-    router.push('/learning/all-courses');
-  }
-});
-
 </script>
 
 <!-- html -->
 <template>
-
+  <IconSprite />
   <main>
     <PCHeader :userId="userId" v-if="width > 800" />
     <MobileHeader :userId="userId" v-else />
@@ -67,20 +45,17 @@ watch(() => route.path, (newPath) => {
         <router-link to="/learning/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
           心愿单
         </router-link>
-        <router-link to="/learning/archived" class="nav-link" :class="{ active: $route.path.includes('archived') }">
-          已存档
+        <router-link to="/learning/log" class="nav-link" :class="{ active: $route.path.includes('log') }">
+          个人日志
         </router-link>
       </nav>
-
-
     </div>
+
     <!-- 内容区域 -->
     <div class="learning-content">
       <router-view />
     </div>
-
   </main>
-
 </template>
 
 <!-- css -->
@@ -118,13 +93,14 @@ watch(() => route.path, (newPath) => {
 .nav-link.active {
   color: white;
   padding: 20px 43px 13px;
-  ;
   margin-inline: 15px;
   font-weight: bold;
   border-bottom: 8px solid white;
 }
 
-.nav-link:hover {}
+.nav-link:hover {
+  color: #ccc;
+}
 
 .learning-content {
   max-width: 1200px;
