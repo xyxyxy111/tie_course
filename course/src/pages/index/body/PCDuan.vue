@@ -9,6 +9,7 @@ import { useWindowSize } from '@/useWindowSize';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 // 导入CourseQuickView类型
 import { CourseQuickView } from '../components/content.ts';
@@ -31,12 +32,16 @@ import {
 
 courseTitles.value[0].activeFlag = true
 
-// 获取userId
 const userId = ref<string | null>(null);
 
 onMounted(async () => {
   // 从URL参数获取userId
   const searchParams = new URLSearchParams(window.location.search);
+    const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  }
+
   let categoryId;
   //session?
   if (!searchParams.get('categoryId')) {
@@ -169,12 +174,6 @@ function handleCourseAdded(event: any) {
     }
   }
 }
-
-function handleCourseWishlisted(event: any) {
-  console.log('课程已添加到愿望单:', event);
-  // 可以显示成功提示
-  console.log(`课程 "${event.courseName}" 已添加到愿望单`);
-}
 </script>
 
 <template>
@@ -212,8 +211,7 @@ function handleCourseWishlisted(event: any) {
           <!-- HoverPopup 组件 -->
           <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="340px" transition="slide"
             :show-delay="150" :hide-delay="150" class="custom-popup-right" :userId="userId || undefined"
-            :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded"
-            @course-wishlisted="handleCourseWishlisted">
+            :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded">
             <template #trigger>
               <div class="popup-trigger-area"></div>
             </template>

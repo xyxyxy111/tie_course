@@ -6,6 +6,7 @@ import PCHeader from '@/components/common/PCHeader.vue';
 import { useCartLogic } from '../components/content';
 import { wishlistApi } from '@/api/user';
 import '../cart.css';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const { width, height } = useWindowSize();
 const { cart, totalPrice, goToCheckout, loading, error, removeCourseFromCart } = useCartLogic();
@@ -23,13 +24,14 @@ const CourseIncartStyle = () => ({});
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
+  // 如果没有token，userId保持为null，用户仍然可以浏览课程
 });
+
 
 // 加入心愿单
 const addToWishlist = async (courseId: number) => {
@@ -80,18 +82,11 @@ const removeFromCart = async (courseId: number) => {
         <p>加载中...</p>
       </div>
 
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="error">
-        <p>{{ error }}</p>
-        <button @click="() => window.location.reload()">重试</button>
-      </div>
-
       <!-- 空购物车状态 -->
       <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
         <div class="empty-icon">🛒</div>
         <h2>购物车为空</h2>
         <p>您还没有添加任何课程到购物车</p>
-        <button class="browse-btn" @click="() => window.location.href = '/course.html'">浏览课程</button>
       </div>
 
       <!-- 购物车内容 -->
@@ -155,7 +150,6 @@ const removeFromCart = async (courseId: number) => {
 <style scoped>
 .cart-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
   padding: 20px 0;
 }
 

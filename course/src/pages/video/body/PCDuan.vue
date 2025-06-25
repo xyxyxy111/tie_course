@@ -109,6 +109,7 @@
 import { useWindowSize } from 'vue-window-size'
 import { ref, onMounted } from 'vue'
 import PCHeader from '@/components/common/PCHeader.vue'
+import { getCurrentUserId, getValidToken } from '@/utils/request'
 
 export default {
 <<<<<<< HEAD
@@ -121,17 +122,17 @@ export default {
   setup() {
     const { width, height } = useWindowSize()
 
-    // 获取userId
-    const userId = ref < string | null > (null);
+    // 获取userId - 从token中获取而不是URL
+    const userId = ref < string | null > (null)
 
     onMounted(() => {
-      // 从URL参数获取userId
-      const searchParams = new URLSearchParams(window.location.search);
-      const urlUserId = searchParams.get('userId');
-      if (urlUserId) {
-        userId.value = decodeURIComponent(urlUserId);
+      // 从token获取userId
+      const token = getValidToken()
+      if (token) {
+        userId.value = getCurrentUserId()
       }
-    });
+      // 如果没有token，userId保持为null，用户仍然可以观看视频
+    })
 
     return {
       userId

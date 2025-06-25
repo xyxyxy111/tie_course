@@ -20,6 +20,51 @@ export const getValidToken = (): string | null => {
   return isValidToken(token) ? token : null;
 };
 
+// 从token中解析用户信息
+export const getUserFromToken = (): { userId?: string; username?: string } | null => {
+  const token = getValidToken();
+  if (!token) return null;
+  
+  try {
+    // 如果token是JWT格式，尝试解析payload
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const payload = JSON.parse(atob(parts[1]));
+      console.log('Token payload:', payload);
+      return {
+        userId: payload.userId || payload.sub || payload.id,
+        username: payload.username || payload.name
+      };
+    }
+    
+    // 如果不是JWT格式，尝试解析为简单格式
+    // 假设token格式为: userId:username 或其他格式
+    if (token.includes(':')) {
+      const [userId, username] = token.split(':');
+      return { userId, username };
+    }
+    
+    // 如果都不匹配，返回null
+    console.log('Token格式无法识别:', token.substring(0, 20) + '...');
+    return null;
+  } catch (error) {
+    console.error('解析token失败:', error);
+    return null;
+  }
+};
+
+// 获取当前用户ID
+export const getCurrentUserId = (): string | null => {
+  const userInfo = getUserFromToken();
+  return userInfo?.userId || null;
+};
+
+// 获取当前用户名
+export const getCurrentUsername = (): string | null => {
+  const userInfo = getUserFromToken();
+  return userInfo?.username || null;
+};
+
 const instance = axios.create({
   baseURL: 'http://localhost:5173/api',
   timeout: 10000,

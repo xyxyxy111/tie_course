@@ -120,9 +120,9 @@ const handleLogin = async () => {
     let res;
     if (loginMethod.value === 'captcha') {
       res = await authApi.loginByCaptcha({
-        phone: formData.value.phone,
-        captcha: formData.value.captcha
-      });
+      phone: formData.value.phone,
+      captcha: formData.value.captcha
+    });
     } else {
       res = await authApi.loginByPassword({
         phone: formData.value.phone,
@@ -163,7 +163,7 @@ const handleLogin = async () => {
       success: true
     };
     console.log('登录成功，用户手机号:', formData.value.phone);
-    goToIndex(formData.value.phone);
+    goToIndex();
   } catch (error: any) {
     console.error('登录错误:', error);
     loginStatus.value = {
@@ -186,25 +186,6 @@ const ImgStyle = () => ({
     : 'none',
 })
 
-const logout = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (token) {
-      await authApi.logout();
-      console.log('登出成功');
-    }
-    localStorage.removeItem('token');
-    console.log('本地token已清除');
-
-    // 重定向到登录页面
-    window.location.href = '/login.html';
-  } catch (error) {
-    console.error('登出失败:', error);
-    // 即使API调用失败，也要清除本地token
-    localStorage.removeItem('token');
-    window.location.href = '/login.html';
-  }
-};
 
 </script>
 
@@ -299,21 +280,6 @@ const logout = async () => {
   margin-top: 15px;
 }
 
-.password {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.password:focus {
-  border-color: #165c91;
-}
-
-/* 登录方式切换按钮样式 */
 .login-method-switch {
   margin-top: 20px;
   text-align: center;

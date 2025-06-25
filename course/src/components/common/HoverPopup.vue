@@ -63,6 +63,7 @@ import { cartApi } from '@/api/cart';
 import type {CourseVO} from '@/api/course';
 import { courseApi } from '@/api/course';
 import { convertMinutesToHours } from '@/utils/common';
+import { userApi, wishlistApi } from '@/api/user';
 
 type Position = 'right' | 'left' | 'top' | 'bottom';
 type TransitionType = 'fade' | 'slide' | 'scale';
@@ -312,25 +313,37 @@ export default defineComponent({
     };
 
     // 添加到愿望单
-    const addToWishlist = () => {
+    const addToWishlist = async () => {
       if (!props.userId || !courseInfo.value?.courseId) {
         console.warn('缺少用户ID或课程ID');
+        alert('缺少用户ID或课程ID');
         return;
       }
-
-      // 这里可以调用愿望单API
-      console.log('添加到愿望单:', {
-        userId: props.userId,
-        courseId: courseInfo.value.courseId,
-        courseName: courseInfo.value.title
-      });
-
-      // 触发事件通知父组件
-      emit('course-wishlisted', {
-        courseId: courseInfo.value.courseId,
-        courseName: courseInfo.value.title,
-        userId: props.userId
-      });
+      try {
+        await wishlistApi.addToWishlist(courseInfo.value.courseId);
+        alert(`✅ "${courseInfo.value.title}" 已添加到心愿单！`);
+        emit('course-wishlisted', {
+          courseId: courseInfo.value.courseId,
+          courseName: courseInfo.value.title,
+          userId: props.userId,
+          success: true
+        });
+      } catch (err: any) {
+        let errorMessage = '添加到心愿单失败';
+        if (err && err.response && err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (err && err.message) {
+          errorMessage = err.message;
+        };
+        console.log(courseInfo.value);
+        emit('course-wishlisted', {
+          courseId: courseInfo.value.courseId,
+          courseName: courseInfo.value.title,
+          userId: props.userId,
+          success: false,
+          error: err
+        });
+      }
     };
 
     watch(() => props.modelValue, (newVal) => {

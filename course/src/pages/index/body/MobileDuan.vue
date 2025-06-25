@@ -4,7 +4,7 @@ import { toRef, ref, onMounted, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize';
-import MoblieHeader from '@/components/common/MoblieHeader.vue';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import {
@@ -134,7 +134,7 @@ function addToCart(course: string) {
         </div>
       </template>
     </CartPopup>
-    <MoblieHeader />
+    <MobileHeader :userId="userId"/>
     <div>
 
       <div class="title" :style="titleStyle()">Software Engineering Courses</div>

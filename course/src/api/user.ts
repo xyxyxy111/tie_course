@@ -33,13 +33,22 @@ interface UserProfile {
   allowSMSNotify?: boolean;
 }
 
+interface UserBindInfo{
+  phone: string;
+  email: string;
+  passwordSet: boolean;
+  wxInfo: string;
+  qqInfo: string;
+}
+
 interface UploadAvatarResponse {
   avatarUrl: string;
 }
 
 //avatarUrl: string;
 
-interface WishListVO {
+export interface WishListVO {
+  courseId: number;
   title: string;
   originalPrice: number;
   currentPrice: number;
@@ -48,7 +57,7 @@ interface WishListVO {
   totalMinutes: number;
 }
 
-interface UserLogVO {
+export interface UserLogVO {
   username: string;
   IP: string;
   location: string;
@@ -62,10 +71,10 @@ interface ChangePhoneParams {
   captcha: string;
 }
 
-
 interface ChangePasswordParams {
-  oldPassword: string;
+  phone: string;
   newPassword: string;
+  captcha: string;
 }
 
 export const authApi = {
@@ -122,7 +131,7 @@ export const authApi = {
   logout: () => {
     return request<{}>({
       method: 'DELETE',
-      url: '/auth/sessions'
+      url: '/account/user/sessions'
     });
   },
 
@@ -187,7 +196,13 @@ export const userApi = {
       url: '/account/user/result/wxBind',
       params: { state }
     });
-  }
+  },
+
+  getBindInfo: () => {
+    return request({
+      method:'GET',
+      url:'/account/user'
+    })  }
 };
 
 export const profileApi = {
@@ -228,7 +243,7 @@ export const wishlistApi = {
     return request({
       url: '/account/wishlist',
       method: 'POST',
-      data: { courseId }
+      params: { courseId }
     })
   },
 
@@ -273,7 +288,7 @@ export const logApi = {
 
   clearUserLogs: () => {
     return request({
-      url: '/account/log/all',
+      url: '/account/log',
       method: 'DELETE'
     })
   }

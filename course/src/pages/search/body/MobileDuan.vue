@@ -5,19 +5,16 @@ import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
 import { useFilterStore } from '../../../stores/filter'
-import MoblieHeader from '@/components/common/MoblieHeader.vue';
-import MobileBottom from '@/components/common/MobileBottom.vue';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
-import MobileHeader from '@/components/common/MoblieHeader.vue';
-import { useSearchLogic } from '../components/content';
-
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 const filterStore = useFilterStore()
 const showFilter = ref(true)
 const searchQuery = ref('')
 const { width, height } = useWindowSize()
 
-// 获取userId
+// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 const courses = ref([
@@ -39,11 +36,12 @@ const courses = ref([
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   searchQuery.value = urlParams.get('q') || '';
-  // 从URL参数获取userId
-  const urlUserId = urlParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
+  // 如果没有token，userId保持为null，用户仍然可以搜索课程
 });// 监听筛选条件变化
 watch(
   () => [

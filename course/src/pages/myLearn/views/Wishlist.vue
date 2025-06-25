@@ -17,14 +17,17 @@
     <!-- 课程列表 -->
     <div v-else class="wishlist-container">
       <div class="wishlist-header">
-        <h2>我的心愿单</h2>
-        <span class="course-count">{{ courses.length }} 门课程</span>
+        <h2 style="display: flex; align-items: center; gap: 16px;">
+          我的心愿单
+          <span class="course-count">{{ courses.length }} 门课程</span>
+        </h2>
+        <button class="clear-btn" @click="clearWishlist">清空心愿单</button>
       </div>
 
       <div class="courses-grid">
-        <div class="course-card" v-for="(course, index) in courses" :key="course.id || course.courseId || index">
+        <div class="course-card" v-for="(course, index) in courses" :key="course.courseId || course.courseId || index">
           <div class="course-image">
-            <img :src="course.coverimg || course.coverImgUrl" :alt="course.title">
+            <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
           </div>
 
           <div class="course-content">
@@ -34,7 +37,7 @@
                 <span class="stars">★★★★★</span>
                 <span class="rating-text">4.8 (2,187)</span>
               </div>
-              <button class="remove-btn" @click="removeFromWishlistByTitle(course.title)">
+              <button class="remove-btn" @click="removeFromWishlist(course.courseId)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19 13H5v-2h14v2z" />
                 </svg>
@@ -50,27 +53,12 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { wishlistApi } from '@/api/user';
-
-interface Course {
-  id?: number;
-  courseId?: number;
-  course_id?: number;
-  wishlistId?: number;
-  wishlist_id?: number;
-  coverimg?: string;
-  coverImgUrl?: string;
-  title: string;
-  progress?: number;
-  currentPrice?: number;
-  originalPrice?: number;
-  score?: number;
-  totalMinutes?: number;
-}
+import type { WishListVO } from '@/api/user';
 
 export default defineComponent({
   name: 'Wishlist',
   setup() {
-    const courses = ref<Course[]>([]);
+    const courses = ref<WishListVO[]>([]);
     const loading = ref(true);
 
     // 获取愿望单列表
@@ -83,19 +71,12 @@ export default defineComponent({
         // 根据API返回的数据更新courses
         if (response && response.data && Array.isArray(response.data)) {
           console.log('愿望单数据:', response.data);
-          courses.value = response.data as Course[];
+          courses.value = response.data as WishListVO[];
 
           // 检查每个课程的ID字段
           courses.value.forEach((course, index) => {
             console.log(`课程 ${index} 完整数据:`, course);
             console.log(`课程 ${index} 所有属性:`, Object.keys(course));
-            console.log(`课程 ${index} ID相关字段:`, {
-              id: course.id,
-              courseId: course.courseId,
-              course_id: (course as any).course_id,
-              wishlistId: (course as any).wishlistId,
-              wishlist_id: (course as any).wishlist_id
-            });
           });
         } else {
           console.log('愿望单数据为空或格式不正确');
@@ -157,7 +138,6 @@ export default defineComponent({
           // 其他错误
           errorMessage = error.message || '未知错误';
         }
-
         alert(errorMessage);
       }
     };
@@ -181,41 +161,15 @@ export default defineComponent({
     };
 
     // 调试课程数据
-    const debugCourse = (course: Course) => {
+    const debugCourse = (course: WishListVO) => {
       console.log('=== 课程数据结构 ===');
       console.log('原始对象:', course);
       console.log('所有属性:', Object.keys(course));
       console.log('JSON格式:', JSON.stringify(course, null, 2));
       console.log('可能的ID字段:');
-      console.log('- id:', course.id);
+      console.log('- id:', course.courseId);
       console.log('- courseId:', course.courseId);
-      console.log('- course_id:', (course as any).course_id);
-      console.log('- wishlistId:', course.wishlistId);
-      console.log('- wishlist_id:', (course as any).wishlist_id);
       console.log('==================');
-    };
-
-    // 通过标题移除心愿单（临时解决方案）
-    const removeFromWishlistByTitle = async (title: string) => {
-      try {
-        console.log('正在移除课程，标题:', title);
-
-        // 由于API设计问题，这里使用一个临时的courseId
-        // 实际应该由后端返回courseId
-        const tempCourseId = 1; // 临时使用ID 1
-
-        const response = await wishlistApi.removeFromWishlist(tempCourseId);
-        console.log('移除课程成功:', response);
-
-        // 显示成功提示
-        alert('课程已从愿望单移除');
-
-        // 重新获取愿望单数据
-        await fetchWishlist();
-      } catch (error: any) {
-        console.error('移除课程失败:', error);
-        alert('移除失败，请重试。注意：当前API设计可能存在问题，需要后端返回courseId字段。');
-      }
     };
 
     // 组件挂载时获取愿望单数据
@@ -229,8 +183,7 @@ export default defineComponent({
       removeFromWishlist,
       clearWishlist,
       goToCourse,
-      debugCourse,
-      removeFromWishlistByTitle
+      debugCourse
     };
   }
 });
@@ -355,6 +308,10 @@ export default defineComponent({
   font-size: 28px;
   font-weight: 600;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
 }
 
 .course-count {
@@ -363,6 +320,7 @@ export default defineComponent({
   background: #f8f9fa;
   padding: 8px 16px;
   border-radius: 20px;
+  margin-left: 0;
 }
 
 .courses-grid {
@@ -550,5 +508,29 @@ export default defineComponent({
   .wishlist-container {
     padding: 20px;
   }
+}
+
+.clear-btn {
+  margin-left: 20px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
+  color: white;
+  border: none;
+  width: fit-content;
+  padding: 0px 12px;
+  height: 42px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.clear-btn:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);
+}
+
+button {
+  white-space: nowrap;
+  width: fit-content;
 }
 </style>

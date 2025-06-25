@@ -95,7 +95,7 @@ const removeFromCart = async (courseId: number) => {
 
     <!-- 购物车内容 -->
     <div v-else class="content">
-      <div class="title">Shopping Cart</div>
+    <div class="title">Shopping Cart</div>
       <div class="course-list">
         <h1>{{ cart.cartItemList.length }} Courses in Cart</h1>
         <div class="course-items-container">
@@ -103,13 +103,13 @@ const removeFromCart = async (courseId: number) => {
             <!-- 图片区域 -->
             <div class="course-image-section">
               <img :src="course.courseImage" alt="" class="course-image">
-            </div>
+              </div>
 
             <!-- 内容区域 -->
             <div class="course-content-section">
               <h2 class="course-title">{{ course.courseName }}</h2>
               <div class="course-price">${{ course.currentPrice }}</div>
-            </div>
+              </div>
 
             <!-- 按钮区域 -->
             <div class="course-actions-section">
@@ -120,9 +120,9 @@ const removeFromCart = async (courseId: number) => {
                 </svg>
               </button>
               <button class="remove-btn" @click="() => removeFromCart(course.courseId)">删除</button>
-            </div>
-          </div>
-        </div>
+              </div>
+              </div>
+              </div>
       </div>
 
       <div class="checkout-section">

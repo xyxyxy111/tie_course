@@ -6,6 +6,7 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize'
 import '../order.css'
 import { OrderItem } from '@/types/types';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 interface Course {
   id: number;
@@ -22,15 +23,17 @@ interface CartData {
 
 const { width, height } = useWindowSize()
 
-// 获取userId
+// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  } else {
+    // 如果没有token，重定向到登录页面
+    window.location.href = '/login.html';
   }
 
   try {

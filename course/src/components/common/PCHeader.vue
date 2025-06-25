@@ -56,39 +56,29 @@
 
 
     </button>
-
     <div :style="headerSpaceStyle" v-if="!userId"></div>
-    <button @click="goToCart(userId)">
+    <button @click="goToCart()">
       <div class="icon">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
           <use href="#mdi--cart-outline" />
         </svg>
       </div>
     </button>
-    <!-- <button v-if="userId">
-      <div class="icon">
-        <div class="icon">
-          <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
-            <use href="#mdi--bell-outline" />
-          </svg>
-        </div>
-      </div>
-    </button> -->
 
 
-    <button v-if="!userId" :style="headerButtonStyle" @click="goToLogin">Login</button>
+    <button v-if="!userId" :style="headerButtonStyle2" @click="goToLogin">Login</button>
 
     <div v-if="userId" :style="headerButtonStyle">
-      <img src="/src/images/userPic.png" alt="" @click="goToMyInfo(userId)">
+      <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
     </div>
 
-    <button style="padding-inline:0% ;" v-if="!userId">
+    <!-- <button style="padding-inline:0% ;" v-if="!userId">
       <div class="icon">
         <svg width="50" height="50" viewBox="-1.3 -1 8 8" fill="#35495e">
           <use href="#mdi--web" />
         </svg>
       </div>
-    </button>
+    </button> -->
 
   </div>
 
@@ -250,9 +240,15 @@ const headerSearchInputStyle = computed(() => ({
 }));
 
 const headerButtonStyle = computed(() => ({
-  paddingInline: `calc(3vw * ${headerButtonPadding.value})`,
+  paddingInline: `calc(2vw * ${headerButtonPadding.value})`,
   transition: 'none'
 }));
+
+const headerButtonStyle2 = computed(() => ({
+  paddingInline: `calc(5vw * ${headerButtonPadding.value})`,
+  transition: 'none'
+}));
+
 
 const goToWishlist = () => {
   window.location.href = "/learning.html#/learning/wishlist";
@@ -387,7 +383,7 @@ img {
 }
 
 .explore-popup-content {
-  padding: 16px;
+  padding: 16px 0;
   background: white;
   border-radius: 8px;
   position: relative;
@@ -419,6 +415,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-inline: 0;
 }
 
 .category-item:hover {
@@ -441,13 +438,14 @@ img {
 /* Tags浮窗样式 */
 .tags-popup {
   position: absolute;
-  left: calc(100% + 8px);
+  left: 100%;
   top: 0;
   width: 270px;
   background: white;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid #eee;
+  border-left: none;
   z-index: 1000;
   padding: 16px;
   animation: fadeIn 0.2s ease-in-out;

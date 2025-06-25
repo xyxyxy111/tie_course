@@ -28,24 +28,14 @@
       </div>
     </div>
 
-    <PCHeader :userId="userId" />
-
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted } from 'vue';
-import PCHeader from '@/components/common/PCHeader.vue';
-
-const progressBarStyle = computed(() => ({
-
-}))
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: 'AllCourses',
-  components: {
-    PCHeader
-  },
+  name: 'AllCourse',
   setup() {
     const courses = ref([
       {
@@ -79,21 +69,8 @@ export default defineComponent({
       }
     ]);
 
-    // 获取userId
-    const userId = ref<string | null>(null);
-
-    onMounted(() => {
-      // 从URL参数获取userId
-      const searchParams = new URLSearchParams(window.location.search);
-      const urlUserId = searchParams.get('userId');
-      if (urlUserId) {
-        userId.value = decodeURIComponent(urlUserId);
-      }
-    });
-
-    return { courses, userId };
+    return { courses };
   }
-
 });
 </script>
 
@@ -169,7 +146,6 @@ button:hover {
 
 .course-card {
   width: 240px;
-
   padding: 10px;
 }
 
