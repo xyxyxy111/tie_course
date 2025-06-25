@@ -6,32 +6,26 @@ import Filter from '../components/Filter.vue';
 import { useFilterStore } from '../../../stores/filter'
 import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
-import { useSearchLogic } from '../components/content';
 import '../search.css'
-import {
-  courseTitles, NavigationButton,
-  courseQuickViews, communityVoices,
-  recommendedProducts, relatedTopics
-} from '../components/content.ts';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const searchQuery = ref('');
 const filterStore = useFilterStore()
 const showFilter = ref(true)
 const { width, height } = useWindowSize()
 
-courseTitles.value[0].activeFlag = true
-
-// 获取userId
+// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   searchQuery.value = urlParams.get('q') || '';
-  // 从URL参数获取userId
-  const urlUserId = urlParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
+  // 如果没有token，userId保持为null，用户仍然可以搜索课程
 });
 
 const SearchResultWidth = computed(() => {

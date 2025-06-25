@@ -6,7 +6,7 @@ import Wishlist from '@/pages/myLearn/views/Wishlist.vue';
 import Archived from '@/pages/myLearn/views/Archived.vue';
 import BasicInformation from '@/pages/myInfo/views/BasicInformation.vue';
 import Communication from '@/pages/myInfo/views/Communication.vue';
-import Courses from '@/pages/myInfo/views/Courses.vue';
+import Keys from '@/pages/myInfo/views/Keys.vue';
 import Photo from '@/pages/myInfo/views/Photo.vue';
 import Privacy from '@/pages/myInfo/views/Privacy.vue';
 import Profile from '@/pages/myInfo/views/Profile.vue';
@@ -43,9 +43,9 @@ const router = createRouter({
       ]
     },
     {
-      name: 'Courses',
-      component: Courses,
-      path: '/my-info/courses'
+      name: 'Keys',
+      component: Keys,
+      path: '/my-info/keys'
     },
     {
       name: 'Communication',

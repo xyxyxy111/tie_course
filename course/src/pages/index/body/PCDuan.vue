@@ -9,6 +9,7 @@ import { useWindowSize } from '@/useWindowSize';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 // 导入CourseQuickView类型
 import type { CourseQuickView } from '../components/content.ts';
@@ -22,16 +23,16 @@ import {
 
 courseTitles.value[0].activeFlag = true
 
-// 获取userId
+// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
+  // 如果没有token，userId保持为null，用户仍然可以浏览课程
 });
 
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
@@ -143,7 +144,7 @@ function handleCourseWishlisted(event: any) {
       <div class="content">
         <div v-for="(courseQuickView, index) in courseQuickViews" class="course"
           @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
-          <div @click="goToCourse(userId)">
+          <div @click="goToCourse()">
             <img :src="courseQuickView.coverImgUrl" alt="">
             <div class="course-title">
               {{ courseQuickView.title }}

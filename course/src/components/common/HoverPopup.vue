@@ -15,41 +15,41 @@
 
         <!-- 否则显示默认的课程信息 -->
         <template v-else>
-          <!-- 课程标题 -->
-          <div class="course-title">{{ courseInfo?.title || courseName }}</div>
+        <!-- 课程标题 -->
+        <div class="course-title">{{ courseInfo?.title || courseName }}</div>
 
-          <!-- 课程信息 -->
-          <div>
-            <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
-            <span class="course-duration">
-              总共{{ courseInfo?.duration || '0' }}小时
-            </span>
-          </div>
+        <!-- 课程信息 -->
+        <div>
+          <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
+          <span class="course-duration">
+            总共{{ courseInfo?.duration || '0' }}小时
+          </span>
+        </div>
 
-          <!-- 课程描述 -->
-          <div class="course-description">
-            {{ courseInfo?.description || '课程描述加载中...' }}
-          </div>
+        <!-- 课程描述 -->
+        <div class="course-description">
+          {{ courseInfo?.description || '课程描述加载中...' }}
+        </div>
 
-          <!-- 学习要点 -->
-          <div class="course-learning-points">
-            <h4>你将学到：</h4>
-            <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
-          </div>
+        <!-- 学习要点 -->
+        <div class="course-learning-points">
+          <h4>你将学到：</h4>
+          <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
+        </div>
 
-          <!-- 操作按钮 -->
-          <div class="popupBtn">
-            <button class="addToCartBtn" @click="addToCart" :disabled="loading">
-              {{ loading ? '添加中...' : '添加到购物车' }}
-            </button>
-            <button class="addToWishlistBtn" @click="addToWishlist">
-              <div class="icon">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
-                  <use href="#line-md--heart-filled" />
-                </svg>
-              </div>
-            </button>
-          </div>
+        <!-- 操作按钮 -->
+        <div class="popupBtn">
+          <button class="addToCartBtn" @click="addToCart" :disabled="loading">
+            {{ loading ? '添加中...' : '添加到购物车' }}
+          </button>
+          <button class="addToWishlistBtn" @click="addToWishlist">
+            <div class="icon">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
+                <use href="#line-md--heart-filled" />
+              </svg>
+            </div>
+          </button>
+        </div>
         </template>
       </div>
     </transition>

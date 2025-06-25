@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { profileApi } from '@/api/user'
-import { getValidToken, isValidToken } from '@/utils/request'
+import { getValidToken, isValidToken, getCurrentUserId, getCurrentUsername } from '@/utils/request'
 
 // 用户信息类型
 export interface UserInfo {
@@ -172,6 +172,16 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // 获取当前用户ID
+  const getUserId = (): string | null => {
+    return getCurrentUserId()
+  }
+
+  // 获取当前用户名
+  const getUsername = (): string | null => {
+    return getCurrentUsername()
+  }
+
   return {
     // 状态
     userInfo,
@@ -192,6 +202,8 @@ export const useUserStore = defineStore('user', () => {
     initializeUser,
     logout,
     clearError,
-    resetLoginStatus
+    resetLoginStatus,
+    getUserId,
+    getUsername
   }
 }) 

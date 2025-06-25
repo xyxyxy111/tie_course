@@ -28,14 +28,13 @@
       </div>
     </div>
 
-    <PCHeader :userId="userId" />
-
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, ref, onMounted } from 'vue';
 import PCHeader from '@/components/common/PCHeader.vue';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const progressBarStyle = computed(() => ({
 
@@ -79,15 +78,17 @@ export default defineComponent({
       }
     ]);
 
-    // 获取userId
+    // 获取userId - 从token中获取而不是URL
     const userId = ref<string | null>(null);
 
     onMounted(() => {
-      // 从URL参数获取userId
-      const searchParams = new URLSearchParams(window.location.search);
-      const urlUserId = searchParams.get('userId');
-      if (urlUserId) {
-        userId.value = decodeURIComponent(urlUserId);
+      // 从token获取userId
+      const token = getValidToken();
+      if (token) {
+        userId.value = getCurrentUserId();
+      } else {
+        // 如果没有token，重定向到登录页面
+        window.location.href = '/login.html';
       }
     });
 

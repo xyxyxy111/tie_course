@@ -80,18 +80,11 @@ const removeFromCart = async (courseId: number) => {
         <p>加载中...</p>
       </div>
 
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="error">
-        <p>{{ error }}</p>
-        <button @click="() => window.location.reload()">重试</button>
-      </div>
-
       <!-- 空购物车状态 -->
       <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
         <div class="empty-icon">🛒</div>
         <h2>购物车为空</h2>
         <p>您还没有添加任何课程到购物车</p>
-        <button class="browse-btn" @click="() => window.location.href = '/course.html'">浏览课程</button>
       </div>
 
       <!-- 购物车内容 -->
@@ -155,7 +148,6 @@ const removeFromCart = async (courseId: number) => {
 <style scoped>
 .cart-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
   padding: 20px 0;
 }
 

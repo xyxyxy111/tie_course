@@ -67,11 +67,11 @@
     </button>
     <!-- <button v-if="userId">
       <div class="icon">
-        <div class="icon">
-          <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
-            <use href="#mdi--bell-outline" />
-          </svg>
-        </div>
+      <div class="icon">
+        <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
+          <use href="#mdi--bell-outline" />
+        </svg>
+      </div>
       </div>
     </button> -->
 
@@ -372,7 +372,7 @@ img {
 }
 
 .explore-popup-content {
-  padding: 16px;
+  padding: 16px 0;
   background: white;
   border-radius: 8px;
   position: relative;
@@ -404,6 +404,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-inline: 0;
 }
 
 .category-item:hover {
@@ -426,13 +427,14 @@ img {
 /* Tags浮窗样式 */
 .tags-popup {
   position: absolute;
-  left: calc(100% + 8px);
+  left: 100%;
   top: 0;
   width: 270px;
   background: white;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid #eee;
+  border-left: none;
   z-index: 1000;
   padding: 16px;
   animation: fadeIn 0.2s ease-in-out;

@@ -121,9 +121,9 @@ const handleLogin = async () => {
     let res;
     if (loginMethod.value === 'captcha') {
       res = await authApi.loginByCaptcha({
-        phone: formData.value.phone,
-        captcha: formData.value.captcha
-      });
+      phone: formData.value.phone,
+      captcha: formData.value.captcha
+    });
     } else {
       res = await authApi.loginByPassword({
         phone: formData.value.phone,

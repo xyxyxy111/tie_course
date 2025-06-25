@@ -6,25 +6,29 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
+import { goToIndex } from '@/components/common/header';
 import AllCourse from './views/AllCourse.vue';
 import MyList from './views/MyList.vue';
 import Wishlist from './views/Wishlist.vue';
 import Archived from './views/Archived.vue';
 import './myLearn.css';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const router = useRouter();
 const route = useRoute();
 const { width, height } = useWindowSize()
 
-// 获取userId
+// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  } else {
+    // 如果没有token，重定向到登录页面
+    window.location.href = '/login.html';
   }
 
   // 检查是否需要重定向
@@ -39,6 +43,7 @@ watch(() => route.path, (newPath) => {
     router.push('/learning/all-courses');
   }
 });
+
 </script>
 
 <!-- html -->

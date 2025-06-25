@@ -9,25 +9,39 @@ import IconSprite from '@/components/Icon/IconSprite.vue';
 import { goToIndex } from '@/components/common/header';
 import BasicInformation from './views/BasicInformation.vue';
 import Communication from './views/Communication.vue';
-import Courses from './views/Courses.vue';
+import Courses from './views/Keys.vue';
 import Photo from './views/Photo.vue';
 import Privacy from './views/Privacy.vue';
 import Profile from './views/Profile.vue';
 import './myInfo.css';
+import { authApi } from '@/api/user';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const { width, height } = useWindowSize()
 
-// 获取userId
+// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  } else {
+    // 如果没有token，重定向到登录页面
+    window.location.href = '/login.html';
   }
 });
+
+const handleLogout = async () => {
+  try {
+    await authApi.logout();
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  } catch (error) {
+    alert('登出失败，请重试');
+  }
+};
 </script>
 <template>
   <IconSprite />
@@ -48,11 +62,10 @@ onMounted(() => {
         </i>
       </router-link>
 
-      <!-- Courses - 跳转到课程页面 -->
-      <router-link to="/my-info/courses" class="sidebar-icon" active-class="active">
+      <router-link to="/my-info/keys" class="sidebar-icon" active-class="active">
         <i class="icon-courses">
           <svg width="30" height="30" viewBox="0 0 16 16" fill="#35495e">
-            <use href="#ph--video-fill" />
+            <use href="#solar--key-bold" />
           </svg>
         </i>
       </router-link>
@@ -65,6 +78,13 @@ onMounted(() => {
           </svg>
         </i>
       </router-link>
+
+      <button @click="handleLogout"
+        style="display: flex; align-items: center; gap: 8px; color: white; background: none; border: none; cursor: pointer; font-size: 16px;">
+        <svg width="80" height="36" viewBox="0 0 16 16" fill="#35495e">
+          <use href="#material-symbols--logout" />
+        </svg>
+      </button>
     </div>
 
     <!-- 主要内容区 -->
@@ -113,6 +133,13 @@ onMounted(() => {
 .sidebar-icon i {
   font-size: 24px;
 }
+
+.my-info-sidebar button {
+  margin: 0 auto;
+  width: 80px;
+  height: 76px;
+}
+
 
 /* 内容区样式 */
 .my-info-content {
