@@ -1,21 +1,13 @@
 <template>
   <div class="tooltip-wrapper" ref="wrapperRef">
     <!-- 触发元素 -->
-    <div 
-      @mouseenter="showTooltip" 
-      @mouseleave="hideTooltip"
-      class="tooltip-trigger"
-    >
+    <div @mouseenter="showTooltip" @mouseleave="hideTooltip" class="tooltip-trigger">
       <slot name="trigger"></slot>
     </div>
-    
+
     <!-- 悬浮窗内容 -->
     <transition name="fade">
-      <div 
-        v-show="isVisible"
-        class="tooltip-content"
-        :class="`tooltip-${position}`"
-      >
+      <div v-show="isVisible" class="tooltip-content" :class="`tooltip-${position}`">
         <slot>{{ content }}</slot>
         <div class="tooltip-arrow" :style="arrowStyle"></div>
       </div>
@@ -40,11 +32,21 @@ export default defineComponent({
     offset: {
       type: Number,
       default: 8
+    },
+    showDelay: {
+      type: Number,
+      default: 150
+    },
+    hideDelay: {
+      type: Number,
+      default: 150
     }
   },
   setup(props) {
     const isVisible = ref(false)
     const wrapperRef = ref<HTMLElement | null>(null)
+    let showTimer: number | null = null
+    let hideTimer: number | null = null
 
     // 箭头位置计算
     const arrowStyle = computed(() => {
@@ -56,15 +58,37 @@ export default defineComponent({
       }
     })
 
-    const showTooltip = () => isVisible.value = true
-    const hideTooltip = () => isVisible.value = false
+    const clearTimers = () => {
+      if (showTimer) {
+        clearTimeout(showTimer)
+        showTimer = null
+      }
+      if (hideTimer) {
+        clearTimeout(hideTimer)
+        hideTimer = null
+      }
+    }
 
-    return { 
-      isVisible, 
+    const showTooltip = () => {
+      clearTimers()
+      showTimer = setTimeout(() => {
+        isVisible.value = true
+      }, props.showDelay)
+    }
+
+    const hideTooltip = () => {
+      clearTimers()
+      hideTimer = setTimeout(() => {
+        isVisible.value = false
+      }, props.hideDelay)
+    }
+
+    return {
+      isVisible,
       wrapperRef,
       arrowStyle,
-      showTooltip, 
-      hideTooltip 
+      showTooltip,
+      hideTooltip
     }
   }
 })
@@ -131,6 +155,7 @@ export default defineComponent({
 .fade-leave-active {
   transition: opacity 0.2s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

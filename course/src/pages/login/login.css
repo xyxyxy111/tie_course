@@ -38,9 +38,10 @@
 
 
 .login-container .captcha {
-  width: calc(100% - 100px);
+  width: calc(100% - 130px);
   border-radius: 10px 0px 0px 10px;
 }
+
 
 .login-container button {
   width: 100%;
@@ -56,8 +57,8 @@
 }
 
 .login-container .send-msg {
+  width: 130px;
   margin-top: 20px;
-  width: fit-content;
   border-radius: 0px 10px 10px 0px;
 }
 

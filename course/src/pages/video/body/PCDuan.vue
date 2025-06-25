@@ -1,6 +1,6 @@
 <template>
   <div class="course-page">
-
+    <PCHeader :userId="userId" />
 
     <div class="video-container">
       <div class="video-player">
@@ -106,8 +106,38 @@
 </template>
 
 <script>
+import { useWindowSize } from 'vue-window-size'
+import { ref, onMounted } from 'vue'
+import PCHeader from '@/components/common/PCHeader.vue'
+
 export default {
+<<<<<<< HEAD
   name: 'PCDuan',
+=======
+  name: 'CoursePage',
+  components: {
+    PCHeader
+  },
+  setup() {
+    const { width, height } = useWindowSize()
+
+    // 获取userId
+    const userId = ref < string | null > (null);
+
+    onMounted(() => {
+      // 从URL参数获取userId
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlUserId = searchParams.get('userId');
+      if (urlUserId) {
+        userId.value = decodeURIComponent(urlUserId);
+      }
+    });
+
+    return {
+      userId
+    }
+  },
+>>>>>>> b3e3f63ec04ae81ba8256396a19e5e84efed8fbf
   data() {
     return {
       currentLesson: null,

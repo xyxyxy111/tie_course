@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配置调试页面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .info {
+      background-color: #e9ecef;
+      padding: 10px;
+      border-radius: 3px;
+      margin: 10px 0;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .warning {
+      color: orange;
+    }
+
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 3px;
+      overflow-x: auto;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>配置调试页面</h1>
+
+  <div class="section">
+    <h2>环境信息</h2>
+    <div id="envInfo"></div>
+  </div>
+
+  <div class="section">
+    <h2>Token状态</h2>
+    <div id="tokenInfo"></div>
+    <button onclick="checkToken()">检查Token</button>
+    <button onclick="clearToken()">清除Token</button>
+  </div>
+
+  <div class="section">
+    <h2>API配置测试</h2>
+    <button onclick="testApiConfig()">测试API配置</button>
+    <div id="apiConfigResult"></div>
+  </div>
+
+  <div class="section">
+    <h2>网络请求测试</h2>
+    <button onclick="testNetworkRequests()">测试网络请求</button>
+    <div id="networkResult"></div>
+  </div>
+
+  <script>
+    function displayEnvInfo() {
+      const envInfo = document.getElementById('envInfo');
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      const protocol = window.location.protocol;
+      const pathname = window.location.pathname;
+
+      const isDev = hostname === 'localhost' && port === '5173';
+      const isProd = !isDev;
+
+      envInfo.innerHTML = `
+                <div class="info">
+                    <strong>当前环境:</strong> ${isDev ? '开发环境' : '生产环境'}<br>
+                    <strong>主机名:</strong> ${hostname}<br>
+                    <strong>端口:</strong> ${port}<br>
+                    <strong>协议:</strong> ${protocol}<br>
+                    <strong>路径:</strong> ${pathname}<br>
+                    <strong>完整URL:</strong> ${window.location.href}<br>
+                    <strong>建议的API地址:</strong> ${isDev ? '/api' : 'http://localhost:8080'}
+                </div>
+            `;
+    }
+
+    function checkToken() {
+      const tokenInfo = document.getElementById('tokenInfo');
+      const token = localStorage.getItem('token');
+
+      if (token && token !== 'undefined' && token.trim() !== '') {
+        tokenInfo.innerHTML = `
+                    <div class="success">
+                        <strong>Token存在且有效</strong><br>
+                        <pre>${token.substring(0, 50)}...</pre>
+                        <br>
+                        <strong>Authorization头格式:</strong> Bearer ${token.substring(0, 20)}...
+                    </div>
+                `;
+      } else {
+        tokenInfo.innerHTML = `
+                    <div class="error">
+                        <strong>Token不存在或无效</strong><br>
+                        当前值: "${token}"
+                    </div>
+                `;
+      }
+    }
+
+    function clearToken() {
+      localStorage.removeItem('token');
+      alert('Token已清除');
+      checkToken();
+    }
+
+    function testApiConfig() {
+      const resultDiv = document.getElementById('apiConfigResult');
+      resultDiv.innerHTML = '<p>正在测试API配置...</p>';
+
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      const isDev = hostname === 'localhost' && port === '5173';
+
+      const config = {
+        environment: isDev ? '开发环境' : '生产环境',
+        suggestedBaseURL: isDev ? '/api' : 'http://localhost:8080',
+        proxyEnabled: isDev,
+        corsEnabled: !isDev
+      };
+
+      resultDiv.innerHTML = `
+                <div class="info">
+                    <strong>API配置分析:</strong><br>
+                    <pre>${JSON.stringify(config, null, 2)}</pre>
+                </div>
+                <div class="${isDev ? 'success' : 'warning'}">
+                    <strong>建议:</strong> ${isDev ? '使用代理配置 /api' : '直接访问后端 http://localhost:8080'}
+                </div>
+            `;
+    }
+
+    function testNetworkRequests() {
+      const resultDiv = document.getElementById('networkResult');
+      resultDiv.innerHTML = '<p>正在测试网络请求...</p>';
+
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      const isDev = hostname === 'localhost' && port === '5173';
+
+      const testUrls = [
+        {
+          name: '开发环境代理测试',
+          url: '/api/auth/captcha?phone=test',
+          shouldWork: isDev
+        },
+        {
+          name: '生产环境直接访问测试',
+          url: 'http://localhost:8080/auth/captcha?phone=test',
+          shouldWork: !isDev
+        }
+      ];
+
+      let results = [];
+
+      Promise.all(testUrls.map(test => {
+        return fetch(test.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => {
+            return {
+              name: test.name,
+              url: test.url,
+              status: response.status,
+              success: response.ok,
+              shouldWork: test.shouldWork
+            };
+          })
+          .catch(error => {
+            return {
+              name: test.name,
+              url: test.url,
+              status: 'ERROR',
+              success: false,
+              error: error.message,
+              shouldWork: test.shouldWork
+            };
+          });
+      }))
+        .then(results => {
+          let html = '<div class="info"><strong>网络请求测试结果:</strong><br>';
+
+          results.forEach(result => {
+            const statusClass = result.success ? 'success' : 'error';
+            const expectedClass = result.success === result.shouldWork ? 'success' : 'warning';
+
+            html += `
+                        <div class="${statusClass}">
+                            <strong>${result.name}:</strong><br>
+                            URL: ${result.url}<br>
+                            状态: ${result.status}<br>
+                            成功: ${result.success}<br>
+                            预期工作: ${result.shouldWork}<br>
+                            <span class="${expectedClass}">结果: ${result.success === result.shouldWork ? '符合预期' : '不符合预期'}</span>
+                        </div>
+                    `;
+          });
+
+          html += '</div>';
+          resultDiv.innerHTML = html;
+        });
+    }
+
+    // 页面加载时执行
+    window.onload = function () {
+      displayEnvInfo();
+      checkToken();
+    };
+  </script>
+</body>
+
+</html>

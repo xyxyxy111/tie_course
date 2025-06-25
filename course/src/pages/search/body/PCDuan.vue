@@ -5,22 +5,34 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
 import { useFilterStore } from '../../../stores/filter'
 import PCHeader from '@/components/common/PCHeader.vue'
-import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize';
-const { width, height } = useWindowSize()
+import { useSearchLogic } from '../components/content';
 import '../search.css'
-
+import {
+  courseTitles, NavigationButton,
+  courseQuickViews, communityVoices,
+  recommendedProducts, relatedTopics
+} from '../components/content.ts';
 
 const searchQuery = ref('');
 const filterStore = useFilterStore()
 const showFilter = ref(true)
+const { width, height } = useWindowSize()
+
+courseTitles.value[0].activeFlag = true
+
+// 获取userId
+const userId = ref<string | null>(null);
 
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   searchQuery.value = urlParams.get('q') || '';
+  // 从URL参数获取userId
+  const urlUserId = urlParams.get('userId');
+  if (urlUserId) {
+    userId.value = decodeURIComponent(urlUserId);
+  }
 });
-
-
 
 const SearchResultWidth = computed(() => {
   const calculatedValue = (width.value - 900);
@@ -34,8 +46,6 @@ const SearchResultStyle = computed(() => ({
 const SearchResultCourseTitleStyle = computed(() => ({
   width: `calc( 200px + 1px * ${SearchResultWidth.value})`
 }));
-
-
 
 const courses = ref([
   {
@@ -53,7 +63,6 @@ const courses = ref([
     price: 79.99
   }
 ])
-
 
 watch(
   () => [
@@ -77,11 +86,10 @@ watch(
 
 </script>
 
-
 <template>
   <IconSprite />
 
-  <PCHeader />
+  <PCHeader :userId="userId" />
   <div class="search-result-container">
     <div class="content">
       <Filter @close="showFilter = true" />
@@ -104,13 +112,8 @@ watch(
     </div>
 
   </div>
-  <PCBottom />
-
-
 
 </template>
-
-
 
 <style scoped>
 .search-result-container {

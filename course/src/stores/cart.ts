@@ -20,9 +20,10 @@ export const useCartStore = defineStore('cart', () => {
   ])
 
   // 计算总价
-  const totalPrice = computed(() =>
-    courses.value.reduce((sum, course) => sum + course.price, 0)
-  )
+  const totalPrice = computed(() => {
+    const sum = courses.value.reduce((sum, course) => sum + course.price, 0);
+    return Number(sum.toFixed(2));
+  })
 
   const userId = ref('')
 

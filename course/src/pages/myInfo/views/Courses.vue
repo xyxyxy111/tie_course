@@ -1,5 +1,7 @@
 <template>
-
+<div class="mycourses-container">
+  <h1>课程</h1>
+</div>
 </template>
 
 <script lang="ts">
@@ -10,4 +12,11 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.mycourses-container{
+margin: 20px auto;
+width: 800px;
+}
+
+
+</style>

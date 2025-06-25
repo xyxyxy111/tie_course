@@ -1,14 +1,41 @@
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 export let searchQuery = ref('');
+const router = useRouter();
+
 export function Search() {
   if (searchQuery.value.trim()) {
     console.log("搜索词:", searchQuery.value);
-    window.location.href = `/search.html?q=${encodeURIComponent(searchQuery.value)}`;
+    // 获取当前userId
+    const currentUserId = getCurrentUserId();
+    const url = new URL('/search.html', window.location.origin);
+    url.searchParams.set('q', encodeURIComponent(searchQuery.value));
+    if (currentUserId) {
+      url.searchParams.set('userId', encodeURIComponent(currentUserId));
+    }
+    window.location.href = url.toString();
   }
 }
 
-export const goToCart = () => {
-  window.location.href = "/cart.html";
+// 获取当前用户ID的辅助函数
+function getCurrentUserId(): string | null {
+  // 从localStorage获取token，然后解析用户ID
+  const token = localStorage.getItem('token');
+  if (token) {
+    // 这里可以根据实际需求解析token获取用户ID
+    // 暂时返回一个默认值或从其他地方获取
+    return '11'; // 示例用户ID
+  }
+  return null;
+}
+
+export const goToCart = (userId?: string | null) => {
+  const url = new URL('/cart.html', window.location.origin);
+  const currentUserId = userId || getCurrentUserId();
+  if (currentUserId) {
+    url.searchParams.set('userId', encodeURIComponent(currentUserId));
+  }
+  window.location.href = url.toString();
 };
 
 //molidis
@@ -23,15 +50,14 @@ export const goToCart = () => {
 //   window.location.href = url.toString();
 // };
 
-export const goToIndex = (e: MouseEvent) => {
-  e.preventDefault(); // 可选：阻止默认行为
-  const userId = 1;
+export const goToIndex = () => {
+  // e.preventDefault(); // 可选：阻止默认行为
+  // const userId = 1;
   const url = new URL('/index.html', window.location.origin);
-
-  if (userId !== undefined && userId !== null) {
-    url.searchParams.set('userId', encodeURIComponent(userId.toString()));
-  }
-
+  // const currentUserId = userId || getCurrentUserId();
+  // if (currentUserId) {
+  //   url.searchParams.set('userId', encodeURIComponent(currentUserId));
+  // }
   window.location.href = url.toString();
 };
 
@@ -39,36 +65,30 @@ export const goToLogin = () => {
   window.location.href = "/login.html";
 };
 
-
-export const goToCourse = () => {
-  window.location.href = "/course.html";
+export const goToCourse = (courseId: number) => {
+  const url = new URL('/course.html', window.location.origin);
+  url.searchParams.set('courseId', encodeURIComponent(courseId));
+  window.location.href = url.toString();
 };
 
 export const goToLearning = () => {
-  window.location.href = "/learning.html";
+  const currentUserId = getCurrentUserId();
+  const url = new URL('/learning.html', window.location.origin);
+  if (currentUserId) {
+    url.searchParams.set('userId', encodeURIComponent(currentUserId));
+  }
+  url.hash = '#/learning/all-courses';
+  window.location.href = url.toString();
 };
 
-//molidis
-//before
-// export const goToMyInfo = (userId?: string | null) => {
-//   const url = new URL('/my-info.html', window.location.origin);
-
-//   if (userId !== undefined && userId !== null && userId !== '') {
-//     url.searchParams.set('userId', encodeURIComponent(userId.toString()));
-//   }
-
-//   window.location.href = url.toString();
-// };
-
-export const goToMyInfo = (e: MouseEvent) => {
-  e.preventDefault(); // 可选：阻止默认行为
-  const userId = 1;
+export const goToMyInfo = (userId?: string | null) => {
   const url = new URL('/my-info.html', window.location.origin);
-
-  if (userId !== undefined && userId !== null) {
-    url.searchParams.set('userId', encodeURIComponent(userId.toString()));
+  const currentUserId = userId || getCurrentUserId();
+  if (currentUserId) {
+    url.searchParams.set('userId', encodeURIComponent(currentUserId));
   }
-
+  // 添加hash路由支持，重定向到profile页面
+  url.hash = '#/my-info/profile';
   window.location.href = url.toString();
 };
 
@@ -77,3 +97,5 @@ export const goToMyInfo = (e: MouseEvent) => {
 export const goToSignup = (e: MouseEvent) => {
     e.preventDefault(); // 可选：阻止默认行为
 }
+
+
