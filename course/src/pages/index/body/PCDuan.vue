@@ -23,7 +23,6 @@ import {
 
 courseTitles.value[0].activeFlag = true
 
-// 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
 
 onMounted(() => {

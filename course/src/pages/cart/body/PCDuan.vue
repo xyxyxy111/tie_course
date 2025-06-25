@@ -6,6 +6,7 @@ import PCHeader from '@/components/common/PCHeader.vue';
 import { useCartLogic } from '../components/content';
 import { wishlistApi } from '@/api/user';
 import '../cart.css';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const { width, height } = useWindowSize();
 const { cart, totalPrice, goToCheckout, loading, error, removeCourseFromCart } = useCartLogic();
@@ -23,13 +24,14 @@ const CourseIncartStyle = () => ({});
 const userId = ref<string | null>(null);
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
+  // 如果没有token，userId保持为null，用户仍然可以浏览课程
 });
+
 
 // 加入心愿单
 const addToWishlist = async (courseId: number) => {
