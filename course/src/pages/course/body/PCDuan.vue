@@ -26,7 +26,6 @@ import { convertMinutesToHoursAndMinutes } from '@/utils/common.ts';
 
 const courseVo = ref<CourseVO | null>(null);
 const chapters = ref<Chapter[]>([]);
-const lessons = ref<Lesson[]>([]);
 
 const { width, height } = useWindowSize()
 const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();
