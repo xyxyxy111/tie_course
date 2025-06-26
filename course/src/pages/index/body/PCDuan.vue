@@ -30,8 +30,6 @@ import {
   recommendedProducts, relatedTopics
 } from '../components/content.ts';
 
-courseTitles.value[0].activeFlag = true
-
 const userId = ref<string | null>(null);
 
 onMounted(async () => {
@@ -60,8 +58,7 @@ onMounted(async () => {
 
   const tagsResponse = await categoryApi.getTagListByCategoryId(1);
   tags.value = tagsResponse.data;
-  console.log(tags.value);
-  courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name));
+  courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
 
   let tagId;
   //session?
@@ -72,6 +69,11 @@ onMounted(async () => {
     tagId = parseInt(searchParams.get('tagId')!);
   }
 
+  getCourseListByTagId(tagId);
+  courseTitles.value[0].activeFlag = true
+});
+
+const getCourseListByTagId = async (tagId: number) => {
   const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
   courseListVos.value = courseListVosResponse.data;
   console.log(courseListVos.value);
@@ -88,8 +90,7 @@ onMounted(async () => {
       course.whatYouWillLearn
     );
   })
-  console.log(courseQuickViews);
-});
+}
 
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   backgroundColor: (activeFlag && hoverFlag) ? 'rgba(22,92,145,0.7)' :
@@ -102,6 +103,7 @@ function changecourseTheme(i: NavigationButton) {
     element.activeFlag = false;
   });
   i.activeFlag = true;
+  getCourseListByTagId(i.tagId);
 }
 const voiceStyle = (index: number) => ({
   height: '3' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
@@ -174,7 +176,6 @@ function handleCourseAdded(event: any) {
     }
   }
 }
-
 </script>
 
 <template>
@@ -186,7 +187,7 @@ function handleCourseAdded(event: any) {
 
     <div>
 
-      <div class="title">Software Engineering courses</div>
+      <div class="title">{{ singleCategory?.name }}</div>
       <div class="navigate">
         <button v-for="(title, index) in courseTitles" :key="index" @click="changecourseTheme(title)"
           @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
@@ -201,7 +202,7 @@ function handleCourseAdded(event: any) {
             :show-delay="150" :hide-delay="150" class="custom-popup-right" :userId="userId || undefined"
             :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded">
             <template #trigger>
-              <div @click="goToCourse()">
+              <div @click="goToCourse(courseQuickView.courseId)">
                 <img :src="courseQuickView.coverImgUrl" alt="">
                 <div class="course-title">
                   {{ courseQuickView.title }}
@@ -238,14 +239,13 @@ function handleCourseAdded(event: any) {
             <div class="voice-link">View {{ communityVoice.course }} ></div>
           </div>
         </div>
-
       </div>
+
     </div>
   </main>
 
 </template>
 
-<!-- css -->
 <style scoped>
 .title {
   font-size: 40px;
@@ -306,7 +306,9 @@ function handleCourseAdded(event: any) {
 .exploreBtn:hover {
   background-color: gainsboro;
   color: rgb(22, 92, 145);
-  box-shadow: 0 4px 4px rgb(22, 92, 145, 0.3);
+  box-shadow: 0 4px 4p
+
+rgb(22, 92, 145, 0.3);
 }
 
 .course,
@@ -328,12 +330,13 @@ function handleCourseAdded(event: any) {
   margin: 20px 10px;
 }
 
+
+
 /* Course Text Content */
-.course img {
+.course img{
   width: 100%;
   height: 140px;
-
-}
+}   
 
 .course-title {
   padding: 10px 0px 0px 15px;

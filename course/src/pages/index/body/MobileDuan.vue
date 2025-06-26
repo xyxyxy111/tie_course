@@ -8,13 +8,10 @@ import MobileHeader from '@/components/common/MoblieHeader.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import {
-  courseTitles, NavigationButton,
   courseQuickViews, communityVoices,
   recommendedProducts, relatedTopics
 } from '../components/content.ts';
-import { useIndexLogic } from '../components/content';
 
-courseTitles.value[0].activeFlag = true
 const { width, height } = useWindowSize()
 
 const voiceStyle = (index: number) => ({
@@ -48,12 +45,12 @@ const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
 
 //切换主题
 
-function changeCourseTheme(i: NavigationButton) {
-  courseTitles.value.forEach(element => {
-    element.activeFlag = false;
-  });
-  i.activeFlag = true;
-}
+// function changeCourseTheme(i: NavigationButton) {
+//   courseTitles.value.forEach(element => {
+//     element.activeFlag = false;
+//   });
+//   i.activeFlag = true;
+// }
 
 const CourseBtnStyle = (flag: boolean) => ({
   top: (flag) ? '-65%' : '20%'
@@ -134,15 +131,15 @@ function addToCart(course: string) {
         </div>
       </template>
     </CartPopup>
-    <MobileHeader :userId="userId"/>
+    <!-- <MobileHeader :userId="userId"/> -->
     <div>
 
       <div class="title" :style="titleStyle()">Software Engineering Courses</div>
       <div class="navigate  container-scroll-x">
-        <button v-for="(title, index) in courseTitles" :key="index" @click="changeCourseTheme(title)"
+        <!-- <button v-for="(title, index) in courseTitles" :key="index" @click="changeCourseTheme(title)"
           @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
           :style="navigaterBtnStyle(title.activeFlag, title.hoverFlag)">
-          {{ title.text }}</button>
+          {{ title.text }}</button> -->
       </div>
       <div class="container container-scroll-x">
         <div class="content">

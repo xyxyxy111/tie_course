@@ -28,8 +28,9 @@ export const goToLogin = () => {
   window.location.href = "/login.html";
 };
 
-export const goToCourse = () => {
+export const goToCourse = (courseId: number) => {
   const url = new URL('/course.html', window.location.origin);
+  url.searchParams.set('courseId', courseId.toString());
   window.location.href = url.toString();
 };
 

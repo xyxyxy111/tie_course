@@ -7,6 +7,7 @@ import { useCartLogic } from '../components/content';
 import { wishlistApi } from '@/api/user';
 import '../cart.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { cartApi } from '@/api/cart';
 
 const { width, height } = useWindowSize();
 const { cart, totalPrice, goToCheckout, loading, error, removeCourseFromCart } = useCartLogic();
@@ -29,7 +30,6 @@ onMounted(() => {
   if (token) {
     userId.value = getCurrentUserId();
   }
-  // 如果没有token，userId保持为null，用户仍然可以浏览课程
 });
 
 
@@ -69,6 +69,25 @@ const removeFromCart = async (courseId: number) => {
     alert('删除失败，请重试');
   }
 };
+
+// 清空购物车
+const clearing = ref(false);
+const clearCart = async () => {
+  if (clearing.value) return;
+  if (!cart.value || !cart.value.cartItemList || cart.value.cartItemList.length === 0) return;
+  if (!confirm('确定要清空购物车吗？')) return;
+  clearing.value = true;
+  try {
+    await cartApi.clearCart();
+    alert('购物车已清空');
+    // 重新加载购物车数据
+    window.location.reload();
+  } catch (error) {
+    alert('清空购物车失败，请重试');
+  } finally {
+    clearing.value = false;
+  }
+};
 </script>
 
 <template>
@@ -93,11 +112,11 @@ const removeFromCart = async (courseId: number) => {
       <div v-else class="cart-layout">
         <div class="cart-title">
           <h1>购物车</h1>
+
         </div>
 
         <div class="cart-main-content">
-          <!-- 左侧购物车区域 (70%) -->
-          <div class="cart-items-section">
+          <div class="cart-items-section" style="position:relative;">
             <div class="cart-items">
               <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
                 <img :src="item.courseImage" :alt="item.courseName" class="course-image">
@@ -117,11 +136,15 @@ const removeFromCart = async (courseId: number) => {
                 </div>
               </div>
             </div>
+            <button class="clear-cart-btn" @click="clearCart" :disabled="clearing || loading"
+              v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
+              {{ clearing ? '清空中...' : '清空' }}
+            </button>
           </div>
-            
+
           <div class="checkout-section">
             <div class="checkout-summary">
-              
+
               <div class="summary-item">
                 <span>课程数量:</span>
                 <span>{{ cart.cartItemList.length }} 门课程</span>
@@ -135,7 +158,7 @@ const removeFromCart = async (courseId: number) => {
                 <span class="total-price">US${{ totalPrice.toFixed(2) }}</span>
               </div>
               <button class="checkout-btn" @click="goToCheckout">去结算</button>
-             
+
             </div>
           </div>
         </div>
@@ -219,7 +242,8 @@ const removeFromCart = async (courseId: number) => {
   margin-left: 20px;
 }
 
-.wishlist-btn,.remove-btn {
+.wishlist-btn,
+.remove-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -235,9 +259,9 @@ const removeFromCart = async (courseId: number) => {
   width: 50px;
 }
 
-.wishlist-btn{
-  background-color:none;
-  color:rgb(22, 92, 145);
+.wishlist-btn {
+  background-color: none;
+  color: rgb(22, 92, 145);
 }
 
 .wishlist-btn:hover {
@@ -255,7 +279,7 @@ const removeFromCart = async (courseId: number) => {
 }
 
 .remove-btn {
-  background-color:rgb(22, 92, 145);
+  background-color: rgb(22, 92, 145);
   color: white;
   font-size: 1.2rem;
   white-space: nowrap;
@@ -264,8 +288,8 @@ const removeFromCart = async (courseId: number) => {
 .remove-btn:hover {
   transform: translateY(-2px);
   font-size: 1.3rem;
-  background-color:white;
-  color:rgb(22, 92, 145);
+  background-color: white;
+  color: rgb(22, 92, 145);
 }
 
 .remove-btn:active {
@@ -286,6 +310,7 @@ const removeFromCart = async (courseId: number) => {
 
 .cart-items-section {
   flex: 0 0 70%;
+  padding-bottom: 60px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -576,5 +601,34 @@ const removeFromCart = async (courseId: number) => {
     font-size: 0.85rem;
     width: 60px;
   }
+}
+
+.clear-cart-btn {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  margin: 0;
+  width: fit-content;
+  white-space: nowrap;
+  padding: 8px 18px;
+  background: #fff;
+  color: #dc3545;
+  border: none ;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-cart-btn:hover:not(:disabled) {
+  background: #dc35467d;
+  color: #fff;
+}
+
+.clear-cart-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

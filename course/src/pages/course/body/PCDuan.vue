@@ -44,6 +44,7 @@ onMounted(async () => {
   }
   const searchParams = new URLSearchParams(window.location.search);
   const courseId = parseInt(searchParams.get('courseId')!);
+ 
   //if(!searchParams.get('courseId')){return;}&&error
 
   const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
@@ -85,7 +86,6 @@ const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => 
     }
   }
 }
-
 
 const CourseDescriptionStyle = computed(() => ({
   height: CourseDescriptionFlag.value ? 'fit-content' : '400px'

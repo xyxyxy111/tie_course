@@ -111,7 +111,7 @@ export default defineComponent({
     },
     hideDelay: {
       type: Number,
-      default: 150
+      default: 1500
     },
     contentClass: {
       type: String,
@@ -250,32 +250,7 @@ export default defineComponent({
         let errorMessage = '添加课程到购物车失败';
         let errorType = 'unknown';
 
-        if (err && typeof err === 'string') {
-          if (err.includes('Data truncation') || err.includes('Truncated incorrect DOUBLE value')) {
-            errorMessage = '⚠️ 系统数据库配置错误\n\n检测到数据库结构问题，是否使用本地存储作为临时解决方案？';
-            errorType = 'database_error';
-          } else if (err.includes('已在购物车中') || err.includes('already in cart')) {
-            errorMessage = 'ℹ️ 该课程已在购物车中';
-            errorType = 'already_in_cart';
-          } else if (err.includes('未授权') || err.includes('unauthorized') || err.includes('401')) {
-            errorMessage = '🔒 请先登录后再添加课程';
-            errorType = 'unauthorized';
-          } else if (err.includes('课程不存在') || err.includes('course not found')) {
-            errorMessage = '❌ 课程不存在或已被删除';
-            errorType = 'course_not_found';
-          } else if (err.includes('网络') || err.includes('network') || err.includes('timeout')) {
-            errorMessage = '🌐 网络连接失败，请检查网络后重试';
-            errorType = 'network_error';
-          }
-        } else if (err && err.message) {
-          if (err.message.includes('Data truncation')) {
-            errorMessage = '⚠️ 系统数据库配置错误\n\n检测到数据库结构问题，是否使用本地存储作为临时解决方案？';
-            errorType = 'database_error';
-          } else if (err.message.includes('Network Error')) {
-            errorMessage = '🌐 网络连接失败，请检查网络后重试';
-            errorType = 'network_error';
-          }
-        }
+      
 
         // 触发事件通知父组件
         emit('course-added', {
