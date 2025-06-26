@@ -40,8 +40,11 @@ onMounted(async () => {
   if (token) {
     userId.value = getCurrentUserId();
   }
+
   const searchParams = new URLSearchParams(window.location.search);
   let categoryId;
+
+  console.log(searchParams.get('categoryId'));
   //session?
   if (!searchParams.get('categoryId')) {
     categoryId = 1;

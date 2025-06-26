@@ -23,6 +23,7 @@ import {
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course.ts';
 import type {CourseVO, Chapter, Lesson } from '@/api/course.ts';
 import { convertMinutesToHoursAndMinutes } from '@/utils/common.ts';
+import { getCurrentUserId, getValidToken } from '@/utils/request'; 
 
 const courseVo = ref<CourseVO | null>(null);
 const chapters = ref<Chapter[]>([]);
@@ -38,6 +39,7 @@ onMounted(async () => {
   const token = getValidToken();
   if (token) {
     userId.value = getCurrentUserId();
+    console.log(userId);
   } else {
     // 如果没有token，重定向到登录页面
     window.location.href = '/login.html';
