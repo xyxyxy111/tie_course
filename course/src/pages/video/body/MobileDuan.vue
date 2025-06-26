@@ -9,7 +9,7 @@
           <div class="chapter-header" @click="toggleChapter(index)">
             <h2 class="chapter-title">{{ chapter.title }}</h2>
             <span class="chapter-progress">{{ chapter.completed }}/{{ chapter.lessons.length }} | {{ chapter.duration
-              }}</span>
+            }}</span>
             <span class="toggle-icon">{{ isChapterOpen(index) ? '−' : '+' }}</span>
           </div>
 
@@ -43,12 +43,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { ref, reactive } from 'vue'
+
 export default {
   name: 'CoursePage',
   data() {
     return {
-      currentLesson: null,
+      currentLesson: null as any,
       chapters: [
         {
           title: "第1节：Git Basic",
@@ -233,7 +235,7 @@ export default {
     }
   },
   methods: {
-    toggleChapter(index) {
+    toggleChapter(index: number) {
       const chapterIndex = this.openChapters.indexOf(index);
       if (chapterIndex > -1) {
         this.openChapters.splice(chapterIndex, 1);
@@ -241,10 +243,10 @@ export default {
         this.openChapters.push(index);
       }
     },
-    isChapterOpen(index) {
+    isChapterOpen(index: number) {
       return this.openChapters.includes(index);
     },
-    selectLesson(chapter, lesson) {
+    selectLesson(chapter: any, lesson: any) {
       this.currentLesson = lesson;
       // 这里可以添加视频播放逻辑
       console.log('播放课程:', lesson.name);
@@ -253,9 +255,9 @@ export default {
   watch: {
     chapters: {
       deep: true,
-      handler(newVal) {
-        newVal.forEach(chapter => {
-          chapter.completed = chapter.lessons.filter(lesson => lesson.completed).length;
+      handler(newVal: any[]) {
+        newVal.forEach((chapter: any) => {
+          chapter.completed = chapter.lessons.filter((lesson: any) => lesson.completed).length;
         });
       }
     }

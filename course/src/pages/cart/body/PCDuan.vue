@@ -118,11 +118,10 @@ const removeFromCart = async (courseId: number) => {
               </div>
             </div>
           </div>
-
-          <!-- 右侧结算区域 (30%) -->
+            
           <div class="checkout-section">
             <div class="checkout-summary">
-              <h3>订单摘要</h3>
+              
               <div class="summary-item">
                 <span>课程数量:</span>
                 <span>{{ cart.cartItemList.length }} 门课程</span>
@@ -136,9 +135,7 @@ const removeFromCart = async (courseId: number) => {
                 <span class="total-price">US${{ totalPrice.toFixed(2) }}</span>
               </div>
               <button class="checkout-btn" @click="goToCheckout">去结算</button>
-              <div class="checkout-note">
-                <p>点击"去结算"将跳转到订单页面</p>
-              </div>
+             
             </div>
           </div>
         </div>
@@ -160,9 +157,9 @@ const removeFromCart = async (courseId: number) => {
 }
 
 .cart-title h1 {
-  font-size: 2rem;
+  font-size: 3rem;
   color: #333;
-  margin-bottom: 30px;
+  margin: 20px;
 }
 
 .cart-items {
@@ -181,8 +178,8 @@ const removeFromCart = async (courseId: number) => {
 }
 
 .course-image {
-  width: 140px;
-  height: 90px;
+  width: 180px;
+  height: 120px;
   object-fit: cover;
   border-radius: 8px;
   margin-right: 20px;
@@ -222,32 +219,34 @@ const removeFromCart = async (courseId: number) => {
   margin-left: 20px;
 }
 
-.wishlist-btn {
+.wishlist-btn,.remove-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   background: none;
-  border: 1px solid #ddd;
-  padding: 10px 20px;
-  border-radius: 6px;
+  border: none;
+  border-radius: 60px;
   cursor: pointer;
   font-size: 1rem;
   color: #666;
   transition: all 0.3s ease;
   white-space: nowrap;
-  width: 80px;
+  width: 50px;
+}
+
+.wishlist-btn{
+  background-color:none;
+  color:rgb(22, 92, 145);
 }
 
 .wishlist-btn:hover {
-  background-color: #f8f9fa;
-  border-color: red;
   color: red;
 }
 
 .wishlist-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   transition: transform 0.3s ease;
 }
 
@@ -256,29 +255,21 @@ const removeFromCart = async (courseId: number) => {
 }
 
 .remove-btn {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background-color:rgb(22, 92, 145);
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  font-size: 1rem;
-  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+  font-size: 1.2rem;
   white-space: nowrap;
-  width: 80px;
 }
 
 .remove-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
-  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+  font-size: 1.3rem;
+  background-color:white;
+  color:rgb(22, 92, 145);
 }
 
 .remove-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
 }
 
 .cart-layout {
@@ -369,9 +360,9 @@ const removeFromCart = async (courseId: number) => {
   background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
   color: white;
   border: none;
-  padding: 16px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -388,20 +379,6 @@ const removeFromCart = async (courseId: number) => {
 .checkout-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(22, 92, 145, 0.3);
-}
-
-.checkout-note {
-  margin-top: 15px;
-  text-align: center;
-  color: #666;
-  font-size: 0.9rem;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 6px;
-}
-
-.checkout-note p {
-  margin: 0;
 }
 
 /* 加载状态样式 */

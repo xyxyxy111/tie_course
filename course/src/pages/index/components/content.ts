@@ -20,6 +20,7 @@ export class CourseQuickView extends Course {
   hoverFlag: boolean = false;
 
   constructor(
+    public courseId: number,
     public coverImgUrl: string,
     public title: string,
     public score: number,
@@ -59,76 +60,7 @@ const courseTitles = ref<NavigationButton[]>([
 ])
 
 const courseQuickViews = ref<CourseQuickView[]>([
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  ),
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  ),
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  ),
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  ),
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  ),
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  ),
-  new CourseQuickView(
-    '/src/images/image2.png', // 封面图片URL
-    '2025 Python全攻略', // 课程标题
-    4.7, // 评分 (2,187条评价)
-    74.99, // 原价 (US$74.99)
-    new Date('2025-03-01'), // 更新日期 (2025年3月)
-    2730, // 总分钟数 (45.5小时 = 2730分钟)
-    '超過40小時的內容，學習Python語法、程式邏輯、識別Python資料類別與使用時機，用正規表示式處理資料、處理文件系統、運用Python網路爬蟲、連結SQL資料庫、處理Excel和CSV，寄送email，一步步實作成為Python達人！', // 课程描述
-    '學會基本Python語法、培養程式邏輯以及程式語言觀念\n識別基本與進階Python資料類別與使用時機' // 你将学到什么
-  )
+ 
 ]);
 
 const communityVoices = ref<CommunityVoice[]>([

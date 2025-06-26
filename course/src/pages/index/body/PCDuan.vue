@@ -12,7 +12,16 @@ import { goToCart, goToCourse } from '@/components/common/header.ts';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 // 导入CourseQuickView类型
-import type { CourseQuickView } from '../components/content.ts';
+import { CourseQuickView } from '../components/content.ts';
+
+import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course.ts';
+import type { Category, Tag, CourseListVO } from '@/api/course.ts';
+
+const categories = ref<Category[]>([]);
+const singleCategory = ref<Category | null>(null);
+const tags = ref<Tag[]>([]);
+const courseListVos = ref<CourseListVO[]>([]);
+const navigationButtons = ref<NavigationButton[]>([]);
 
 const { width, height } = useWindowSize()
 import {
@@ -25,13 +34,61 @@ courseTitles.value[0].activeFlag = true
 
 const userId = ref<string | null>(null);
 
-onMounted(() => {
+onMounted(async () => {
   // 从token获取userId
   const token = getValidToken();
   if (token) {
     userId.value = getCurrentUserId();
   }
-  // 如果没有token，userId保持为null，用户仍然可以浏览课程
+  const searchParams = new URLSearchParams(window.location.search);
+  let categoryId;
+  //session?
+  if (!searchParams.get('categoryId')) {
+    categoryId = 1;
+    // flag; tag is default
+  } else {
+    categoryId = parseInt(searchParams.get('categoryId')!);
+  }
+
+  const categoriesResponse = await categoryApi.getAllCategories();
+  categories.value = categoriesResponse.data;
+  console.log(categories.value);
+
+  const singleCategoryResponse = await categoryApi.getCategoryDetail(1);
+  singleCategory.value = singleCategoryResponse.data;
+  console.log(singleCategory.value);
+
+  const tagsResponse = await categoryApi.getTagListByCategoryId(1);
+  tags.value = tagsResponse.data;
+  console.log(tags.value);
+  courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name));
+
+  let tagId;
+  //session?
+  if (!searchParams.get('tagId')) {
+    let firstTag = tags.value[0];
+    tagId = firstTag.tagId;
+  } else {
+    tagId = parseInt(searchParams.get('tagId')!);
+  }
+
+  const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
+  courseListVos.value = courseListVosResponse.data;
+  console.log(courseListVos.value);
+  courseQuickViews.value = courseListVos.value.map(course => {
+    return new CourseQuickView(
+      course.courseId,
+      course.coverImgUrl,
+      course.title,
+      course.score,
+      course.originalPrice,
+      new Date(course.updateTime || new Date()),
+      course.totalMinutes,
+      course.description,
+      course.whatYouWillLearn
+    );
+  })
+  console.log(courseQuickViews);
 });
 
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
@@ -67,6 +124,9 @@ function addToCart(course: CourseQuickView) {
 
 function handleCourseAdded(event: any) {
   console.log('课程已添加到购物车:', event);
+
+  // 每次加购后都弹出CartPopup
+  showCart.value = true;
 
   if (event.success) {
     // 成功处理
@@ -137,23 +197,22 @@ function handleCourseAdded(event: any) {
       <div class="content">
         <div v-for="(courseQuickView, index) in courseQuickViews" class="course"
           @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
-          <div @click="goToCourse()">
-            <img :src="courseQuickView.coverImgUrl" alt="">
-            <div class="course-title">
-              {{ courseQuickView.title }}
-            </div>
-            <div class="course-rating">
-              {{ courseQuickView.score }} ★★★★ (2,187)
-            </div>
-            <div class="course-price">
-              US${{ courseQuickView.originalPrice.toFixed(2) }}
-            </div>
-          </div>
-          <!-- HoverPopup 组件 -->
           <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="340px" transition="slide"
             :show-delay="150" :hide-delay="150" class="custom-popup-right" :userId="userId || undefined"
             :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded">
             <template #trigger>
+              <div @click="goToCourse()">
+                <img :src="courseQuickView.coverImgUrl" alt="">
+                <div class="course-title">
+                  {{ courseQuickView.title }}
+                </div>
+                <div class="course-rating">
+                  {{ courseQuickView.score }} ★★★★ (2,187)
+                </div>
+                <div class="course-price">
+                  US${{ courseQuickView.originalPrice.toFixed(2) }}
+                </div>
+              </div>
               <div class="popup-trigger-area"></div>
             </template>
           </HoverPopup>
@@ -269,9 +328,13 @@ function handleCourseAdded(event: any) {
   margin: 20px 10px;
 }
 
-
-
 /* Course Text Content */
+.course img {
+  width: 100%;
+  height: 140px;
+
+}
+
 .course-title {
   padding: 10px 0px 0px 15px;
   font-weight: 700;

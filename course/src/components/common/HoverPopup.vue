@@ -15,7 +15,8 @@
 
         <!-- 否则显示默认的课程信息 -->
         <template v-else>
-          <!-- 课程标题 -->
+
+<div class="course-info">          <!-- 课程标题 -->
           <div class="course-title">{{ courseInfo?.title || courseName }}</div>
 
           <!-- 课程信息 -->
@@ -35,8 +36,7 @@
           <div class="course-learning-points">
             <h4>你将学到：</h4>
             <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
-          </div>
-
+          </div></div>
           <!-- 操作按钮 -->
           <div class="popupBtn">
             <button class="addToCartBtn" @click="addToCart" :disabled="loading">
@@ -60,6 +60,9 @@
 import { defineComponent, ref, computed, watch, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import { cartApi } from '@/api/cart';
+import type { CourseVO } from '@/api/course';
+import { courseApi } from '@/api/course';
+import { convertMinutesToHours } from '@/utils/common';
 import { userApi, wishlistApi } from '@/api/user';
 
 type Position = 'right' | 'left' | 'top' | 'bottom';
@@ -71,7 +74,7 @@ interface CourseInfo {
   description: string;
   whatYouWillLearn: string;
   updateDate: string;
-  duration: string;
+  duration: number;
   courseId: number;
   price: number;
   coverImgUrl: string;
@@ -128,8 +131,7 @@ export default defineComponent({
       default: ''
     },
     courseId: {
-      type: Number,
-      default: undefined
+      type: Number
     }
   },
   emits: ['update:modelValue', 'course-added', 'course-wishlisted'],
@@ -137,6 +139,7 @@ export default defineComponent({
     const isVisible = ref(false);
     const loading = ref(false);
     const courseInfo = ref<CourseInfo | null>(null);
+    const courseVo = ref<CourseVO | null>(null);
     let showTimer: number | null = null;
     let hideTimer: number | null = null;
 
@@ -155,25 +158,26 @@ export default defineComponent({
 
     // 根据courseName获取课程信息
     const fetchCourseInfo = async () => {
-      if (!props.courseName) return;
-
+      if (!props.courseName||!props.courseId) return;
+      const courseVoResponse = await courseApi.getSingleCourseDetail((props.courseId!));
       try {
-        // 这里可以根据courseName调用API获取课程详细信息
+ // 这里可以根据courseName调用API获取课程详细信息
         // 暂时使用模拟数据
         courseInfo.value = {
-          title: props.courseName,
-          description: '这是一个精彩的课程，包含丰富的学习内容和实践项目。通过本课程，您将掌握相关技能并能够应用到实际工作中。',
-          whatYouWillLearn: '掌握核心概念和技能\n学习最佳实践方法\n完成实际项目练习\n获得行业认证',
-          updateDate: '2025年3月',
-          duration: '45.5',
-          courseId: props.courseId || 101,
-          price: 99.99,
-          coverImgUrl: '/src/images/image2.png'
+          title: courseVoResponse.data.title,
+          description: courseVoResponse.data.description,
+          whatYouWillLearn: courseVoResponse.data.whatYouWillLearn,
+          updateDate: courseVoResponse.data.updateTime!,
+          duration: convertMinutesToHours(courseVoResponse.data.totalMinutes!),
+          courseId: courseVoResponse.data.courseId!,
+          price: courseVoResponse.data.originalPrice,
+          coverImgUrl: courseVoResponse.data.coverImgUrl
         };
       } catch (err) {
         console.error('获取课程信息失败:', err);
       }
     };
+
 
     // 临时解决方案：使用本地存储作为备用
     const addToCartLocal = (courseInfo: CourseInfo) => {
@@ -438,6 +442,7 @@ export default defineComponent({
 .trigger-area {
   display: inline-block;
   cursor: pointer;
+  width: 100%;
 }
 
 .popup-content {
@@ -543,8 +548,15 @@ export default defineComponent({
 }
 
 /* 课程内容样式 */
+.course-info{
+  width: 100%;
+  margin:0 auto;
+  height: 265px;
+  overflow: hidden;
+}
+
 .course-title {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   color: #333;
   margin-bottom: 8px;

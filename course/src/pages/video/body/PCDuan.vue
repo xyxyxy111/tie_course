@@ -1,7 +1,6 @@
 <template>
   <div class="course-page">
-    <PCHeader :userId="userId" />
-
+   
     <div class="video-container">
       <div class="video-player">
         <div v-if="currentLesson" class="video-info">
@@ -105,8 +104,8 @@
 
 </template>
 
-<script>
-import { useWindowSize } from 'vue-window-size'
+<script lang="ts">
+import { useWindowSize } from '@/useWindowSize'
 import { ref, onMounted } from 'vue'
 import PCHeader from '@/components/common/PCHeader.vue'
 import { getCurrentUserId, getValidToken } from '@/utils/request'
@@ -120,7 +119,7 @@ export default {
     const { width, height } = useWindowSize()
 
     // 获取userId - 从token中获取而不是URL
-    const userId = ref < string | null > (null)
+    const userId = ref<string | null>(null)
 
     onMounted(() => {
       // 从token获取userId
@@ -322,7 +321,7 @@ export default {
     }
   },
   methods: {
-    toggleChapter(index) {
+    toggleChapter(index: number) {
       const chapterIndex = this.openChapters.indexOf(index);
       if (chapterIndex > -1) {
         this.openChapters.splice(chapterIndex, 1);
@@ -330,10 +329,10 @@ export default {
         this.openChapters.push(index);
       }
     },
-    isChapterOpen(index) {
+    isChapterOpen(index: number) {
       return this.openChapters.includes(index);
     },
-    selectLesson(chapter, lesson) {
+    selectLesson(chapter: any, lesson: any) {
       this.currentLesson = lesson;
       // 这里可以添加视频播放逻辑
       console.log('播放课程:', lesson.name);
@@ -342,9 +341,9 @@ export default {
   watch: {
     chapters: {
       deep: true,
-      handler(newVal) {
-        newVal.forEach(chapter => {
-          chapter.completed = chapter.lessons.filter(lesson => lesson.completed).length;
+      handler(newVal: any[]) {
+        newVal.forEach((chapter: any) => {
+          chapter.completed = chapter.lessons.filter((lesson: any) => lesson.completed).length;
         });
       }
     }

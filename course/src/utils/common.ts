@@ -8,7 +8,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: number | null = null
 
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout)
@@ -273,4 +273,27 @@ export async function retry<T>(
   }
 
   throw lastError!
-} 
+}
+
+export function convertMinutesToHours(minutes: number): number {
+  if (typeof minutes !== 'number' || isNaN(minutes)) {
+    console.warn("输入必须是一个有效的数字。");
+    return 0;
+  }
+  const hours = minutes / 60;
+  return parseFloat(hours.toFixed(2));
+}
+export function convertMinutesToHoursAndMinutes(totalMinutes: number): { hours: number; minutes: number } {
+  if (typeof totalMinutes !== 'number' || isNaN(totalMinutes)) {
+    console.warn("输入必须是一个有效的数字。");
+    return { hours: 0, minutes: 0 }; // 或者抛出错误
+  }
+
+  // 确保输入是正数，如果需要处理负数，则需要额外的逻辑
+  const absMinutes = Math.abs(totalMinutes);
+
+  const hours = Math.floor(absMinutes / 60);
+  const minutes = absMinutes % 60;
+
+  return { hours, minutes };
+}

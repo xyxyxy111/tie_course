@@ -11,20 +11,19 @@
       <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handlePopupEnter" @mouseleave="handlePopupLeave">
         <div class="explore-popup-content">
           <div class="categories-list">
-            <div v-for="category in categories" :key="category.id" class="category-item"
+            <div v-for="category in categoryList" :key="category.categoryId" class="category-item"
               @mouseenter="handleCategoryHover(category)" @mouseleave="handleCategoryLeave">
               <div class="category-content">
                 <span class="category-name">{{ category.name }}</span>
               </div>
-
-              <!-- 右侧tags浮窗 -->
-              <div v-if="hoveredCategory?.id === category.id" class="tags-popup" @mouseenter="handleTagsHover"
-                @mouseleave="handleTagsLeave">
+              <div v-if="hoveredCategory?.categoryId === category.categoryId" class="tags-popup"
+                @mouseenter="handleTagsHover" @mouseleave="handleTagsLeave">
                 <div class="tags-list">
-                  <span v-for="tag in category.tags" :key="tag.id" class="tag-item"
-                    @click="goToCategory(category.id, tag.id)">
+                  <span v-for="tag in category.tags" :key="tag.tagId" class="tag-item"
+                    @click="goToCategory(category.categoryId!, tag.tagId)">
                     {{ tag.name }}
                   </span>
+
                 </div>
               </div>
             </div>
@@ -86,97 +85,31 @@
 
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import IconSprite from '../Icon/IconSprite.vue';
 import './header.css'
 import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin, goToLearning, goToCourse } from './header.ts';
+import type { CategoryList } from '@/api/course.ts';
+import { categoryApi } from '@/api/course.ts';
 
 const exploreHoverFlag = ref(false)
 const hoveredCategory = ref<any>(null)
 const tagsHoverFlag = ref(false)
 let exploreHideTimer: number | null = null
 
-// 课程分类数据
-const categories = ref([
-  {
-    id: 1,
-    name: '编程开发',
-    courseCount: 156,
-    tags: [
-      { id: 1, name: 'JavaScript' },
-      { id: 2, name: 'Python' },
-      { id: 3, name: 'Java' },
-      { id: 4, name: 'React' },
-      { id: 5, name: 'Vue.js' },
-      { id: 6, name: 'Node.js' }
-    ]
-  },
-  {
-    id: 2,
-    name: '数据科学',
-    courseCount: 89,
-    tags: [
-      { id: 7, name: '机器学习' },
-      { id: 8, name: '深度学习' },
-      { id: 9, name: '数据分析' },
-      { id: 10, name: '统计学' },
-      { id: 11, name: 'SQL' },
-      { id: 12, name: 'R语言' }
-    ]
-  },
-  {
-    id: 3,
-    name: '设计创意',
-    courseCount: 124,
-    tags: [
-      { id: 13, name: 'UI设计' },
-      { id: 14, name: 'UX设计' },
-      { id: 15, name: '平面设计' },
-      { id: 16, name: '插画' },
-      { id: 17, name: '摄影' },
-      { id: 18, name: '视频制作' }
-    ]
-  },
-  {
-    id: 4,
-    name: '商业管理',
-    courseCount: 98,
-    tags: [
-      { id: 19, name: '项目管理' },
-      { id: 20, name: '市场营销' },
-      { id: 21, name: '财务管理' },
-      { id: 22, name: '领导力' },
-      { id: 23, name: '创业' },
-      { id: 24, name: '战略规划' }
-    ]
-  },
-  {
-    id: 5,
-    name: '语言学习',
-    courseCount: 67,
-    tags: [
-      { id: 25, name: '英语' },
-      { id: 26, name: '日语' },
-      { id: 27, name: '韩语' },
-      { id: 28, name: '法语' },
-      { id: 29, name: '德语' },
-      { id: 30, name: '西班牙语' }
-    ]
-  },
-  {
-    id: 6,
-    name: '职业技能',
-    courseCount: 145,
-    tags: [
-      { id: 31, name: '办公软件' },
-      { id: 32, name: '沟通技巧' },
-      { id: 33, name: '时间管理' },
-      { id: 34, name: '团队协作' },
-      { id: 35, name: '演讲技巧' },
-      { id: 36, name: '谈判技巧' }
-    ]
-  }
-])
+
+const categoryList = ref<CategoryList[]>([]);
+onMounted(async () => {
+  const categoriesResponse = await categoryApi.getAllCategories();
+  categoryList.value = categoriesResponse.data;
+  console.log(categoryList);
+  categoryList.value.map(async category => {
+    const TagResponse = await categoryApi.getTagListByCategoryId(category.categoryId!);
+    category.tags = TagResponse.data;
+  });
+
+});
+
 
 // 处理分类hover
 const handleCategoryHover = (category: any) => {
@@ -242,6 +175,7 @@ const goToWishlist = () => {
 defineProps<{
   userId: string | null
 }>()
+
 
 // 处理explore按钮hover
 const handleExploreEnter = () => {

@@ -1,9 +1,9 @@
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 import { getCurrentUserId } from '@/utils/request';
 
 export let searchQuery = ref('');
-const router = useRouter();
+// const router = useRouter();
 
 export function Search() {
   if (searchQuery.value.trim()) {
