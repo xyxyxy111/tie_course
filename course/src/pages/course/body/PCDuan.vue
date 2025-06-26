@@ -33,6 +33,8 @@ const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
 // 获取userId
 const userId = ref<string | null>(null);
 
+// 展开章节的id集合
+const expandedChapters = ref<number[]>([]);
 
 onMounted(async () => {
   const token = getValidToken();
@@ -44,7 +46,7 @@ onMounted(async () => {
   }
   const searchParams = new URLSearchParams(window.location.search);
   const courseId = parseInt(searchParams.get('courseId')!);
- 
+
   //if(!searchParams.get('courseId')){return;}&&error
 
   const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
@@ -69,7 +71,7 @@ onMounted(async () => {
   } else {
     console.warn("No chapters found");
   }
-
+  getLessonListBySortOrder
 });
 
 const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
@@ -77,7 +79,7 @@ const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => 
   if (!chooseChapter?.hasLoadedLessons) {
     //true
     const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
-    console.log(lessonsResponse);
+    console.log("lessonsResponse" + lessonsResponse.data.map(lesson => lesson.title));
     if (chooseChapter) {
       chooseChapter.lessons! = lessonsResponse.data;
       chooseChapter.hasLoadedLessons = true;
@@ -87,6 +89,18 @@ const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => 
   }
 }
 
+const toggleChapter = async (courseId: number, sortOrder: number) => {
+  const idx = expandedChapters.value.indexOf(sortOrder);
+  if (idx > -1) {
+    // 已展开则收起
+    expandedChapters.value.splice(idx, 1);
+  } else {
+    // 展开并加载lesson
+    await getLessonListBySortOrder(courseId, sortOrder);
+    expandedChapters.value.push(sortOrder);
+  }
+};
+
 const CourseDescriptionStyle = computed(() => ({
   height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
 }));
@@ -95,55 +109,9 @@ const CourseDescriptionStyle = computed(() => ({
 
 <template>
   <IconSprite />
-  <CartPopup v-model="showCart" :style="`width:${width};height:${height}`">
-    <template #content>
-      <div class="shopping-cart-container container-scroll-y">
-        <!-- 添加成功提示 -->
-        <h2>已添加至购物车</h2>
-        <div class="added-notification">
-          <img src="/src/images/image6.png" alt="">
-          <div class="product-info">
-            来杯Java吧! 2025 Java 入門到精通課程
-          </div>
-          <button class="go-to-cart-btn" @click="goToCart()">前往购物车</button>
-        </div>
-
-
-        <div class="recommendations">
-          <h2>常见购买搭配</h2>
-
-          <div class="recommendation-list">
-            <div v-for="product in recommendedProducts" :key="product.id" class="product-card">
-              <img :src="product.coverImgUrl" alt="">
-              <div class="recommendationItem-detail">
-                <h3>{{ product.name }}</h3>
-                <div class="rating">
-                  <span class="stars">★★★★</span>
-                  <span class="rating-score">{{ product.rating }}</span>
-                  <span class="review-count">({{ product.reviewCount }})</span>
-                </div>
-                <p class="price">{{ product.price }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="total-section">
-            <p class="total-price">总计： US$204.97</p>
-            <button class="add-all-btn">全部添加至购物车</button>
-          </div>
-        </div>
-
-        <!-- 相关主题 -->
-        <div class="related-topics ">
-          <h2>相关主题</h2>
-          <div class="topic-tags">
-            <span v-for="topic in relatedTopics" :key="topic" class="topic-tag">{{ topic }}</span>
-          </div>
-        </div>
-      </div>
-    </template>
-  </CartPopup>
+  <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
   <PCHeader :userId="userId" />
-  <FloatingBox />
+  <FloatingBox @addToCart="showCart = true" />
   <div id="top-container">
     <div class="content">
       <div class="course-theme">
@@ -190,26 +158,35 @@ const CourseDescriptionStyle = computed(() => ({
       <h1>课程内容</h1>
       <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟</h3>
       <ul>
-        <li v-for="courseCurriculum in chapters"
-          @click="getLessonListBySortOrder(courseCurriculum.courseId, courseCurriculum.chapterSortOrder)">
-          <span>{{ courseCurriculum.chapterSortOrder }}</span>
-          <span class="curriculum-title">{{ courseCurriculum.title }}</span>
-          <span class="lectrue-duration">
-            {{ courseCurriculum.lessonNum }}个讲座·
-            <template v-if="courseCurriculum.hours !== 0">
-              {{ courseCurriculum.hours }}小时
-            </template>
-            <template v-if="courseCurriculum.minutes !== 0">
-              {{ courseCurriculum.minutes }}分钟
-            </template>
-          </span>
-        </li>
+        <template v-for="courseCurriculum in chapters" :key="courseCurriculum.chapterSortOrder">
+          <li @click="toggleChapter(courseCurriculum.courseId, courseCurriculum.chapterSortOrder)">
+            <span>第{{ courseCurriculum.chapterSortOrder }}章 </span>
+            <span class="curriculum-title">{{ courseCurriculum.title }}</span>
+            <span class="lectrue-duration">
+              {{ courseCurriculum.lessonNum }}个讲座·
+              <template v-if="courseCurriculum.hours !== 0">
+                {{ courseCurriculum.hours }}小时
+              </template>
+              <template v-if="courseCurriculum.minutes !== 0">
+                {{ courseCurriculum.minutes }}分钟
+              </template>
+            </span>
+          </li>
+          <transition name="slide-lesson">
+            <ul class="lesson-list"
+              v-if="expandedChapters.includes(courseCurriculum.chapterSortOrder) && courseCurriculum.lessons">
+              <li v-for="lesson in courseCurriculum.lessons" :key="lesson.lessonId"
+                style="padding-left:32px;list-style:circle;cursor:default;">
+                {{ lesson.title }}
+              </li>
+            </ul>
+          </transition>
+        </template>
       </ul>
     </div>
-
     <div class="course-descrpition" :style="CourseDescriptionStyle">
       <h1>描述</h1>
- 
+
       <h4>
         {{ courseVo?.description }}
       </h4>
@@ -232,7 +209,6 @@ const CourseDescriptionStyle = computed(() => ({
     </div>
   </div>
 </template>
-
 
 <style scoped>
 #top-container {
@@ -271,5 +247,28 @@ const CourseDescriptionStyle = computed(() => ({
   padding: 20px;
   width: calc(30% + 680px);
   padding-right: 360px;
+}
+
+.lesson-list {
+  border: none;
+  padding-left: 32px;
+  list-style: circle;
+  cursor: default;
+}
+
+.slide-lesson-enter-active,
+.slide-lesson-leave-active {
+  transition: max-height 0.3s cubic-bezier(.55, 0, .1, 1);
+  overflow: hidden;
+}
+
+.slide-lesson-enter-from,
+.slide-lesson-leave-to {
+  max-height: 0;
+}
+
+.slide-lesson-enter-to,
+.slide-lesson-leave-from {
+  max-height: 500px;
 }
 </style>

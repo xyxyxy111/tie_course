@@ -59,7 +59,6 @@
 <script lang="ts">
 import { defineComponent, ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { cartApi } from '@/api/cart';
-
 // 定义课程信息接口
 interface CourseInfo {
   courseName: string;
@@ -288,6 +287,130 @@ export default defineComponent({
   color: #333;
 }
 
+.shopping-cart-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.added-notification {
+  display: flex;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.added-notification img {
+  width: 30%;
+  margin-top: 3px;
+  height: fit-content;
+}
+
+.shopping-cart-container button,
+.topic-tag {
+  width: fit-content;
+  background-color: rgb(22, 92, 145);
+  color: white;
+  border: none;
+  padding: 2px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 30px;
+  font-size: 12px;
+  transition: all 0.3s;
+}
+
+.shopping-cart-container button:hover,
+.topic-tag:hover {
+  background-color: white;
+  color: rgb(22, 92, 145);
+}
+
+.recommendations {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.recommendations img {
+  width: 45%;
+  height: 100%;
+}
+
+.recommendationItem-detail {
+  margin-left: 10px;
+}
+
+.shopping-cart-container h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+.recommendation-list {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.product-info {
+  width: 45%;
+  font-size: 12px;
+  text-align: left;
+  margin: 5px;
+}
+
+.product-card {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 8px;
+
+}
+
+.product-card h3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  height: 45px;
+  font-size: 16px;
+}
+
+.rating {
+  color: #6c757d;
+}
+
+.stars {
+  color: #ffc107;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 12px;
+  color: #dc3545;
+}
+
+.total-section {
+  display: flex;
+  text-align: right;
+}
+
+.total-price {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.add-all-btn {
+  position: absolute;
+  right: 30px;
+}
+
+.topic-tag {
+  margin: 10px;
+}
+
 /* 过渡动画 */
 .fade-enter-active,
 .fade-leave-active {
@@ -297,5 +420,13 @@ export default defineComponent({
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.container-scroll-y {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-color: white;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 </style>
