@@ -5,7 +5,7 @@ class NavigationButton {
   activeFlag: boolean = false;
   hoverFlag: boolean = false;
 
-  constructor(public text: string) { }
+  constructor(public text: string, public tagId: number) { }
 
   mouseEnter() {
     this.hoverFlag = true;
@@ -25,7 +25,7 @@ export class CourseQuickView extends Course {
     public title: string,
     public score: number,
     public originalPrice: number,
-    public upDateTime: Date,
+    public updateTime: Date,
     public totalMinutes: number,
     public description: string,
     public whatYouWillLearn: string
@@ -50,17 +50,10 @@ class CommunityVoice {
 }
 
 const courseTitles = ref<NavigationButton[]>([
-  new NavigationButton('JavaScript'),
-  new NavigationButton('React JS'),
-  new NavigationButton('Angular'),
-  new NavigationButton('Java'),
-  new NavigationButton('CSS'),
-  new NavigationButton('Android'),
-  new NavigationButton('iOS')
 ])
 
 const courseQuickViews = ref<CourseQuickView[]>([
- 
+
 ]);
 
 const communityVoices = ref<CommunityVoice[]>([

@@ -48,7 +48,7 @@ export const goToLogin = () => {
 
 export const goToCourse = (courseId: number) => {
   const url = new URL('/course.html', window.location.origin);
-  url.searchParams.set('courseId', encodeURIComponent(courseId));
+  url.searchParams.set('courseId', courseId.toString());
   window.location.href = url.toString();
 };
 
