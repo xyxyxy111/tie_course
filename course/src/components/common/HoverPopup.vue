@@ -15,7 +15,8 @@
 
         <!-- 否则显示默认的课程信息 -->
         <template v-else>
-          <!-- 课程标题 -->
+
+<div class="course-info">          <!-- 课程标题 -->
           <div class="course-title">{{ courseInfo?.title || courseName }}</div>
 
           <!-- 课程信息 -->
@@ -35,8 +36,7 @@
           <div class="course-learning-points">
             <h4>你将学到：</h4>
             <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
-          </div>
-
+          </div></div>
           <!-- 操作按钮 -->
           <div class="popupBtn">
             <button class="addToCartBtn" @click="addToCart" :disabled="loading">
@@ -132,6 +132,7 @@ export default defineComponent({
     },
     courseId: {
       type: Number,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'course-added', 'course-wishlisted'],
@@ -162,7 +163,7 @@ export default defineComponent({
       if (!props.courseId) return;
         const courseVoResponse = await courseApi.getSingleCourseDetail((props.courseId!));
       try {
-        // 这里可以根据courseName调用API获取课程详细信息
+ // 这里可以根据courseName调用API获取课程详细信息
         // 暂时使用模拟数据
         courseInfo.value = {
           title: courseVoResponse.data.title,
@@ -178,6 +179,7 @@ export default defineComponent({
         console.error('获取课程信息失败:', err);
       }
     };
+
 
     // 临时解决方案：使用本地存储作为备用
     const addToCartLocal = (courseInfo: CourseInfo) => {
@@ -442,6 +444,7 @@ export default defineComponent({
 .trigger-area {
   display: inline-block;
   cursor: pointer;
+  width: 100%;
 }
 
 .popup-content {
@@ -547,8 +550,15 @@ export default defineComponent({
 }
 
 /* 课程内容样式 */
+.course-info{
+  width: 100%;
+  margin:0 auto;
+  height: 265px;
+  overflow: hidden;
+}
+
 .course-title {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   color: #333;
   margin-bottom: 8px;

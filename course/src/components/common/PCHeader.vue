@@ -25,6 +25,7 @@
                     @click="goToCategory(category.categoryId!, tag.tagId)">
                     {{ tag.name }}
                   </span>
+
                 </div>
               </div>
             </div>
@@ -257,6 +258,7 @@ const goToWishlist = () => {
 defineProps<{
   userId: string | null
 }>()
+
 
 // 处理explore按钮hover
 const handleExploreEnter = () => {

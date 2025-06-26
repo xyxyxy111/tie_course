@@ -16,7 +16,6 @@ import Profile from './views/Profile.vue';
 import './myInfo.css';
 import { authApi } from '@/api/user';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
-
 const { width, height } = useWindowSize()
 
 const userId = ref<string | null>(null);

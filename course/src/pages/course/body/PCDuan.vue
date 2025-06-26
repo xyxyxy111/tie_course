@@ -33,8 +33,15 @@ const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
 // 获取userId
 const userId = ref<string | null>(null);
 
-onMounted(async() => {
-  // 从URL参数获取userId
+
+onMounted(async () => {
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  } else {
+    // 如果没有token，重定向到登录页面
+    window.location.href = '/login.html';
+  }
   const searchParams = new URLSearchParams(window.location.search);
   const courseId = parseInt(searchParams.get('courseId')!);
   //if(!searchParams.get('courseId')){return;}&&error
@@ -61,11 +68,12 @@ onMounted(async() => {
   } else {
     console.warn("No chapters found");
   }
+
 });
 
-const getLessonListBySortOrder = async (courseId:number,sortOrder:number)=>{
+const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
   const chooseChapter = chapters.value.find(chapter => chapter.chapterSortOrder === sortOrder);
-  if(!chooseChapter?.hasLoadedLessons){
+  if (!chooseChapter?.hasLoadedLessons) {
     //true
     const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
     console.log(lessonsResponse);
@@ -74,9 +82,10 @@ const getLessonListBySortOrder = async (courseId:number,sortOrder:number)=>{
       chooseChapter.hasLoadedLessons = true;
     } else {
       console.warn("No chapters found");
-    }    
+    }
   }
 }
+
 
 const CourseDescriptionStyle = computed(() => ({
   height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
@@ -137,23 +146,17 @@ const CourseDescriptionStyle = computed(() => ({
   <div id="top-container">
     <div class="content">
       <div class="course-theme">
-        <!-- <h6> 开发 数据科学 R（编程语言）</h6> -->
-        <h6> {{ courseVo?.categoryName }} {{ courseVo?.tagName}}</h6>
+        <h6> {{ courseVo?.categoryName }} {{ courseVo?.tagName }}</h6>
       </div>
 
       <div class="divider"></div>
 
       <div class="course-title">
-        <!-- <h3> R Programming A-Z™: R For Data Science With Real Exercises!
-        </h3> -->
         <h3> {{ courseVo?.title }}
         </h3>
       </div>
 
       <div class="course-introduction">
-        <!-- <h5>Learn Programming In R And R Studio. Data Analytics, Data Science, Statistical Analysis, Packages,
-          Functions,
-          GGPlot2</h5> -->
         <h5>{{ courseVo?.highLights }}</h5>
 
       </div>
@@ -161,13 +164,8 @@ const CourseDescriptionStyle = computed(() => ({
       <div class="divider"></div>
 
       <div class="update-time">
-        <!-- <h6>上次更新时间：2025年1月</h6> -->
         <h6>上次更新时间：{{ courseVo?.updateTime }}</h6>
       </div>
-
-      <!-- <div class="language">
-        <h6> 中文 , 英语</h6>
-      </div> -->
 
     </div>
 
@@ -176,13 +174,6 @@ const CourseDescriptionStyle = computed(() => ({
   <div id="course-detail">
     <div class="what-you-will-learn">
       <h1>您将会学到</h1>
-      <!-- <ul>
-        <li>從完全不會寫程式，做出10款應用程式</li>
-        <li>學習如何撰寫 Swift 程式碼</li>
-        <li>
-          學習紮實的程式觀念，從變數觀念教到類別、物件、協定與 MVC 程式設計
-        </li>
-      </ul> -->
       <p>{{ courseVo?.whatYouWillLearn }}</p>
     </div>
 
@@ -197,20 +188,19 @@ const CourseDescriptionStyle = computed(() => ({
     <div class="course-content">
       <h1>课程内容</h1>
       <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟</h3>
-      <!-- <h3>10个章节·100个讲座·总时长10小时10分钟</h3> -->
       <ul>
-        <li v-for="courseCurriculum in chapters"  @click="getLessonListBySortOrder(courseCurriculum.courseId,courseCurriculum.chapterSortOrder)">
-          <span>{{ courseCurriculum.chapterSortOrder }}</span>         
+        <li v-for="courseCurriculum in chapters"
+          @click="getLessonListBySortOrder(courseCurriculum.courseId, courseCurriculum.chapterSortOrder)">
+          <span>{{ courseCurriculum.chapterSortOrder }}</span>
           <span class="curriculum-title">{{ courseCurriculum.title }}</span>
-          <!-- <span class="lectrue-duration">{{ courseCurriculum.lectures }}个讲座·{{ courseCurriculum.duration }}个小时</span> -->
           <span class="lectrue-duration">
             {{ courseCurriculum.lessonNum }}个讲座·
-              <template v-if="courseCurriculum.hours !== 0">
-                {{ courseCurriculum.hours }}小时
-              </template>
-              <template v-if="courseCurriculum.minutes !== 0">
-                {{ courseCurriculum.minutes }}分钟
-              </template>              
+            <template v-if="courseCurriculum.hours !== 0">
+              {{ courseCurriculum.hours }}小时
+            </template>
+            <template v-if="courseCurriculum.minutes !== 0">
+              {{ courseCurriculum.minutes }}分钟
+            </template>
           </span>
         </li>
       </ul>
@@ -218,85 +208,7 @@ const CourseDescriptionStyle = computed(() => ({
 
     <div class="course-descrpition" :style="CourseDescriptionStyle">
       <h1>描述</h1>
-      <!-- <h4>您想找一份寫程式的工作嗎？
-        您想要開發自己的 iPhone App 嗎？
-        歡迎來到「深入淺出 iPhone 開發」課程。
-
-        我是魏巍。Udemy 大中華地區 iPhone 開發課程合作講師。
-        目前我已經上架了40 款 iPhone Apps。
-        包括曾登上台灣區冠軍的「黃色小鴨爆炸了」，
-        以及台灣區第二名的「指認嫌疑犯」。
-
-        我撰寫書籍，也在資策會、Alpha Camp、赫綵電腦與各大專院校教授程式課程。
-        完全沒有程式基礎也沒有關係，我會從最基礎的概念開始教，
-        我真的都會解釋地超清楚。
-        同時也會給同學很多練習機會。
-        不僅教您概念，
-        還真的帶您實際製作出10 款應用程式。
-        會教地圖、多媒體，以及連結網路 API。
-        我去年的 Swift3 課程在 Udemy 已經有超過 1300 多位同學報名，
-        除了線上學習，內容很豐富，同學留言問我問題，我也會回答。
-        超多人都留下了好評。
-
-        今年我準備更豐富、更超值的中文教學，
-        能夠省去您看英文書的時間。
-        不管您是想要找工作、想要接案，
-        或是自己想要做自己的 App，
-        都能以最簡單最快速的方式達到目的。
-        歡迎來學習全世界最爆炸成長的語言，
-        一起來做自己的 iPhone 應用程式吧！
-
-
-        製作 10 款 Apps
-
-        Hello Swift
-        解鎖大師
-        小小算命師
-        質數判斷
-        Color Finder
-        快樂鋼琴
-        待辦事項
-        電子書
-        使用者產生器
-        RSS閱讀器
-
-        課程內容包括:
-
-        安裝 Xcode
-        超詳細的 Swift 語言介紹
-        超實用的 UIKit 元件知識
-        完整的 AutoLayout 技巧
-        多場景應用程式製作(TabBar, Navigation)
-        表格視圖應用程式的開發
-        地圖
-        多媒體
-        連結網路與解析下載資料
-
-        課程要求
-
-        無須程式背景，一般人就可以學習
-        無需成為付費的 Apple 開發者，一般人就可以學習
-        需要蘋果電腦(iMac、MacBook Air、MacBook、MacBook Pro，Mac Mini 任一可)
-
-
-        可以學到什麼？
-
-        從完全不會寫程式，做出10款應用程式。
-        學習如何撰寫 Swift 程式碼。
-        學習紮實的程式觀念，從變數觀念教到類別、物件、協定與 MVC 程式設計。
-        培養程式的能力，找到更好、更多金的工作。
-
-        誰可以學？
-
-        只要有興趣，每個人都可以學。
-        想要學習寫程式的您。沒有寫程式的經驗也沒有關係。
-        想要找一份寫程式的工作，轉換工作跑道的追夢者。
-        此课程面向哪些人：
-        只要有興趣，每個人都可以學
-        想要學習寫程式的您。沒有寫程式的經驗也沒有關係
-        想要找一份寫程式的工作，轉換工作跑道的追夢者
-
-      </h4> -->
+ 
       <h4>
         {{ courseVo?.description }}
       </h4>
@@ -319,6 +231,7 @@ const CourseDescriptionStyle = computed(() => ({
     </div>
   </div>
 </template>
+
 
 <style scoped>
 #top-container {

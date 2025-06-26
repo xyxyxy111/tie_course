@@ -77,7 +77,6 @@ instance.interceptors.request.use((config) => {
   const token = getValidToken();
   if (token) {
     config.headers.Authorization = `${token}`;
-    console.log('请求头已设置Authorization:', `${token.substring(0, 20)}...`);
   } else {
     console.log('未找到有效token，跳过Authorization设置');
   }

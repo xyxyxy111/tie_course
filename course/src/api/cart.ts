@@ -42,7 +42,7 @@ export const cartApi = {
   getMyCart: () => {
     return request<Cart>({
       method: 'GET',
-      url: '/cart/mycart'
+      url: '/cart/my'
     });
   },
 
@@ -50,15 +50,15 @@ export const cartApi = {
   addCourseToCart: (courseId: number) => {
     return request<Cart>({
       method: 'POST',
-      url: `/cart/add/course/${courseId}`
+      url: `/cart/courses/${courseId}`
     });
   },
 
   // 从购物车移除课程
   removeCourseFromCart: (courseId: number) => {
     return request<Cart>({
-      method: 'POST',
-      url: `/cart/remove/course/${courseId}`
+      method: 'DELETE',
+      url: `/cart/courses/${courseId}`
     });
   },
 
