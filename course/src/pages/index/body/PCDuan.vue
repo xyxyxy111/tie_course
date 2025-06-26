@@ -72,7 +72,6 @@ onMounted(async () => {
   getCourseListByTagId(tagId);
   courseTitles.value[0].activeFlag = true
 });
-
 const getCourseListByTagId = async (tagId: number) => {
   const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
   courseListVos.value = courseListVosResponse.data;
@@ -108,14 +107,11 @@ function changecourseTheme(i: NavigationButton) {
 const voiceStyle = (index: number) => ({
   height: '3' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
 })
-
 const voiceCommentStyle = (index: number) => ({
   height: '1' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
 })
-
 const showCart = ref(false);
 const selectedCourse = ref<{ title: string; courseId: number } | null>(null);
-
 function addToCart(course: CourseQuickView) {
   selectedCourse.value = {
     title: course.title,
@@ -126,55 +122,7 @@ function addToCart(course: CourseQuickView) {
 
 function handleCourseAdded(event: any) {
   console.log('课程已添加到购物车:', event);
-
-  // 每次加购后都弹出CartPopup
   showCart.value = true;
-
-  if (event.success) {
-    // 成功处理
-    if (event.isLocalStorage) {
-      console.log(`✅ 课程 "${event.courseName}" 已添加到本地购物车（临时解决方案）`);
-      // 可以在这里更新UI显示本地购物车状态
-    } else {
-      console.log(`✅ 课程 "${event.courseName}" 已成功添加到购物车`);
-      // 这里可以添加更友好的成功提示，比如使用 toast 组件
-      // 或者更新购物车图标上的数量显示
-    }
-
-  } else {
-    // 错误处理
-    console.error('❌ 添加课程到购物车失败:', event.error);
-
-    if (event.errorType) {
-      console.error('错误类型:', event.errorType);
-    }
-
-    if (event.errorMessage) {
-      console.error('错误信息:', event.errorMessage);
-    }
-
-    // 根据错误类型进行不同的处理
-    switch (event.errorType) {
-      case 'database_error':
-        console.error('🚨 数据库配置错误，需要后端修复');
-        // 可以在这里添加错误上报逻辑
-        break;
-      case 'network_error':
-        console.error('🌐 网络连接错误');
-        // 可以在这里添加网络状态检测
-        break;
-      case 'unauthorized':
-        console.error('🔒 用户未授权，需要重新登录');
-        // 可以在这里添加重定向到登录页面的逻辑
-        break;
-      case 'already_in_cart':
-        console.warn('ℹ️ 课程已在购物车中');
-        // 可以在这里添加跳转到购物车页面的逻辑
-        break;
-      default:
-        console.error('❓ 未知错误类型');
-    }
-  }
 }
 </script>
 
