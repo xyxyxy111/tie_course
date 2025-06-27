@@ -25,23 +25,22 @@
       </li>
     </ul>
 
-    <!-- 语言选择 -->
-    <ul class="sidebar-content">
-      <li class="sidebar-title">语言</li>
-      <li v-for="lang in filterStore.languages" :key="lang.value">
-        <button :class="{ active: lang.isSelected }" @click="filterStore.selectLanguage(lang)">
-          {{ lang.label }}
-        </button>
-      </li>
-    </ul>
 
-    <!-- 主题选择 -->
+    <!-- 分类选择 -->
     <ul class="sidebar-content">
-      <li class="sidebar-title">主题</li>
-      <li v-for="theme in filterStore.themes" :key="theme.value">
-        <button :class="{ active: theme.isSelected }" @click="filterStore.selectTheme(theme)">
-          {{ theme.label }}
+      <li class="sidebar-title">分类</li>
+      <li v-for="category in filterStore.categories" :key="category.value">
+        <button :class="{ active: category.isSelected }" @click="filterStore.selectCategory(category)">
+          {{ category.label }}
         </button>
+        <!-- 展开tags -->
+        <ul v-if="category.isSelected && filterStore.tags.length" class="tag-list">
+          <li v-for="tag in filterStore.tags" :key="tag.value">
+            <button :class="{ active: tag.isSelected }" @click.stop="filterStore.selectTag(tag)">
+              {{ tag.label }}
+            </button>
+          </li>
+        </ul>
       </li>
     </ul>
 
@@ -70,11 +69,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useFilterStore } from '../../../stores/filter';
+import { ref, watch, onMounted } from 'vue'
+import { useFilterStore } from './filterStore';
 
 const filterStore = useFilterStore()
 
+onMounted(() => {
+  filterStore.fetchCategories().then(() => {
+  }).catch((error) => {
+    console.error("fetchCategories 调用失败:", error)
+  });
+});
 
 // 控制页面滚动
 </script>
@@ -136,5 +141,26 @@ const filterStore = useFilterStore()
   font-weight: 600;
   color: rgb(22, 92, 145);
   background-color: rgba(22, 92, 145, 0.1);
+}
+
+.tag-list {
+  padding-left: 16px;
+  margin-bottom: 8px;
+}
+
+.tag-list button {
+  width: 100%;
+  margin: 0px 0;
+  font-size: 14px;
+  padding: 6px 10px;
+  color: #35495e;
+  border: none;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.tag-list button.active {
+  background: rgb(22, 92, 145);
+  color: #fff;
 }
 </style>

@@ -71,14 +71,6 @@
       <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
     </div>
 
-    <!-- <button style="padding-inline:0% ;" v-if="!userId">
-      <div class="icon">
-        <svg width="50" height="50" viewBox="-1.3 -1 8 8" fill="#35495e">
-          <use href="#mdi--web" />
-        </svg>
-      </div>
-    </button> -->
-
   </div>
 
 </template>

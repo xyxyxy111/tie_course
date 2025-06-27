@@ -4,7 +4,7 @@ import { toRef, ref, onMounted, watch, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
-import { useFilterStore } from '../../../stores/filter'
+import { useFilterStore } from '../components/filterStore'
 import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
