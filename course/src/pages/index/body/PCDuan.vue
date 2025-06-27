@@ -5,11 +5,24 @@ import { toRef, ref, onMounted, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import PCHeader from '@/components/common/PCHeader.vue'
-import PCBottom from '@/components/common/PCBottom.vue';
 import { useWindowSize } from '@/useWindowSize';
 import HoverPopup from '@/components/common/HoverPopup.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
+
+// 导入CourseQuickView类型
+import { CourseQuickView } from '../components/content.ts';
+
+import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course.ts';
+import type { Category, Tag, CourseListVO } from '@/api/course.ts';
+
+const categories = ref<Category[]>([]);
+const singleCategory = ref<Category | null>(null);
+const tags = ref<Tag[]>([]);
+const courseListVos = ref<CourseListVO[]>([]);
+const navigationButtons = ref<NavigationButton[]>([]);
+
 const { width, height } = useWindowSize()
 import {
   courseTitles, NavigationButton,
@@ -17,8 +30,66 @@ import {
   recommendedProducts, relatedTopics
 } from '../components/content.ts';
 
-courseTitles.value[0].activeFlag = true
+const userId = ref<string | null>(null);
 
+onMounted(async () => {
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  }
+  const searchParams = new URLSearchParams(window.location.search);
+  let categoryId;
+  //session?
+  if (!searchParams.get('categoryId')) {
+    categoryId = 1;
+    // flag; tag is default
+  } else {
+    categoryId = parseInt(searchParams.get('categoryId')!);
+  }
+
+  const categoriesResponse = await categoryApi.getAllCategories();
+  categories.value = categoriesResponse.data;
+  console.log(categories.value);
+
+  const singleCategoryResponse = await categoryApi.getCategoryDetail(1);
+  singleCategory.value = singleCategoryResponse.data;
+  console.log(singleCategory.value);
+
+  const tagsResponse = await categoryApi.getTagListByCategoryId(1);
+  tags.value = tagsResponse.data;
+  courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
+
+  let tagId;
+  //session?
+  if (!searchParams.get('tagId')) {
+    let firstTag = tags.value[0];
+    tagId = firstTag.tagId;
+  } else {
+    tagId = parseInt(searchParams.get('tagId')!);
+  }
+
+  getCourseListByTagId(tagId);
+  courseTitles.value[0].activeFlag = true
+});
+const getCourseListByTagId = async (tagId: number) => {
+  const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
+  courseListVos.value = courseListVosResponse.data;
+  console.log(courseListVos.value);
+  courseQuickViews.value = courseListVos.value.map(course => {
+    return new CourseQuickView(
+      course.courseId,
+      course.coverImgUrl,
+      course.title,
+      course.score,
+      course.originalPrice,
+      new Date(course.updateTime || new Date()),
+      course.totalMinutes,
+      course.description,
+      course.whatYouWillLearn
+    );
+  })
+}
 
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   backgroundColor: (activeFlag && hoverFlag) ? 'rgba(22,92,145,0.7)' :
@@ -31,94 +102,40 @@ function changecourseTheme(i: NavigationButton) {
     element.activeFlag = false;
   });
   i.activeFlag = true;
+  getCourseListByTagId(i.tagId);
 }
 const voiceStyle = (index: number) => ({
   height: '3' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
 })
-
 const voiceCommentStyle = (index: number) => ({
   height: '1' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
 })
-
-
-
-
-function tocourse() {
-
-}
-
-function toComment() {
-
-}
-
 const showCart = ref(false);
-const cartTitle = ref('')
-
-function addToCart(course: string) {
-  cartTitle.value = course;
+const selectedCourse = ref<{ title: string; courseId: number } | null>(null);
+function addToCart(course: CourseQuickView) {
+  selectedCourse.value = {
+    title: course.title,
+    courseId: course.courseId
+  };
   showCart.value = true;
 }
 
-
-
-
+function handleCourseAdded(event: any) {
+  console.log('课程已添加到购物车:', event);
+  showCart.value = true;
+}
 </script>
 
 <template>
   <IconSprite />
   <main>
-    <CartPopup v-model="showCart" :style="`width:${width};height:${height}`">
-      <template #content>
-        <div class="shopping-cart-container container-scroll-y">
-          <!-- 添加成功提示 -->
-          <h2>已添加至购物车</h2>
-          <div class="added-notification">
-            <img src="/src/images/image6.png" alt="">
-            <div class="product-info">
-              来杯Java吧! 2025 Java 入門到精通課程
-            </div>
-            <button class="go-to-cart-btn" @click="goToCart">前往购物车</button>
-          </div>
-
-
-          <div class="recommendations">
-            <h2>常见购买搭配</h2>
-
-            <div class="recommendation-list">
-              <div v-for="product in recommendedProducts" :key="product.id" class="product-card">
-                <img :src="product.coverImgUrl" alt="">
-                <div class="recommendationItem-detail">
-                  <h3>{{ product.name }}</h3>
-                  <div class="rating">
-                    <span class="stars">★★★★</span>
-                    <span class="rating-score">{{ product.rating }}</span>
-                    <span class="review-count">({{ product.reviewCount }})</span>
-                  </div>
-                  <p class="price">{{ product.price }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="total-section">
-              <p class="total-price">总计： US$204.97</p>
-              <button class="add-all-btn">全部添加至购物车</button>
-            </div>
-          </div>
-
-          <!-- 相关主题 -->
-          <div class="related-topics ">
-            <h2>相关主题</h2>
-            <div class="topic-tags">
-              <span v-for="topic in relatedTopics" :key="topic" class="topic-tag">{{ topic }}</span>
-            </div>
-          </div>
-        </div>
-      </template>
-    </CartPopup>
-    <PCHeader />
+    <CartPopup v-model="showCart" :userId="userId || undefined" :courseName="selectedCourse?.title || ''"
+      :courseId="selectedCourse?.courseId || undefined" :style="`width:${width};height:${height}`" />
+    <PCHeader :userId="userId" />
 
     <div>
 
-      <div class="title">Software Engineering courses</div>
+      <div class="title">{{ singleCategory?.name }}</div>
       <div class="navigate">
         <button v-for="(title, index) in courseTitles" :key="index" @click="changecourseTheme(title)"
           @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
@@ -127,51 +144,25 @@ function addToCart(course: string) {
       </div>
 
       <div class="content">
-        <div v-for="(courseQuickView, index) in courseQuickViews" @click="goToCourse" class="course"
+        <div v-for="(courseQuickView, index) in courseQuickViews" class="course"
           @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
-          <img :src="courseQuickView.coverImgUrl" alt="">
-          <div class="course-title">
-            {{ courseQuickView.title }}
-          </div>
-          <div class="course-rating">
-            {{ courseQuickView.score }} ★★★★ (2,187)
-          </div>
-          <div class="course-price">
-            US${{ courseQuickView.originalPrice.toFixed(2) }}
-          </div>
-
-          <!-- HoverPopup 组件 -->
           <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="340px" transition="slide"
-            :show-delay="200" :hide-delay="300" class="custom-popup-right">
+            :show-delay="150" :hide-delay="150" class="custom-popup-right" :userId="userId || undefined"
+            :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded">
             <template #trigger>
+              <div @click="goToCourse(courseQuickView.courseId)">
+                <img :src="courseQuickView.coverImgUrl" alt="">
+                <div class="course-title">
+                  {{ courseQuickView.title }}
+                </div>
+                <div class="course-rating">
+                  {{ courseQuickView.score }} ★★★★ (2,187)
+                </div>
+                <div class="course-price">
+                  US${{ courseQuickView.originalPrice.toFixed(2) }}
+                </div>
+              </div>
               <div class="popup-trigger-area"></div>
-            </template>
-            <template #content>
-              <!-- 弹窗内容 -->
-              <div class="course-title">{{ courseQuickView.title }}</div>
-              <div>
-                <span class="course-update">更新日期 2025年3月</span>|
-                <span class="course-duration">
-                  总共{{ (courseQuickView.totalMinutes / 60).toFixed(1) }}小时
-                </span>
-              </div>
-              <div class="course-description">
-                {{ courseQuickView.description }}
-              </div>
-              <div class="course-learning-points">
-                <h4>你将学到：</h4>
-                <p>{{ courseQuickView.whatYouWillLearn }}</p>
-              </div>
-              <div class="popupBtn">
-                <button class="addToCartBtn" @click="addToCart(courseQuickView.title)">添加到购物车</button>
-                <button class="addToWishlistBtn">
-                  <div class="icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
-                      <use href="#line-md--heart-filled" />
-                    </svg>
-                  </div>
-                </button>
-              </div>
             </template>
           </HoverPopup>
         </div>
@@ -185,8 +176,7 @@ function addToCart(course: string) {
       <div class="voice-container container-scroll-x ">
         <div class="inContainer">
 
-          <div v-for="(communityVoice, index) in communityVoices" @click="toComment()" class="comment"
-            :style="voiceStyle(index)">
+          <div v-for="(communityVoice, index) in communityVoices" class="comment" :style="voiceStyle(index)">
             <div>
               <svg width="80" height="40" viewBox="0 -10 48 48" fill="#35495e">
                 <use href="#raphael--quote" />
@@ -197,15 +187,13 @@ function addToCart(course: string) {
             <div class="voice-link">View {{ communityVoice.course }} ></div>
           </div>
         </div>
-
       </div>
+
     </div>
-    <PCBottom />
   </main>
 
 </template>
 
-<!-- css -->
 <style scoped>
 .title {
   font-size: 40px;
@@ -266,7 +254,9 @@ function addToCart(course: string) {
 .exploreBtn:hover {
   background-color: gainsboro;
   color: rgb(22, 92, 145);
-  box-shadow: 0 4px 4px rgb(22, 92, 145, 0.3);
+  box-shadow: 0 4px 4p
+
+rgb(22, 92, 145, 0.3);
 }
 
 .course,
@@ -291,6 +281,11 @@ function addToCart(course: string) {
 
 
 /* Course Text Content */
+.course img{
+  width: 100%;
+  height: 140px;
+}   
+
 .course-title {
   padding: 10px 0px 0px 15px;
   font-weight: 700;

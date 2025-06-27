@@ -18,28 +18,59 @@
       </div>
     </div>
 
-    <!-- 学习计划部分 -->
-    <div class="learning-schedule">
-      <h3>安排学习时间</h3>
-      <p>学习需要日积月累。研究表明，养成良好学习习惯的学生更有可能实现目标。请留出时间学习并使用学习计划链接收提醒。</p>
-      <button class="start-btn">开始</button>
-      <button class="cancel-btn">取消</button>
+    <div class="mycourses-container">
+      <div class="course-card" v-for="(course, index) in courses" :key="index">
+        <img :src="course.coverimg" alt="">
+        <h5>Git/GitHub/GitLab完全教程（包括Git底层原理）</h5>
+        <div class="progress-bar">
+          <div class="in-progressbar"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- 课程卡片 -->
-    <div class="course-card">
-      <h3>Git/GitHub/GitLab完全教程（包括Git底层原理）</h3>
-      <p class="instructor">Peng Xiao</p>
-      <button class="start-course-btn">开始课程</button>
-    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: 'AllCourses',
+  name: 'AllCourse',
+  setup() {
+    const courses = ref([
+      {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }, {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }, {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }, {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }, {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }, {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }, {
+        coverimg: '/src/images/git.png',
+        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
+        progress: 50
+      }
+    ]);
+
+    return { courses };
+  }
 });
 </script>
 
@@ -50,7 +81,7 @@ export default defineComponent({
 
 .learning-progress,
 .learning-schedule,
-.course-card {
+.mycourses-container {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 20px;
@@ -77,9 +108,9 @@ h3 {
   color: #1a73e8;
 }
 
- button {
+button {
   position: relative;
-  left:80%;
+  left: 80%;
   width: fit-content;
   background-color: rgb(22, 92, 145);
   color: white;
@@ -91,31 +122,35 @@ h3 {
   height: 30px;
   font-size: 12px;
   transition: all 0.3s;
-  border:1px rgb(22, 92, 145) solid;
+  border: 1px rgb(22, 92, 145) solid;
 }
 
- button:hover {
-  background-color: rgba(22, 92, 145,0.8);
+button:hover {
+  background-color: rgba(22, 92, 145, 0.8);
 }
 
-.start-btn{
+.start-btn {
   background-color: white;
   color: rgb(22, 92, 145);
-  border:1px rgb(22, 92, 145) solid;
+  border: 1px rgb(22, 92, 145) solid;
 }
 
-.start-btn:hover{
-  background-color: rgba(22, 92, 145,0.08);
+.start-btn:hover {
+  background-color: rgba(22, 92, 145, 0.08);
 }
 
-.start-course-btn{
-left: 85%;
+.mycourses-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(24%, 280px));
 }
 
+.course-card {
+  width: 240px;
+  padding: 10px;
+}
 
-
-.instructor {
-  color: #5f6368;
-  margin: 10px 0;
+.course-card img {
+  width: 100%;
+  height: fit-content;
 }
 </style>

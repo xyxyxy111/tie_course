@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token测试页面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 3px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Token测试页面</h1>
+
+  <div class="section">
+    <h2>Token状态</h2>
+    <div id="tokenStatus"></div>
+    <button onclick="checkToken()">检查Token</button>
+    <button onclick="clearToken()">清除Token</button>
+  </div>
+
+  <div class="section">
+    <h2>测试API请求</h2>
+    <button onclick="testProfileAPI()">测试/profile接口</button>
+    <div id="apiResult"></div>
+  </div>
+
+  <div class="section">
+    <h2>模拟登录</h2>
+    <input type="text" id="testToken" placeholder="输入测试token" style="width: 300px; padding: 5px;">
+    <button onclick="setTestToken()">设置测试Token</button>
+    <button onclick="simulateLogin()">模拟登录流程</button>
+  </div>
+
+  <script>
+    function checkToken() {
+      const token = localStorage.getItem('token');
+      const statusDiv = document.getElementById('tokenStatus');
+
+      if (token && token !== 'undefined' && token.trim() !== '') {
+        statusDiv.innerHTML = `
+                    <div class="success">
+                        <strong>Token存在:</strong><br>
+                        <pre>${token.substring(0, 50)}...</pre>
+                    </div>
+                `;
+      } else {
+        statusDiv.innerHTML = `
+                    <div class="error">
+                        <strong>Token不存在或无效</strong><br>
+                        当前值: "${token}"
+                    </div>
+                `;
+      }
+    }
+
+    function clearToken() {
+      localStorage.removeItem('token');
+      alert('Token已清除');
+      checkToken();
+    }
+
+    function setTestToken() {
+      const testToken = document.getElementById('testToken').value;
+      if (testToken.trim()) {
+        localStorage.setItem('token', testToken);
+        alert('测试Token已设置');
+        checkToken();
+      } else {
+        alert('请输入有效的token');
+      }
+    }
+
+    function simulateLogin() {
+      // 模拟登录API响应
+      const mockResponse = {
+        status: 1011,
+        message: '用户登录成功',
+        data: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVMTAwMDIiLCJpYXQiOjE3NTA0NzU2MzYsImV4cCI6MTc1MDUxMTYzNn0.XdNQv4cxPye4k0MYVDggpOR3cSdnWiEzrcD7g83L4Wg'
+      };
+
+      console.log('模拟登录响应:', mockResponse);
+
+      // 使用修复后的逻辑处理token
+      if (mockResponse.data && typeof mockResponse.data === 'string') {
+        localStorage.setItem('token', mockResponse.data);
+        console.log('Token已保存:', mockResponse.data);
+        alert('模拟登录成功，Token已保存');
+        checkToken();
+      } else {
+        console.error('登录响应中没有有效的token');
+        alert('模拟登录失败：未获取到token');
+      }
+    }
+
+    function testProfileAPI() {
+      const resultDiv = document.getElementById('apiResult');
+      resultDiv.innerHTML = '<p>正在测试...</p>';
+
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      if (token && token !== 'undefined' && token.trim() !== '') {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // 根据环境选择API地址
+      const apiUrl = window.location.hostname === 'localhost' && window.location.port === '5173'
+        ? '/api/profile'  // 开发环境使用代理
+        : 'http://localhost:8080/profile';  // 生产环境直接访问
+
+      fetch(apiUrl, {
+        method: 'GET',
+        headers: headers
+      })
+        .then(response => {
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+          return response.json();
+        })
+        .then(data => {
+          resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>API请求成功</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>API请求失败</strong><br>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+        });
+    }
+
+    // 页面加载时检查token
+    window.onload = function () {
+      checkToken();
+    };
+  </script>
+</body>
+
+</html>

@@ -32,7 +32,7 @@ const handleLoginByCaptcha = async () => {
 
   try {
     const response = await authApi.loginByCaptcha(params);
-    const token = response.data.token;
+    const token = response.data;
     localStorage.setItem('token', token);
     console.log('登录成功，token已保存');
   } catch (error) {
@@ -49,7 +49,7 @@ const handleLoginByPassword = async () => {
 
   try {
     const response = await authApi.loginByPassword(params);
-    const token = response.data.token;
+    const token = response.data;
     localStorage.setItem('token', token);
     console.log('登录成功，token已保存');
   } catch (error) {
@@ -66,7 +66,7 @@ const handleRegister = async () => {
 
   try {
     const response = await authApi.register(params);
-    const token = response.data.token;
+    const token = response.data;
     localStorage.setItem('token', token);
     console.log('注册成功，token已保存');
   } catch (error) {
@@ -143,5 +143,5 @@ const updateUserProfile = async () => {
 
 
 export {
-  authApi,userApi,profileApi
+  authApi, userApi, profileApi
 }

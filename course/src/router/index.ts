@@ -1,51 +1,51 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import MyLearning from '@/pages/myLearn/App.vue';
 import AllCourse from '@/pages/myLearn/views/AllCourse.vue';
 import MyList from '@/pages/myLearn/views/MyList.vue';
 import Wishlist from '@/pages/myLearn/views/Wishlist.vue';
-import Archived from '@/pages/myLearn/views/Archived.vue';
+import Log from '@/pages/myLearn/views/Log.vue';
 import BasicInformation from '@/pages/myInfo/views/BasicInformation.vue';
 import Communication from '@/pages/myInfo/views/Communication.vue';
-import Courses from '@/pages/myInfo/views/Courses.vue';
+import Keys from '@/pages/myInfo/views/Keys.vue';
 import Photo from '@/pages/myInfo/views/Photo.vue';
 import Privacy from '@/pages/myInfo/views/Privacy.vue';
 import Profile from '@/pages/myInfo/views/Profile.vue';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
     {
-      path: '/my-info.html', // 根路径直接重定向
+      path: '/my-info', // 根路径直接重定向
       redirect: '/my-info/profile'
     },
-   {
+    {
       path: '/my-info/profile', // 根路径直接重定向
-    name: 'Profile',
-     component: Profile,
-     redirect: '/my-info/profile/basic-infomation',
-     // 或者使用嵌套路由方式
-     children: [
-       {
-         path: 'basic-infomation',
-         name: 'BasicInformation',
-         component: BasicInformation
-       },
-       {
-         path: 'privacy',
-         name: 'Privacy',
-         component: Privacy
-       },
-       {
-         path: 'photo',
-         name: 'Photo',
-         component: Photo
-       }
-     ]
+      name: 'Profile',
+      component: Profile,
+      redirect: '/my-info/profile/basic-infomation',
+      // 或者使用嵌套路由方式
+      children: [
+        {
+          path: 'basic-infomation',
+          name: 'BasicInformation',
+          component: BasicInformation
+        },
+        {
+          path: 'privacy',
+          name: 'Privacy',
+          component: Privacy
+        },
+        {
+          path: 'photo',
+          name: 'Photo',
+          component: Photo
+        }
+      ]
     },
     {
-      name: 'Courses',
-      component: Courses,
-      path: '/my-info/courses'
+      name: 'Keys',
+      component: Keys,
+      path: '/my-info/keys'
     },
     {
       name: 'Communication',
@@ -53,28 +53,28 @@ const router = createRouter({
       path: '/my-info/communication'
     },
     {
-      path: '/learning.html', // 根路径直接重定向
+      path: '/learning',
       redirect: '/learning/all-courses'
     },
     {
+      path: '/learning/all-courses',
       name: 'AllCourse',
-      path: '/learning/all-courses', // 使用带连字符的路径
       component: AllCourse
     },
     {
+      path: '/learning/my-list',
       name: 'MyList',
-      path: '/learning/my-list', // 使用带连字符的路径
       component: MyList
     },
     {
-      name: 'Wishlist',
       path: '/learning/wishlist',
+      name: 'Wishlist',
       component: Wishlist
     },
     {
-      name: 'Archived',
-      path: '/learning/archived',
-      component: Archived
+      path: '/learning/log',
+      name: 'Log',
+      component: Log
     }
   ]
 })

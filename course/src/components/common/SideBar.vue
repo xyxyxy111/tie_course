@@ -14,10 +14,9 @@
     }" :style="{ width: `${width}px` }">
       <div class="sidebar-body">
         <ul class="sidebar-content">
-          <li><button @click="goToLogin">Log in</button></li>
-         
+          <li v-if="!userId"><button @click="goToLogin">Log in</button></li>
+          <li v-else><button @click="goToMyInfo">个人中心</button></li>
         </ul>
-
 
         <ul class="sidebar-content">
           <li class="sidebar-title">PopularProject</li>
@@ -25,27 +24,6 @@
             <button>{{ PopularProject }}</button>
           </li>
         </ul>
-
-        <ul class="sidebar-content">
-          <li class="sidebar-title">More</li>
-          <li><button>Business</button> </li>
-          <li><button>Get the app</button></li>
-          <li><button>Invite friends</button></li>
-          <li><button>Help and Support</button></li>
-        </ul>
-
-        <ul class="sidebar-content">
-
-          <button style=" margin: 8px 0px; ">
-            <div class="icon">
-              <svg width="40" height="40" viewBox="-1.3 -1 8 8" fill="#35495e">
-                <use href="#mdi--web" />
-              </svg> language
-            </div>
-
-          </button>
-        </ul>
-
       </div>
     </aside>
   </div>
@@ -54,7 +32,7 @@
 <script setup lang="ts">
 import { watch, ref } from 'vue'
 
-import { goToSignup, goToLogin } from './header.ts';
+import { goToLogin, goToMyInfo } from './header.ts';
 const PopularContent = ref<string[]>([
   'Web Development',
   'Mobile Development',
@@ -74,7 +52,7 @@ const props = defineProps({
   position: {
     type: String,
     default: 'left',
-    validator: (v:string) => ['left', 'right'].includes(v)
+    validator: (v: string) => ['left', 'right'].includes(v)
   },
   width: {
     type: Number,
@@ -87,7 +65,8 @@ const props = defineProps({
   disableScroll: {
     type: Boolean,
     default: true
-  }
+  },
+  userId: String,
 })
 
 const emit = defineEmits(['update:isOpen', 'open', 'close'])
@@ -179,7 +158,7 @@ watch(() => props.isOpen, (open) => {
 
 .sidebar-body .sidebar-title {
   font-weight: 700;
-  padding:10px 20px;
+  padding: 10px 20px;
 }
 
 .sidebar-body button {

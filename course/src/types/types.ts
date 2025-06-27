@@ -140,21 +140,6 @@ export class Favorite {
   unused: string='' ;
 }
 
-export class Wishlist {
-  id: bigint | undefined;
-  userId: string='';
-  courseId: string='';
-  title: string='';
-  originalPrice:number=0;
-  currentPrice:number=0;
-  coverImgUrl: string='';
-  score: string='' ;
-  totalMinutes: bigint | undefined;
-  createdAt: Date | undefined;
-  upDatedAt: Date | undefined;
-  deletedAt: Date | undefined;
-  unused: string='' ;
-}
 
 // 我的课程
 export class MyCourse {

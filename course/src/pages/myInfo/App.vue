@@ -6,8 +6,40 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
+import { goToIndex } from '@/components/common/header';
+import BasicInformation from './views/BasicInformation.vue';
+import Communication from './views/Communication.vue';
+import Courses from './views/Keys.vue';
+import Photo from './views/Photo.vue';
+import Privacy from './views/Privacy.vue';
+import Profile from './views/Profile.vue';
+import './myInfo.css';
+import { authApi } from '@/api/user';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 const { width, height } = useWindowSize()
 
+const userId = ref<string | null>(null);
+
+onMounted(() => {
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  } else {
+    // 如果没有token，重定向到登录页面
+    window.location.href = '/login.html';
+  }
+});
+
+const handleLogout = async () => {
+  try {
+    await authApi.logout();
+    console.log('登出成功');
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  } catch (error) {
+    alert('登出失败，请重试');
+  }
+};
 </script>
 <template>
   <IconSprite />
@@ -15,9 +47,9 @@ const { width, height } = useWindowSize()
     <!-- 侧边栏直接写在父组件中 -->
     <div class="my-info-sidebar">
       <!-- Logo - 跳转到首页 -->
-      <router-link to="/index.html" class="sidebar-icon" active-class="active" exact>
+      <div class="sidebar-icon" active-class="active" exact @click="goToIndex()">
         T
-      </router-link>
+      </div>
 
       <!-- User - 跳转到个人信息 -->
       <router-link to="/my-info/profile" class="sidebar-icon" active-class="active">
@@ -28,11 +60,10 @@ const { width, height } = useWindowSize()
         </i>
       </router-link>
 
-      <!-- Courses - 跳转到课程页面 -->
-      <router-link to="/my-info/courses" class="sidebar-icon" active-class="active">
+      <router-link to="/my-info/keys" class="sidebar-icon" active-class="active">
         <i class="icon-courses">
           <svg width="30" height="30" viewBox="0 0 16 16" fill="#35495e">
-    <use href="#ph--video-fill" /> 
+            <use href="#solar--key-bold" />
           </svg>
         </i>
       </router-link>
@@ -41,15 +72,21 @@ const { width, height } = useWindowSize()
       <router-link to="/my-info/communication" class="sidebar-icon" active-class="active">
         <i class="icon-communication">
           <svg width="30" height="30" viewBox="0 0 16 16" fill="#35495e">
-                   <use href="#material-symbols--chat-rounded" />
+            <use href="#material-symbols--chat-rounded" />
           </svg>
         </i>
       </router-link>
+
+      <button @click="handleLogout"
+        style="display: flex; align-items: center; gap: 8px; color: white; background: none; border: none; cursor: pointer; font-size: 16px;">
+        <svg width="80" height="36" viewBox="0 0 16 16" fill="#35495e">
+          <use href="#material-symbols--logout" />
+        </svg>
+      </button>
     </div>
 
     <!-- 主要内容区 -->
     <div class="my-info-content">
-
       <router-view />
     </div>
   </div>
@@ -65,7 +102,7 @@ const { width, height } = useWindowSize()
 /* 侧边栏样式 */
 .my-info-sidebar {
   width: 80px;
-  background:rgb(4, 35, 58);
+  background: rgb(4, 35, 58);
   position: fixed;
   height: 100vh;
 }
@@ -83,7 +120,7 @@ const { width, height } = useWindowSize()
 }
 
 .sidebar-icon.active {
-  background: rgb(22,92,145);
+  background: rgb(22, 92, 145);
 }
 
 .sidebar-icon img {
@@ -95,6 +132,13 @@ const { width, height } = useWindowSize()
   font-size: 24px;
 }
 
+.my-info-sidebar button {
+  margin: 0 auto;
+  width: 80px;
+  height: 76px;
+}
+
+
 /* 内容区样式 */
 .my-info-content {
   flex: 1;
@@ -102,5 +146,4 @@ const { width, height } = useWindowSize()
   /* 与侧边栏宽度一致 */
   padding: 20px;
 }
-
 </style>

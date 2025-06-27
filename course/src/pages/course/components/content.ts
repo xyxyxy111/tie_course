@@ -8,14 +8,10 @@ function useCourseDescription() {
     CourseDescriptionFlag.value ? "收起" : "显示更多"
   );
 
-  const CourseDescriptionStyle = computed(() => ({
-    height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
-  }));
 
   return {
     CourseDescriptionFlag,
-    CourseDescription,
-    CourseDescriptionStyle
+    CourseDescription
   };
 }
 

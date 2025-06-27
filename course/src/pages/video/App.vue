@@ -1,26 +1,25 @@
 <script lang="ts" setup name="App">
-import { RouterView, RouterLink, useRouter } from 'vue-router';
-import { toRef, ref, onMounted, computed } from 'vue';
-import { defineComponent } from 'vue';
-//molidis
-// import PCDuan from '@/pages/video/body/PCDuan.vue';
-// import MobileDuan from '@/pages/video/body/MobileDuan.vue';
+import { ref, onMounted, computed } from 'vue';
+import PCDuan from './body/PCDuan.vue';
+import MobileDuan from './body/MobileDuan.vue';
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import { goToCart, goToIndex } from '@/components/common/header';
 const { width, height } = useWindowSize()
 
+const userId = ref<string | null>(null)
 
 </script>
 <template>
 
   <IconSprite />
-<!-- <PCDuan v-if="width>800"/>
-<MobileDuan v-else /> -->
+  <div>
+    <!-- PC -->
+    <PCDuan v-if="width > 800" class="app" />
+    <MobileDuan v-else class="app" />
+  </div>
+
 </template>
 
-<!-- css -->
-<style scoped>
 
-
-</style>
+<style scoped></style>

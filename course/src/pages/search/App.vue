@@ -13,15 +13,12 @@ const { width, height } = useWindowSize()
 <template>
   <main>
 
-    <div v-if="width > 800" class="app">
+    <div>
       <!-- PC -->
-      <PCduan />
+      <PCduan v-if="width > 800" class="app" />
+      <MobileDuan v-else />
     </div>
 
-    <div v-if="width <= 800" class="app">
-      <!-- phone -->
-      <MobileDuan />
-    </div>
   </main>
 
 </template>

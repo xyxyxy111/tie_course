@@ -9,7 +9,7 @@
     </button>
     <div id="header-space"></div>
 
-      <div id="logo" @click="goToIndex">Course</div>
+      <div id="logo" @click="goToIndex()">Course</div>
     
     <button @click="searchFlag= !searchFlag">
       <div class="icon">
@@ -18,7 +18,7 @@
         </svg>
       </div>
     </button>
-    <button @click="goToCart">
+    <button @click="goToCart(userId)">
       <div class="icon">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="#35495e">
           <use href="#mdi--cart-outline" />
@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import './header.css'
-import { searchQuery, Search, goToCart, goToIndex, goToSignup, goToLogin } from './header.ts';
+import { searchQuery, Search, goToCart, goToIndex,  goToLogin } from './header.ts';
 import SideBar from '@/components/common/SideBar.vue'
 import { ref, computed } from 'vue'
 
@@ -69,7 +69,9 @@ const headerSearchStyle = () => ({
   top: (searchFlag.value) ? '-27px' :'-77px'
 })
 
-
+defineProps<{
+  userId?: string | null
+}>()
 
 </script>
 

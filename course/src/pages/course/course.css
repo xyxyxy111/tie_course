@@ -55,9 +55,11 @@
 }
 
 .course-content .lecture-duration {
-  white-space: nowrap;
+  right: 10px;
+  margin-left: auto;
   text-align: right;
-  font-weight: 300;
+  display: inline-block;
+  min-width: 120px;
 }
 
 .course-descrpition {
@@ -90,8 +92,8 @@
 .comment-container {
   overflow: auto;
   scrollbar-color: white;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   height: 360px;
   width: 100%;
 }
@@ -115,7 +117,9 @@
   display: flex;
   padding-left: 10px;
   margin-bottom: 10px;
-}.user span {
+}
+
+.user span {
   font-size: 1.2em;
   font-weight: 500;
   padding-left: 10px;
@@ -134,3 +138,8 @@
   text-align: right;
 }
 
+
+.container-scroll-y {
+  overflow-y: auto;
+  /* max-height: 400px; */
+}
