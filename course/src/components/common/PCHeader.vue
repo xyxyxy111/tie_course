@@ -7,7 +7,6 @@
     <div class="explore">
       <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">Explore</button>
 
-      <!-- 直接使用div实现浮窗，不使用HoverPopup组件 -->
       <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handlePopupEnter" @mouseleave="handlePopupLeave">
         <div class="explore-popup-content">
           <div class="categories-list">
@@ -16,6 +15,7 @@
               <div class="category-content">
                 <span class="category-name">{{ category.name }}</span>
               </div>
+              <div class="category-arrow">→</div>
               <div v-if="hoveredCategory?.categoryId === category.categoryId" class="tags-popup"
                 @mouseenter="handleTagsHover" @mouseleave="handleTagsLeave">
                 <div class="tags-list">
@@ -71,21 +71,13 @@
       <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
     </div>
 
-    <!-- <button style="padding-inline:0% ;" v-if="!userId">
-      <div class="icon">
-        <svg width="50" height="50" viewBox="-1.3 -1 8 8" fill="#35495e">
-          <use href="#mdi--web" />
-        </svg>
-      </div>
-    </button> -->
-
   </div>
 
 </template>
 
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import IconSprite from '../Icon/IconSprite.vue';
 import './header.css'
 import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin, goToLearning, goToCourse } from './header.ts';
@@ -96,6 +88,8 @@ const exploreHoverFlag = ref(false)
 const hoveredCategory = ref<any>(null)
 const tagsHoverFlag = ref(false)
 let exploreHideTimer: number | null = null
+let categoryHideTimer: number | null = null
+let tagsHideTimer: number | null = null
 
 
 const categoryList = ref<CategoryList[]>([]);
@@ -107,31 +101,54 @@ onMounted(async () => {
     const TagResponse = await categoryApi.getTagListByCategoryId(category.categoryId!);
     category.tags = TagResponse.data;
   });
-
 });
 
+// 清理定时器
+onUnmounted(() => {
+  if (exploreHideTimer) {
+    clearTimeout(exploreHideTimer)
+  }
+  if (categoryHideTimer) {
+    clearTimeout(categoryHideTimer)
+  }
+  if (tagsHideTimer) {
+    clearTimeout(tagsHideTimer)
+  }
+});
 
 // 处理分类hover
 const handleCategoryHover = (category: any) => {
+  if (categoryHideTimer) {
+    clearTimeout(categoryHideTimer)
+    categoryHideTimer = null
+  }
   hoveredCategory.value = category
 }
 
 // 处理分类离开
 const handleCategoryLeave = () => {
   if (!tagsHoverFlag.value) {
-    hoveredCategory.value = null
+    categoryHideTimer = setTimeout(() => {
+      hoveredCategory.value = null
+    }, 200) // 200ms延迟
   }
 }
 
 // 处理tags浮窗hover
 const handleTagsHover = () => {
+  if (tagsHideTimer) {
+    clearTimeout(tagsHideTimer)
+    tagsHideTimer = null
+  }
   tagsHoverFlag.value = true
 }
 
 // 处理tags浮窗离开
 const handleTagsLeave = () => {
-  tagsHoverFlag.value = false
-  hoveredCategory.value = null
+  tagsHideTimer = setTimeout(() => {
+    tagsHoverFlag.value = false
+    hoveredCategory.value = null
+  }, 300) // 300ms延迟
 }
 
 // 跳转到分类页面
@@ -191,7 +208,7 @@ const handleExploreLeave = () => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 150) // 150ms延迟
+  }, 300) // 增加到300ms延迟
 }
 
 // 处理浮窗hover
@@ -207,7 +224,7 @@ const handlePopupLeave = () => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 150) // 150ms延迟
+  }, 500) // 增加到500ms延迟，给用户更多时间移动到子菜单
 }
 
 </script>
@@ -280,26 +297,16 @@ img {
   top: 100%;
   left: 0;
   width: 270px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid #eee;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   z-index: 1000;
   margin-top: 8px;
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(10px);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 
 .explore-popup-content {
   padding: 16px 0;
@@ -314,8 +321,16 @@ img {
   font-weight: 600;
   color: #333;
   margin-bottom: 16px;
-  padding-bottom: 8px;
+  padding: 0 20px 16px 20px;
   border-bottom: 1px solid #eee;
+}
+
+.explore-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
 }
 
 .categories-list {
@@ -327,31 +342,65 @@ img {
 
 .category-item {
   position: relative;
-  padding: 12px 16px;
-  border-radius: 6px;
+  padding: 14px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-inline: 0;
+  margin: 2px 0px;
+  border: 1px solid transparent;
 }
 
 .category-item:hover {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #495057;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+}
+
+.category-item:hover .category-name {
+  color: #495057;
 }
 
 .category-content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
+}
+
+.category-icon {
+  font-size: 16px;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.category-item:hover .category-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.category-arrow {
+  font-size: 16px;
+  color: #999;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.category-item:hover .category-arrow {
+  color: #6c757d;
+  opacity: 1;
+  transform: translateX(4px);
 }
 
 .category-name {
   font-size: 14px;
   font-weight: 500;
   color: #333;
+  transition: color 0.3s ease;
 }
 
 /* Tags浮窗样式 */
@@ -359,28 +408,27 @@ img {
   position: absolute;
   left: 100%;
   top: 0;
-  width: 270px;
-  background: white;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid #eee;
+  width: 280px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 0 12px 12px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-left: none;
   z-index: 1000;
-  padding: 16px;
-  animation: fadeIn 0.2s ease-in-out;
+  padding: 0px;
 }
 
 .tags-header {
   margin-bottom: 16px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
 }
 
 .tags-header h4 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #333;
-  margin: 0;
+  margin: 0 0 8px 0;
+  text-align: center;
 }
 
 .tags-list {
@@ -392,22 +440,27 @@ img {
 .tag-item {
   position: relative;
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: white;
-  border: none;
+  background-color: transparent;
+  border: 1px solid transparent;
   font-size: 14px;
   font-weight: 500;
   color: #333;
   user-select: none;
+  margin: 2px 0;
 }
 
 .tag-item:hover {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #495057;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #dee2e6;
 }
 
 /* 响应式设计 - 修复重叠问题 */

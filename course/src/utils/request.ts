@@ -126,9 +126,7 @@ instance.interceptors.response.use(
       console.log('response.data:', response.data);
       return Promise.reject(response.data.message);
     }
-    console.log('完response:', response);
-    console.log('response.data:', response.data);
-    return response.data;
+   return response.data;
   },
   (error) => {
     // 处理token相关错误
