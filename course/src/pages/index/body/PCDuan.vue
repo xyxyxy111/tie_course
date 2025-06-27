@@ -46,20 +46,21 @@ onMounted(async () => {
   //session?
   if (!searchParams.get('categoryId')) {
     categoryId = 1;
-    // flag; tag is default
+    // flag; tag is default 
   } else {
     categoryId = parseInt(searchParams.get('categoryId')!);
+    console.log(categoryId);
   }
 
   const categoriesResponse = await categoryApi.getAllCategories();
   categories.value = categoriesResponse.data;
   console.log(categories.value);
 
-  const singleCategoryResponse = await categoryApi.getCategoryDetail(1);
+  const singleCategoryResponse = await categoryApi.getCategoryDetail(categoryId);
   singleCategory.value = singleCategoryResponse.data;
   console.log(singleCategory.value);
 
-  const tagsResponse = await categoryApi.getTagListByCategoryId(1);
+  const tagsResponse = await categoryApi.getTagListByCategoryId(categoryId);
   tags.value = tagsResponse.data;
   courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
 
@@ -72,8 +73,13 @@ onMounted(async () => {
     tagId = parseInt(searchParams.get('tagId')!);
   }
 
+  courseTitles.value.forEach(course => {
+    if (course.tagId === tagId) {
+      course.activeFlag = true;
+    }
+  });
+
   getCourseListByTagId(tagId);
-  courseTitles.value[0].activeFlag = true
 });
 const getCourseListByTagId = async (tagId: number) => {
   const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
