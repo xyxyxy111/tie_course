@@ -6,7 +6,7 @@
 
 
 
-    <img src="/src/images/userPic.png" alt="">
+    <img src="/src/images/userPic.png" alt="头像预览">
 
     <input type="file" id="avatarUpload" class="upload-btn" accept="image/*" >
    
