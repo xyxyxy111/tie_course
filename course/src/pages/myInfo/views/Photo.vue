@@ -14,8 +14,19 @@
 </template>
 
 <script lang="ts">
+import { request } from '@/utils/request'; 
 import { profileApi } from '@/api/user';
 import { defineComponent, onMounted, reactive, ref } from 'vue';
+
+import OSS from 'ali-oss';
+
+interface StsCredentials {
+  endpoint: string;
+  bucketName: string;
+  AccessKeyId: string;
+  AccessKeySecret: string;
+  securityToken: string;
+}
 
 export default defineComponent({
   name: 'Photo',
@@ -23,6 +34,10 @@ export default defineComponent({
     const isSubmitting = ref(false);
     const selectedFile = ref<File | null>(null);
     const fileInput = ref<HTMLInputElement | null>(null);
+
+    // 新增用于本地预览的URL和状态信息
+    const previewUrl = ref('');
+    const statusMessage = ref('');
 
     const form = reactive({
       username: '',
@@ -45,61 +60,82 @@ export default defineComponent({
     }
 
     const handleFileSelect = (event: Event) => {
+      // 优化文件选择和预览逻辑
+
       const target = event.target as HTMLInputElement;
       const file = target.files?.[0];
 
       if (file) {
         // 验证文件类型
         if (!file.type.startsWith('image/')) {
-          alert('请选择图片文件');
+          statusMessage.value = '请选择图片文件';
           return;
         }
 
         // 验证文件大小 (限制为 5MB)
         if (file.size > 5 * 1024 * 1024) {
-          alert('文件大小不能超过 5MB');
+          statusMessage.value = '文件大小不能超过 5MB';
           return;
         }
 
         selectedFile.value = file;
+        statusMessage.value = `已选择文件: ${file.name}`;
 
-        // 预览图片（仅用于预览，不保存到form中）
+        // 使用FileReader创建本地预览URL，并赋值给新的ref
         const reader = new FileReader();
         reader.onload = (e) => {
-          // 创建一个临时的预览URL，不保存到form.avatarUrl
-          const previewUrl = e.target?.result as string;
-          // 更新预览图片
-          const imgElement = document.querySelector('img');
-          if (imgElement) {
-            imgElement.src = previewUrl;
-          }
+          previewUrl.value = e.target?.result as string;
         };
         reader.readAsDataURL(file);
       }
     }
 
     const submitForm = async () => {
+      // 重写提交流程,改为STS直传OSS
       if (!selectedFile.value) {
         alert('请先选择图片文件');
         return;
       }
 
       isSubmitting.value = true;
+      statusMessage.value = '正在处理.请稍候';
       try {
-        // 创建FormData对象来上传文件
-        const formData = new FormData();
-        formData.append('avatar', selectedFile.value);
+        // 1.获取sts凭证
+        statusMessage.value = '正在获取上传凭证';
+        // 调用后端sts接口
+        const stsApiResponse = await request<StsCredentials>({
+          url: '/sts', // 你的 STS 接口地址
+          method: 'GET'
+        });
 
-        // 调用上传头像的API
-        const uploadResponse = await profileApi.uploadAvatar(formData);
+        const creds = stsApiResponse.data;
 
-        // 使用返回的avatarUrl
-        form.avatarUrl = uploadResponse.data.avatarUrl;
+        // 2. 初始化OSS客户端
+        const client = new OSS({
+          endpoint: creds.endpoint,
+          bucket: creds.bucketName,
+          accessKeyId: creds.AccessKeyId,
+          accessKeySecret: creds.AccessKeySecret,
+          stsToken: creds.securityToken,
+          secure: true,
+        });
 
-        // 更新用户资料
+        // 3. 定义文件名并上传到OSS
+        statusMessage.value = '正在上传头像...';
+        const objectKey = `avatars/${Date.now()}-${selectedFile.value.name}`;
+        const uploadResult = await client.put(objectKey, selectedFile.value);
+
+        // 4. 上传成功后，使用返回的URL更新form
+        statusMessage.value = '上传成功，正在保存资料...';
+        form.avatarUrl = uploadResult.url; // 将OSS返回的URL赋值给form
+
+        // 5. 调用原有的更新资料接口，将包含新avatarUrl的form提交
         await profileApi.updateProfile(form);
+
         alert('保存头像成功!');
-        selectedFile.value = null;
+        statusMessage.value = '头像已更新！';
+        selectedFile.value = null; // 重置状态
+        previewUrl.value = ''; // 清空预览，显示最新的form.avatarUrl
         if (fileInput.value) {
           fileInput.value.value = '';
         }
@@ -122,7 +158,9 @@ export default defineComponent({
       isSubmitting,
       selectedFile,
       handleFileSelect,
-      fileInput
+      fileInput,
+      previewUrl,  // 将状态返回给模板
+      statusMessage
     }
   }
 })
@@ -186,5 +224,10 @@ button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
   border-color: #ccc;
+}
+
+.status-message {
+  margin-top: 10px;
+  color: #666;
 }
 </style>
