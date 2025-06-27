@@ -9,7 +9,7 @@ export function Search() {
   if (searchQuery.value.trim()) {
     console.log("搜索词:", searchQuery.value);
     const url = new URL('/search.html', window.location.origin);
-    url.searchParams.set('q', encodeURIComponent(searchQuery.value));
+    url.searchParams.set('keyword', encodeURIComponent(searchQuery.value));
     window.location.href = url.toString();
   }
 }
@@ -46,9 +46,3 @@ export const goToMyInfo = () => {
   url.hash = '#/my-info/profile';
   window.location.href = url.toString();
 };
-
-//molidis
-//add
-export const goToSignup = (e: MouseEvent) => {
-    e.preventDefault(); // 可选：阻止默认行为
-}

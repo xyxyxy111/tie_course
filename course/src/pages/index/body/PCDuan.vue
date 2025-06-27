@@ -10,86 +10,28 @@ import HoverPopup from '@/components/common/HoverPopup.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
-
-// 导入CourseQuickView类型
-import { CourseQuickView } from '../components/content.ts';
-
-import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course.ts';
-import type { Category, Tag, CourseListVO } from '@/api/course.ts';
-
-const categories = ref<Category[]>([]);
-const singleCategory = ref<Category | null>(null);
-const tags = ref<Tag[]>([]);
-const courseListVos = ref<CourseListVO[]>([]);
-const navigationButtons = ref<NavigationButton[]>([]);
+import { useIndexData } from '../components/content.ts';
+import {  communityVoices} from '../components/content.ts';
 
 const { width, height } = useWindowSize()
-import {
-  courseTitles, NavigationButton,
-  courseQuickViews, communityVoices,
-  recommendedProducts, relatedTopics
-} from '../components/content.ts';
 
-const userId = ref<string | null>(null);
+const {
+  categories,
+  singleCategory,
+  tags,
+  courseListVos,
+  userId,
+  selectedTagId,
+  courseTitles,
+  courseQuickViews,
+  initializeData,
+  getCourseListByTagId,
+  changeCourseTheme
+} = useIndexData();
 
 onMounted(async () => {
-  // 从token获取userId
-  const token = getValidToken();
-  if (token) {
-    userId.value = getCurrentUserId();
-  }
-  const searchParams = new URLSearchParams(window.location.search);
-  let categoryId;
-  //session?
-  if (!searchParams.get('categoryId')) {
-    categoryId = 1;
-    // flag; tag is default
-  } else {
-    categoryId = parseInt(searchParams.get('categoryId')!);
-  }
-
-  const categoriesResponse = await categoryApi.getAllCategories();
-  categories.value = categoriesResponse.data;
-  console.log(categories.value);
-
-  const singleCategoryResponse = await categoryApi.getCategoryDetail(1);
-  singleCategory.value = singleCategoryResponse.data;
-  console.log(singleCategory.value);
-
-  const tagsResponse = await categoryApi.getTagListByCategoryId(1);
-  tags.value = tagsResponse.data;
-  courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
-
-  let tagId;
-  //session?
-  if (!searchParams.get('tagId')) {
-    let firstTag = tags.value[0];
-    tagId = firstTag.tagId;
-  } else {
-    tagId = parseInt(searchParams.get('tagId')!);
-  }
-
-  getCourseListByTagId(tagId);
-  courseTitles.value[0].activeFlag = true
+  await initializeData();
 });
-const getCourseListByTagId = async (tagId: number) => {
-  const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
-  courseListVos.value = courseListVosResponse.data;
-  console.log(courseListVos.value);
-  courseQuickViews.value = courseListVos.value.map(course => {
-    return new CourseQuickView(
-      course.courseId,
-      course.coverImgUrl,
-      course.title,
-      course.score,
-      course.originalPrice,
-      new Date(course.updateTime || new Date()),
-      course.totalMinutes,
-      course.description,
-      course.whatYouWillLearn
-    );
-  })
-}
 
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   backgroundColor: (activeFlag && hoverFlag) ? 'rgba(22,92,145,0.7)' :
@@ -97,13 +39,6 @@ const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   color: activeFlag ? 'gainsboro' : 'rgb(22,92,145)'
 });
 
-function changecourseTheme(i: NavigationButton) {
-  courseTitles.value.forEach(element => {
-    element.activeFlag = false;
-  });
-  i.activeFlag = true;
-  getCourseListByTagId(i.tagId);
-}
 const voiceStyle = (index: number) => ({
   height: '3' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
 })
@@ -112,7 +47,7 @@ const voiceCommentStyle = (index: number) => ({
 })
 const showCart = ref(false);
 const selectedCourse = ref<{ title: string; courseId: number } | null>(null);
-function addToCart(course: CourseQuickView) {
+function addToCart(course: any) {
   selectedCourse.value = {
     title: course.title,
     courseId: course.courseId
@@ -137,7 +72,7 @@ function handleCourseAdded(event: any) {
 
       <div class="title">{{ singleCategory?.name }}</div>
       <div class="navigate">
-        <button v-for="(title, index) in courseTitles" :key="index" @click="changecourseTheme(title)"
+        <button v-for="(title, index) in courseTitles" :key="index" @click="changeCourseTheme(title)"
           @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
           :style="navigaterBtnStyle(title.activeFlag, title.hoverFlag)">
           {{ title.text }}</button>
@@ -254,9 +189,7 @@ function handleCourseAdded(event: any) {
 .exploreBtn:hover {
   background-color: gainsboro;
   color: rgb(22, 92, 145);
-  box-shadow: 0 4px 4p
-
-rgb(22, 92, 145, 0.3);
+  box-shadow: 0 4px 4p rgb(22, 92, 145, 0.3);
 }
 
 .course,
@@ -281,10 +214,10 @@ rgb(22, 92, 145, 0.3);
 
 
 /* Course Text Content */
-.course img{
+.course img {
   width: 100%;
   height: 140px;
-}   
+}
 
 .course-title {
   padding: 10px 0px 0px 15px;

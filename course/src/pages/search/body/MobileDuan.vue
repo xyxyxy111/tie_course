@@ -8,41 +8,45 @@ import { useFilterStore } from '../components/filterStore'
 import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
-import { getCurrentUserId, getValidToken } from '@/utils/request';
+
+// 导入共享的数据和逻辑
+import { useSearchData, searchSortOptions, priceRanges } from '../components/content';
+
 const filterStore = useFilterStore()
 const showFilter = ref(true)
-const searchQuery = ref('')
 const { width, height } = useWindowSize()
 
-// 获取userId - 从token中获取而不是URL
-const userId = ref<string | null>(null);
+// 使用共享的数据和逻辑
+const {
+  searchResults,
+  categories,
+  tags,
+  userId,
+  loading,
+  totalPages,
+  currentPage,
+  pageSize,
+  searchKeyword,
+  selectedCategoryId,
+  selectedTagIds,
+  priceRange,
+  sortBy,
+  initializeData,
+  performSearch,
+  handleCategoryChange,
+  handleTagChange,
+  handlePriceRangeChange,
+  handleSortChange,
+  handlePageChange,
+  clearFilters,
+  formatPrice,
+  formatDuration
+} = useSearchData();
 
-const courses = ref([
-  {
-    id: 1,
-    image: '/src/images/image1.png',
-    title: 'Ultimate AWS Certified Solutions Architect Associate 2025',
-    instructor: 'Shizhane Muresi',
-    price: 109.99
-  },
-  {
-    id: 2,
-    image: '/src/images/image2.png',
-    title: 'The Complete AI Guide: Learn ChatGPT, Generative AI & More',
-    instructor: 'Julian Melancon',
-    price: 79.99
-  }
-])
-onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  searchQuery.value = urlParams.get('q') || '';
-  // 从token获取userId
-  const token = getValidToken();
-  if (token) {
-    userId.value = getCurrentUserId();
-  }
-  // 如果没有token，userId保持为null，用户仍然可以搜索课程
-});// 监听筛选条件变化
+onMounted(async () => {
+  await initializeData();
+});
+
 watch(
   () => [
     filterStore.sortBy,
@@ -52,16 +56,15 @@ watch(
     filterStore.selectedPrice
   ],
   () => {
-    console.log('筛选条件变化:', {
-      sortBy: filterStore.sortBy,
-      themes: filterStore.selectedThemes,
-      languages: filterStore.selectedLanguage,
-      level: filterStore.selectedLevel,
-      price: filterStore.selectedPrice
-    })
+    performSearch();
   },
   { deep: true }
 )
+
+const addToCart = (courseId: number) => {
+  // TODO: 调用购物车接口
+  alert('加入购物车: ' + courseId);
+};
 
 // 侧边栏控制逻辑
 const emit = defineEmits(['update:isOpen', 'open', 'close', 'filter-change'])
@@ -99,34 +102,34 @@ const handleBackdropClick = () => {
   <main>
     <MobileHeader :userId="userId" />
     <div class="search-result-container">
-      <div class="title">“{{ searchQuery }}”的1000个结果
+      <div class="title">“{{ searchKeyword }}”的{{ searchResults.length }}个结果
         <button @click="showFilter = true">Filter</button>
       </div>
-
       <div class="content">
-
         <div class="search-result">
-          <div v-for="course in courses" :key="course.id" class="course-item">
+          <div v-for="course in searchResults" :key="course.courseId" class="course-item">
             <div class="image-container">
-              <img :src="course.image" alt="">
-
+              <img :src="course.coverImgUrl" alt="">
             </div>
             <div class="course-details">
               <div class="course-title">{{ course.title }}</div>
-              <div class="course-instruction">By {{ course.instructor }}</div>
-              <p class="price">${{ course.price }}</p>
-              <button class="arrToCartBtn">Add to Cart</button>
+              <div class="course-instruction">By {{ course.categoryName }}</div>
+              <p class="price">{{ formatPrice(course.originalPrice) }}</p>
+              <button class="arrToCartBtn" @click="addToCart(course.courseId)">Add to Cart</button>
             </div>
           </div>
         </div>
-
+        <div v-if="totalPages > currentPage && !loading" style="text-align:center;margin:20px 0;">
+          <button @click="handlePageChange(currentPage + 1)" :disabled="loading">{{ loading ? '加载中...' : '加载更多'
+          }}</button>
+        </div>
+        <div v-else-if="!searchResults.length && !loading" style="text-align:center;color:#888;">暂无课程</div>
       </div>
     </div>
     <div class="sidebar-system">
       <transition name="fade">
         <div v-if="showFilter" class="sidebar-backdrop" @click.self="handleBackdropClick" />
       </transition>
-
       <transition name="slide-right">
         <aside v-if="showFilter" class="sidebar-panel" :style="{ width: '180px' }">
           <Filter @close="showFilter = false" />

@@ -55,7 +55,7 @@
 
 
     </button>
-    <div :style="headerSpaceStyle" v-if="!userId"></div>
+    <div :style="headerSpaceStyle2" v-if="!userId"></div>
     <button @click="goToCart()">
       <div class="icon">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
@@ -169,6 +169,12 @@ const headerSpaceStyle = computed(() => ({
   transition: 'none'
 }));
 
+const headerSpaceStyle2 = computed(() => ({
+  width: `calc(8vw *( ${headerSpaceWidth.value}))`,
+  transition: 'none',
+  minWidth: '40px'
+}));
+
 const headerSearchInputStyle = computed(() => ({
   width: `clamp(30vw, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 50vw)`,
   transition: 'none'
@@ -208,7 +214,7 @@ const handleExploreLeave = () => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 300) // 增加到300ms延迟
+  }, 800)
 }
 
 // 处理浮窗hover
@@ -304,7 +310,6 @@ img {
   z-index: 1000;
   margin-top: 8px;
   animation: fadeIn 0.3s ease-out;
-  backdrop-filter: blur(10px);
 }
 
 
@@ -340,25 +345,21 @@ img {
   position: relative;
 }
 
-.category-item {
+.category-item,.tag-item {
   position: relative;
   padding: 14px 20px;
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 2px 0px;
-  border: 1px solid transparent;
 }
 
-.category-item:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+.category-item:hover ,.tag-item:hover{
+  background: linear-gradient(105deg, white 70%,rgba(22, 92, 145, 0.2) 100%);
   color: #495057;
-  transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
 }
 
 .category-item:hover .category-name {
@@ -375,25 +376,24 @@ img {
 .category-icon {
   font-size: 16px;
   opacity: 0.7;
-  transition: all 0.3s ease;
+  transition: all 0.3s;
 }
 
 .category-item:hover .category-icon {
   opacity: 1;
-  transform: scale(1.1);
+ transform: scale(1.1);
 }
 
 .category-arrow {
   font-size: 16px;
   color: #999;
-  transition: all 0.3s ease;
+  transition: all 0.3s;
   opacity: 0.6;
 }
 
 .category-item:hover .category-arrow {
   color: #6c757d;
   opacity: 1;
-  transform: translateX(4px);
 }
 
 .category-name {
@@ -403,14 +403,12 @@ img {
   transition: color 0.3s ease;
 }
 
-/* Tags浮窗样式 */
 .tags-popup {
   position: absolute;
   left: 100%;
   top: 0;
   width: 280px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border-radius: 0 12px 12px 0;
+  background: white;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-left: none;
@@ -437,31 +435,6 @@ img {
   gap: 4px;
 }
 
-.tag-item {
-  position: relative;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: transparent;
-  border: 1px solid transparent;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  user-select: none;
-  margin: 2px 0;
-}
-
-.tag-item:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #495057;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #dee2e6;
-}
 
 /* 响应式设计 - 修复重叠问题 */
 @media (max-width: 1200px) {

@@ -33,6 +33,7 @@ export default defineComponent({
 .profile-container{
   margin: 0 auto;
   width: 70%;
+  min-width: 600px;
 }
 
 .profile-title{
@@ -48,6 +49,7 @@ export default defineComponent({
 
 .nav-link {
   font-size: 20px;
+  white-space: nowrap;
   padding: 20px 20px 5px;
   color: rgb(4, 35, 58);
   text-decoration: none;

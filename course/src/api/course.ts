@@ -165,3 +165,27 @@ export const courseSuccessCodes = [
 export const categorySuccessCodes = [
   1100, // 获取分类列表成功
 ];
+
+export const searchCourseByMessage = (pageNum: number, pageSize: number, courseMessage?: string) => {
+  return request({
+    method: 'GET',
+    url: '/courses/search',
+    params: {
+      pageNum,
+      pageSize,
+      courseMessage
+    }
+  });
+};
+
+// 最新课程
+export const searchLatestCourse = (pageNum: number, pageSize: number) => {
+  return request({
+    method: 'GET',
+    url: '/courses/latest',
+    params: {
+      pageNum,
+      pageSize
+    }
+  });
+};

@@ -3,29 +3,45 @@ import { toRef, ref, onMounted, watch, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
-import { useFilterStore } from '../components/filterStore'
 import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import '../search.css'
-import { getCurrentUserId, getValidToken } from '@/utils/request';
 
-const searchQuery = ref('');
-const filterStore = useFilterStore()
-const showFilter = ref(true)
+// 导入共享的数据和逻辑
+import { useSearchData } from '../components/content';
+
 const { width, height } = useWindowSize()
 
-// 获取userId - 从token中获取而不是URL
-const userId = ref<string | null>(null);
+// 使用共享的数据和逻辑
+const {
+  searchResults,
+  categories,
+  tags,
+  userId,
+  loading,
+  totalPages,
+  currentPage,
+  pageSize,
+  searchKeyword,
+  selectedCategoryId,
+  selectedTagIds,
+  priceRange,
+  sortBy,
+  initializeData,
+  performSearch,
+  handleCategoryChange,
+  handleTagChange,
+  handlePriceRangeChange,
+  handleSortChange,
+  handlePageChange,
+  clearFilters,
+  formatPrice,
+  formatDuration
+} = useSearchData();
 
-onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  searchQuery.value = urlParams.get('q') || '';
-  // 从token获取userId
-  const token = getValidToken();
-  if (token) {
-    userId.value = getCurrentUserId();
-  }
-  // 如果没有token，userId保持为null，用户仍然可以搜索课程
+onMounted(async () => {
+  await initializeData();
+  console.log('onMounted后searchResults:', searchResults.value);
 });
 
 const SearchResultWidth = computed(() => {
@@ -41,128 +57,6 @@ const SearchResultCourseTitleStyle = computed(() => ({
   width: `calc( 200px + 1px * ${SearchResultWidth.value})`
 }));
 
-const courses = ref([
-  {
-    id: 1,
-    image: '/src/images/image1.png',
-    title: 'Ultimate AWS Certified Solutions Architect Associate 2025',
-    instructor: 'Shizhane Muresi',
-    price: 109.99
-  },
-  {
-    id: 2,
-    image: '/src/images/image2.png',
-    title: 'The Complete AI Guide: Learn ChatGPT, Generative AI & More',
-    instructor: 'Julian Melancon',
-    price: 79.99
-  },
-  {
-    id: 3,
-    image: '/src/images/image3.png',
-    title: 'Python全栈开发实战2025',
-    instructor: '王小明',
-    price: 89.99
-  },
-  {
-    id: 4,
-    image: '/src/images/image4.png',
-    title: 'Java零基础到精通',
-    instructor: '李雷',
-    price: 99.99
-  },
-  {
-    id: 5,
-    image: '/src/images/image5.png',
-    title: 'Vue3+TS企业级项目实战',
-    instructor: '张三',
-    price: 69.99
-  },
-  {
-    id: 6,
-    image: '/src/images/image6.png',
-    title: 'React Native移动开发',
-    instructor: '李四',
-    price: 59.99
-  },
-  {
-    id: 7,
-    image: '/src/images/image7.png',
-    title: '数据结构与算法精讲',
-    instructor: '王五',
-    price: 79.99
-  },
-  {
-    id: 8,
-    image: '/src/images/image8.png',
-    title: '机器学习与深度学习入门',
-    instructor: '赵六',
-    price: 109.99
-  },
-  {
-    id: 9,
-    image: '/src/images/image9.png',
-    title: 'Web前端高薪就业班',
-    instructor: '钱七',
-    price: 119.99
-  },
-  {
-    id: 10,
-    image: '/src/images/image1.png',
-    title: 'C++高性能编程',
-    instructor: '孙八',
-    price: 89.99
-  },
-  {
-    id: 11,
-    image: '/src/images/image2.png',
-    title: 'Go语言微服务实战',
-    instructor: '周九',
-    price: 99.99
-  },
-  {
-    id: 12,
-    image: '/src/images/image3.png',
-    title: 'Kubernetes云原生入门',
-    instructor: '吴十',
-    price: 109.99
-  }
-])
-
-// 分页相关
-const pageSize = 6;
-const currentPage = ref(1);
-const totalPages = computed(() => Math.ceil(courses.value.length / pageSize));
-const pagedCourses = computed(() => {
-  const start = (currentPage.value - 1) * pageSize;
-  return courses.value.slice(start, start + pageSize);
-});
-
-function goToPage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-}
-
-watch(
-  () => [
-    filterStore.sortBy,
-    filterStore.selectedThemes,
-    filterStore.selectedLanguage,
-    filterStore.selectedLevel,
-    filterStore.selectedPrice
-  ],
-  () => {
-    console.log('筛选条件变化:', {
-      sortBy: filterStore.sortBy,
-      themes: filterStore.selectedThemes,
-      languages: filterStore.selectedLanguage,
-      level: filterStore.selectedLevel,
-      price: filterStore.selectedPrice
-    })
-  },
-  { deep: true }
-)
-
 </script>
 
 <template>
@@ -171,30 +65,32 @@ watch(
   <PCHeader :userId="userId" />
   <div class="search-result-container">
     <div class="content">
-      <Filter @close="showFilter = true" />
+      <Filter />
 
       <div class="search-result" :style="SearchResultStyle">
-        <div class="title">“{{ searchQuery }}”的1000个结果</div>
-        <div v-for="course in pagedCourses" :key="course.id" class="course-item">
-          <img :src="course.image" alt="" class="course-img">
+        <div class="title">"{{ searchKeyword }}"的1000个结果</div>
+        <div v-for="course in searchResults" :key="course.courseId" class="course-item">
+          <img :src="course.coverImgUrl" alt="" class="course-img">
           <div>
             <div class="course-title" :style="SearchResultCourseTitleStyle">{{ course.title }}</div>
-            <div class="course-instruction">By {{ course.instructor }}</div>
+            <div class="course-instruction">By {{ course.categoryName }}</div>
           </div>
           <div class="course-price">
-            <div class="price"> ${{ course.price }}</div>
+            <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
             <button class="arrToCartBtn">Add to Cart</button>
           </div>
         </div>
         <div class="pagination">
-          <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">上一页</button>
+          <button @click="handlePageChange(currentPage - 1)" :disabled="currentPage === 1">上一页</button>
           <span>第{{ currentPage }}页 / 共{{ totalPages }}页</span>
-          <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">下一页</button>
+          <button @click="handlePageChange(currentPage + 1)" :disabled="currentPage === totalPages">下一页</button>
         </div>
       </div>
     </div>
 
   </div>
+
+  <div style="color:red;">DEBUG: {{ searchResults }}</div>
 
 </template>
 

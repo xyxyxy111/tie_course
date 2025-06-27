@@ -18,7 +18,7 @@
         </svg>
       </div>
     </button>
-    <button @click="goToCart(userId)">
+    <button @click="goToCart()">
       <div class="icon">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="#35495e">
           <use href="#mdi--cart-outline" />

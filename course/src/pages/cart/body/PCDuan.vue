@@ -3,14 +3,41 @@ import { ref, computed, onMounted } from 'vue'
 import { useWindowSize } from '@/useWindowSize';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import PCHeader from '@/components/common/PCHeader.vue';
-import { useCartLogic } from '../components/content';
+
+// 导入共享的数据和逻辑
+import { useCartLogic, useCartUtils } from '../components/content';
 import { wishlistApi } from '@/api/user';
 import '../cart.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { cartApi } from '@/api/cart';
 
 const { width, height } = useWindowSize();
-const { cart, totalPrice, goToCheckout, loading, error, removeCourseFromCart } = useCartLogic();
+
+// 使用共享的数据和逻辑
+const {
+  cart,
+  userId,
+  loading,
+  error,
+  totalPrice,
+  totalOriginalPrice,
+  savedAmount,
+  fetchCart,
+  addCourseToCart,
+  removeCourseFromCart,
+  clearCart,
+  goToCheckout
+} = useCartLogic();
+
+const {
+  formatPrice,
+  formatDiscount,
+  formatTime,
+  isCartEmpty,
+  getCartItemCount,
+  isUserLoggedIn,
+  goToLogin
+} = useCartUtils();
 
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 const headerSpaceStyle = computed(() => ({
@@ -21,9 +48,6 @@ const CourseInstructorStyle = () => ({});
 const CourseTitleStyle = () => ({});
 const CourseIncartStyle = () => ({});
 
-// 获取userId
-const userId = ref<string | null>(null);
-
 onMounted(() => {
   // 从token获取userId
   const token = getValidToken();
@@ -31,7 +55,6 @@ onMounted(() => {
     userId.value = getCurrentUserId();
   }
 });
-
 
 // 加入心愿单
 const addToWishlist = async (courseId: number) => {
@@ -72,16 +95,14 @@ const removeFromCart = async (courseId: number) => {
 
 // 清空购物车
 const clearing = ref(false);
-const clearCart = async () => {
+const handleClearCart = async () => {
   if (clearing.value) return;
-  if (!cart.value || !cart.value.cartItemList || cart.value.cartItemList.length === 0) return;
+  if (isCartEmpty(cart.value)) return;
   if (!confirm('确定要清空购物车吗？')) return;
   clearing.value = true;
   try {
-    await cartApi.clearCart();
+    await clearCart();
     alert('购物车已清空');
-    // 重新加载购物车数据
-    window.location.reload();
   } catch (error) {
     alert('清空购物车失败，请重试');
   } finally {
@@ -136,7 +157,7 @@ const clearCart = async () => {
                 </div>
               </div>
             </div>
-            <button class="clear-cart-btn" @click="clearCart" :disabled="clearing || loading"
+            <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
               v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
               {{ clearing ? '清空中...' : '清空' }}
             </button>
@@ -323,62 +344,6 @@ const clearCart = async () => {
   height: fit-content;
 }
 
-.checkout-summary {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e1e1e1;
-}
-
-.checkout-summary h3 {
-  font-size: 1.4rem;
-  color: #333;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.summary-item:last-of-type {
-  border-bottom: none;
-}
-
-.summary-item span {
-  font-size: 1rem;
-  color: #666;
-}
-
-.summary-item .subtotal {
-  font-weight: 600;
-  color: #333;
-}
-
-.summary-item.total-row {
-  border-top: 2px solid #eee;
-  border-bottom: none;
-  margin-top: 10px;
-  padding-top: 15px;
-}
-
-.summary-item.total-row span {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #333;
-}
-
-.total-price {
-  font-weight: bold;
-  color: #165c91;
-  font-size: 1.4rem;
-}
 
 .checkout-btn {
   width: 100%;
@@ -454,7 +419,6 @@ const clearCart = async () => {
   background: #c82333;
 }
 
-/* 空购物车样式 */
 .empty-cart {
   text-align: center;
   padding: 80px 20px;
@@ -603,32 +567,4 @@ const clearCart = async () => {
   }
 }
 
-.clear-cart-btn {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  margin: 0;
-  width: fit-content;
-  white-space: nowrap;
-  padding: 8px 18px;
-  background: #fff;
-  color: #dc3545;
-  border: none ;
-  height: 30px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.clear-cart-btn:hover:not(:disabled) {
-  background: #dc35467d;
-  color: #fff;
-}
-
-.clear-cart-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 </style>

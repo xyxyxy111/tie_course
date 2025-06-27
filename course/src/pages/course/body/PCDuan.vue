@@ -8,25 +8,19 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
-//molidis
-//before
-// import FloatingBox from '../components/FloatingBox.vue';
-import { goToCart } from '@/components/common/header.ts';
+import FloatingBox from '../components/FloatingBox.vue';
+import { goToCart } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription, useCart, otherThemes, courseCurriculums, Comments } from '../components/content';
 
-
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
-import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course.ts';
-import type { CourseVO, Chapter, Lesson } from '@/api/course.ts';
-import { convertMinutesToHoursAndMinutes } from '@/utils/common.ts';
+import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
+import type { CourseVO, Chapter, Lesson } from '@/api/course';
+import { convertMinutesToHoursAndMinutes } from '@/utils/common';
 
 const courseVo = ref<CourseVO | null>(null);
 const chapters = ref<Chapter[]>([]);
-const lessons = ref<Lesson[]>([]);
-
-
 
 const { width, height } = useWindowSize()
 const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();

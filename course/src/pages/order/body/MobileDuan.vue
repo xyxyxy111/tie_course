@@ -5,25 +5,51 @@ import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import '../order.css'
-import { OrderItem } from '@/types/types';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
 
-interface Course {
-  id: number;
-  image: string;
-  title: string;
-  price: number;
-}
+// 导入共享的数据和逻辑
+import { useOrderData, useOrderUtils, orderStatusOptions, timeRangeOptions } from '../content';
 
-interface CartData {
-  courses: Course[];
-  total: number;
-  userId: string;
-}
+// 使用共享的数据和逻辑
+const {
+  orders,
+  loading,
+  error,
+  userId,
+  currentPage,
+  pageSize,
+  totalPages,
+  totalOrders,
+  selectedStatus,
+  selectedTimeRange,
+  initializeData,
+  fetchOrders,
+  handlePageChange,
+  handleStatusFilter,
+  handleTimeRangeFilter,
+  cancelOrder,
+  confirmReceipt,
+  applyRefund
+} = useOrderData();
+
+const {
+  formatOrderStatus,
+  getOrderStatusColor,
+  formatPrice,
+  formatTime,
+  formatOrderNumber,
+  calculateOrderTotal,
+  calculateOrderOriginalTotal,
+  canCancelOrder,
+  canConfirmReceipt,
+  canApplyRefund
+} = useOrderUtils();
+
+onMounted(async () => {
+  await initializeData();
+});
 
 // 响应式数据
-const orderList = ref<Course[]>([]);
-const totalPrice = ref(0);
-const courseCount = ref(0);
 const selectedPayment = ref('alipay'); // 默认选择支付宝
 const couponCode = ref(''); // 优惠券码
 const discountAmount = ref(0); // 优惠金额
@@ -31,44 +57,8 @@ const finalPrice = ref(0); // 最终价格
 
 // 计算最终价格
 const calculateFinalPrice = () => {
-  finalPrice.value = totalPrice.value - discountAmount.value;
+  finalPrice.value = totalOrders - discountAmount.value;
 };
-
-onMounted(() => {
-  try {
-    // 1. 从localStorage获取数据
-    const rawData = localStorage.getItem('tempCartData');
-
-    // 2. 检查数据是否存在
-    if (!rawData) {
-      throw new Error('购物车数据不存在');
-    }
-
-    // 3. 解析数据
-    const cartData: CartData = JSON.parse(rawData);
-
-    // 4. 验证数据格式
-    if (!cartData.courses || !Array.isArray(cartData.courses)) {
-      throw new Error('购物车数据格式错误');
-    }
-
-    // 5. 赋值给响应式变量
-    orderList.value = cartData.courses;
-    totalPrice.value = cartData.total;
-    courseCount.value = cartData.courses.length;
-
-    // 6. 清除临时存储（可选）
-    localStorage.removeItem('tempCartData');
-
-    // 7. 初始化最终价格
-    calculateFinalPrice();
-
-  } catch (error) {
-    console.error('加载购物车数据失败:', error);
-    // 8. 出错时重定向回购物车页
-    window.location.href = '/cart.html';
-  }
-});
 
 // 处理付款方式选择
 const handlePaymentChange = (paymentMethod: string) => {
@@ -85,7 +75,7 @@ const applyCoupon = () => {
   // 这里可以添加实际的优惠券验证逻辑
   // 示例：简单的优惠券逻辑
   if (couponCode.value.toLowerCase() === 'discount10') {
-    discountAmount.value = totalPrice.value * 0.1; // 10%折扣
+    discountAmount.value = totalOrders * 0.1; // 10%折扣
     calculateFinalPrice();
     alert('优惠券应用成功！获得10%折扣');
   } else if (couponCode.value.toLowerCase() === 'save5') {
@@ -108,12 +98,17 @@ const handlePayment = () => {
   // 这里可以添加实际的支付逻辑
   alert(`正在跳转到${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付页面...`);
 };
+
+// 初始化最终价格
+onMounted(() => {
+  calculateFinalPrice();
+});
 </script>
 
 <!-- html -->
 <template>
   <IconSprite />
-
+  <MobileHeader :userId="userId" />
   <div class="payment-container">
     <!-- 付款方式部分 -->
     <div class="section">
@@ -132,12 +127,12 @@ const handlePayment = () => {
       </div>
 
       <div class="order-summary">
-        <h3>订单详细信息 ( {{ orderList.length }} 个课程)</h3>
+        <h3>订单详细信息 ( {{ orders.length }} 个课程)</h3>
         <ul class="course-list">
-          <li v-for="(course, index) in orderList" class="course-item">
-            <img :src="course.image" alt="">
-            <span class="title">{{ course.title }}</span>
-            <span class="price">{{ course.price }}</span>
+          <li v-for="(order, index) in orders" class="course-item">
+            <img :src="order.image" alt="">
+            <span class="title">{{ order.title }}</span>
+            <span class="price">{{ order.price }}</span>
           </li>
         </ul>
       </div>
@@ -147,7 +142,7 @@ const handlePayment = () => {
         <h3>价格明细</h3>
         <div class="price-item">
           <span>小计:</span>
-          <span>US${{ totalPrice.toFixed(2) }}</span>
+          <span>US${{ totalOrders.toFixed(2) }}</span>
         </div>
         <div class="price-item" v-if="discountAmount > 0">
           <span>优惠:</span>

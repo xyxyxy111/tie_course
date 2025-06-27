@@ -171,7 +171,7 @@ const relatedTopics = [
   '数据可视化'
 ];
 
-export{
+export {
   useCourseDescription,
   useCart,
   otherThemes,

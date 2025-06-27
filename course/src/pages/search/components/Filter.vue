@@ -148,6 +148,12 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 
+.tag-list li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .tag-list button {
   width: 100%;
   margin: 0px 0;

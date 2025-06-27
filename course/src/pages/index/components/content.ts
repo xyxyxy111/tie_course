@@ -1,5 +1,8 @@
 import { Course } from "@/types/types.ts";
 import { toRef, ref, onMounted, defineComponent } from 'vue';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { categoryApi, courseApi } from '@/api/course.ts';
+import type { Category, Tag, CourseListVO } from '@/api/course.ts';
 
 class NavigationButton {
   activeFlag: boolean = false;
@@ -49,12 +52,97 @@ class CommunityVoice {
     public course: string) { }
 }
 
-const courseTitles = ref<NavigationButton[]>([
-])
+// 共享的响应式数据
+const categories = ref<Category[]>([]);
+const singleCategory = ref<Category | null>(null);
+const tags = ref<Tag[]>([]);
+const courseListVos = ref<CourseListVO[]>([]);
+const userId = ref<string | null>(null);
+const selectedTagId = ref<number | null>(null);
 
-const courseQuickViews = ref<CourseQuickView[]>([
+const courseTitles = ref<NavigationButton[]>([]);
+const courseQuickViews = ref<CourseQuickView[]>([]);
 
-]);
+// 共享的数据获取逻辑
+export const useIndexData = () => {
+  const initializeData = async () => {
+    // 获取userId
+    const token = getValidToken();
+    if (token) {
+      userId.value = getCurrentUserId();
+    }
+
+    const searchParams = new URLSearchParams(window.location.search);
+    let categoryId;
+    if (!searchParams.get('categoryId')) {
+      categoryId = 1;
+    } else {
+      categoryId = parseInt(searchParams.get('categoryId')!);
+    }
+
+    const categoriesResponse = await categoryApi.getAllCategories();
+    categories.value = categoriesResponse.data;
+
+    const singleCategoryResponse = await categoryApi.getCategoryDetail(categoryId);
+    singleCategory.value = singleCategoryResponse.data;
+
+    const tagsResponse = await categoryApi.getTagListByCategoryId(categoryId);
+    tags.value = tagsResponse.data;
+    courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
+
+    let tagId;
+    if (!searchParams.get('tagId')) {
+      let firstTag = tags.value[0];
+      tagId = firstTag.tagId;
+    } else {
+      tagId = parseInt(searchParams.get('tagId')!);
+    }
+    selectedTagId.value = tagId;
+    await getCourseListByTagId(tagId);
+    if (courseTitles.value.length > 0) courseTitles.value[0].activeFlag = true;
+  };
+
+  const getCourseListByTagId = async (tagId: number) => {
+    const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
+    courseListVos.value = courseListVosResponse.data;
+    courseQuickViews.value = courseListVos.value.map(course => {
+      return new CourseQuickView(
+        course.courseId,
+        course.coverImgUrl,
+        course.title,
+        course.score,
+        course.originalPrice,
+        new Date(course.updateTime || new Date()),
+        course.totalMinutes,
+        course.description,
+        course.whatYouWillLearn
+      );
+    });
+  };
+
+  const changeCourseTheme = (i: NavigationButton) => {
+    courseTitles.value.forEach(element => {
+      element.activeFlag = false;
+    });
+    i.activeFlag = true;
+    selectedTagId.value = i.tagId;
+    getCourseListByTagId(i.tagId);
+  };
+
+  return {
+    categories,
+    singleCategory,
+    tags,
+    courseListVos,
+    userId,
+    selectedTagId,
+    courseTitles,
+    courseQuickViews,
+    initializeData,
+    getCourseListByTagId,
+    changeCourseTheme
+  };
+};
 
 const communityVoices = ref<CommunityVoice[]>([
   new CommunityVoice(
@@ -81,7 +169,6 @@ const communityVoices = ref<CommunityVoice[]>([
   new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
     'User', '/src/images/userPic.png', 'course'
   ),
-
   new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
     'User', '/src/images/userPic.png', 'course'
   ),

@@ -17,7 +17,7 @@ export enum PaymentType {
 // 订单项接口
 export interface OrderItem {
   id?: number;
-  orderId: string;
+  orderId: number;
   userId: number;
   courseId: number;
   courseName: string;
@@ -34,7 +34,7 @@ export interface OrderItem {
 // 订单接口
 export interface Order {
   id?: number;
-  orderId: string;
+  orderId: number;
   userId: number;
   status: OrderStatus;
   paymentType: PaymentType;
@@ -53,7 +53,7 @@ export interface Order {
 
 // 创建订单请求参数
 export interface CreateOrderParams {
-  orderId: string;
+  orderId: number;
   userId: number;
   status: OrderStatus;
   paymentType: PaymentType;

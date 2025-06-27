@@ -7,12 +7,45 @@ import { useWindowSize } from '@/useWindowSize';
 import MobileHeader from '@/components/common/MoblieHeader.vue';
 import CartPopup from '@/components/common/CartPopup.vue';
 import HoverPopup from '@/components/common/HoverPopup.vue';
+import { useIndexData } from '../components/content.ts';
 import {
-  courseQuickViews, communityVoices,
+  communityVoices,
   recommendedProducts, relatedTopics
 } from '../components/content.ts';
 
 const { width, height } = useWindowSize()
+
+const {
+  categories,
+  singleCategory,
+  tags,
+  courseListVos,
+  userId,
+  selectedTagId,
+  courseTitles,
+  courseQuickViews,
+  initializeData,
+  getCourseListByTagId,
+  changeCourseTheme
+} = useIndexData();
+
+onMounted(async () => {
+  await initializeData();
+});
+
+function toCourse(courseId?: number) {
+  if (courseId) {
+    window.location.href = `/course.html?courseId=${courseId}`;
+  }
+}
+
+const showCart = ref(false);
+const cartTitle = ref('')
+
+function addToCart(courseTitle: string) {
+  cartTitle.value = courseTitle;
+  showCart.value = true;
+}
 
 const voiceStyle = (index: number) => ({
   height: '3' + (index % 4 == 0 ? '6' : (index % 4 == 1 ? '9' : (index % 4 == 2 ? '3' : '0'))) + '0px'
@@ -32,7 +65,6 @@ const titleStyle = () => ({
   transition: 'none'
 })
 
-
 const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   backgroundColor: (activeFlag && hoverFlag) ? 'rgba(22,92,145,0.7)' :
     (hoverFlag ? 'rgba(22,92,145,0.3)' : (activeFlag ? 'rgb(22,92,145)' : 'gainsboro')),
@@ -43,44 +75,12 @@ const navigaterBtnStyle = (activeFlag: boolean, hoverFlag: boolean) => ({
   transition: 'background-color 0.3s'
 });
 
-//切换主题
-
-// function changeCourseTheme(i: NavigationButton) {
-//   courseTitles.value.forEach(element => {
-//     element.activeFlag = false;
-//   });
-//   i.activeFlag = true;
-// }
-
 const CourseBtnStyle = (flag: boolean) => ({
   top: (flag) ? '-65%' : '20%'
 });
 
-function toCourse() {
-
-}
-
-
-function toComment() {
-
-}
-
-
-
-// 
-const showCart = ref(false);
-const cartTitle = ref('')
-
-function addToCart(course: string) {
-  cartTitle.value = course;
-  showCart.value = true;
-  console.log(cartTitle.value + "" + showCart.value)
-}
-
-
 </script>
 
-<!-- html -->
 <template>
   <IconSprite />
   <main>
@@ -96,11 +96,8 @@ function addToCart(course: string) {
             </div>
             <button class="go-to-cart-btn">前往购物车</button>
           </div>
-
-
           <div class="recommendations">
             <h2>常见购买搭配</h2>
-
             <div class="recommendation-list">
               <div v-for="product in recommendedProducts" :key="product.id" class="product-card">
                 <img :src="product.coverImgUrl" alt="">
@@ -131,48 +128,39 @@ function addToCart(course: string) {
         </div>
       </template>
     </CartPopup>
-    <!-- <MobileHeader :userId="userId"/> -->
+    <MobileHeader :userId="userId" />
     <div>
-
-      <div class="title" :style="titleStyle()">Software Engineering Courses</div>
-      <div class="navigate  container-scroll-x">
-        <!-- <button v-for="(title, index) in courseTitles" :key="index" @click="changeCourseTheme(title)"
-          @mouseenter="title.mouseEnter()" @mouseleave="title.mouseLeave()"
+      <div class="title" :style="titleStyle()">{{ singleCategory?.name || '课程分类' }}</div>
+      <div class="navigate container-scroll-x">
+        <button v-for="(title, index) in courseTitles" :key="index" @click="changeCourseTheme(title)"
           :style="navigaterBtnStyle(title.activeFlag, title.hoverFlag)">
-          {{ title.text }}</button> -->
+          {{ title.text }}
+        </button>
       </div>
       <div class="container container-scroll-x">
         <div class="content">
-          <div v-for="(courseQuickView, index) in courseQuickViews" @click="toCourse()" class="course"
-            @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
+          <div v-for="(courseQuickView, index) in courseQuickViews" @click="toCourse(courseQuickView.courseId)"
+            class="course" @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
             <img :src="courseQuickView.coverImgUrl" alt="">
             <div class="course-title">
               {{ courseQuickView.title }}
             </div>
-            <!-- 评分 -->
             <div class="course-rating">
               {{ courseQuickView.score }} ★★★★ (2,187)
             </div>
-
-            <!-- 价格 -->
             <div class="course-price">
               US${{ courseQuickView.originalPrice.toFixed(2) }}
             </div>
-
-
-
-            <!-- HoverPopup 组件 -->
             <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="310px" transition="slide"
               :show-delay="150" :hide-delay="150" class="custom-popup-right">
               <template #trigger>
-                <!-- 空触发区域（由父元素控制） -->
                 <div class="popup-trigger-area"></div>
               </template>
               <template #content>
-                <!-- 弹窗内容 -->
                 <div class="course-title">{{ courseQuickView.title }}</div>
                 <div>
-                  <span class="course-update">更新日期 2025年3月</span>|
+                  <span class="course-update">更新日期 {{ courseQuickView.updateTime ?
+                    courseQuickView.updateTime.toLocaleDateString() : '' }}</span>|
                   <span class="course-duration">
                     总共{{ (courseQuickView.totalMinutes / 60).toFixed(1) }}小时
                   </span>
@@ -185,7 +173,7 @@ function addToCart(course: string) {
                   <p>{{ courseQuickView.whatYouWillLearn }}</p>
                 </div>
                 <div class="popupBtn">
-                  <button class="addToCartBtn" @click="addToCart(courseQuickView.title)">添加到购物车</button>
+                  <button class="addToCartBtn" @click.stop="addToCart(courseQuickView.title)">添加到购物车</button>
                   <button class="addToWishlistBtn">
                     <div class="icon">
                       <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
@@ -197,15 +185,12 @@ function addToCart(course: string) {
               </template>
             </HoverPopup>
           </div>
-
         </div>
       </div>
-
       <div class="title" :style="titleStyle()">Voices across Commnities</div>
       <div class="voice-container container-scroll-x">
         <div class="inContainer">
-
-          <div v-for="(communityVoice, index) in communityVoices" @click="toComment()" class="comment"
+          <div v-for="(communityVoice, index) in communityVoices" class="comment"
             :style="voiceStyle(index)">
             <div>
               <svg width="70" height="35" viewBox="0 -10 48 48" fill="#35495e">
@@ -217,11 +202,9 @@ function addToCart(course: string) {
             <div class="voice-link">View {{ communityVoice.course }} ></div>
           </div>
         </div>
-
       </div>
     </div>
   </main>
-
 </template>
 
 <!-- css -->

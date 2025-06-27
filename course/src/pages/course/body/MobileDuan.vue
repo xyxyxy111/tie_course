@@ -1,17 +1,21 @@
 <script lang="ts" setup>
 import '../course.css'
-import { RouterView, RouterLink } from 'vue-router';
-import { toRef, ref, onMounted, computed } from 'vue';
-import { defineComponent } from 'vue'
+import { ref, onMounted, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
-import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
-import { goToCart } from '@/components/common/header.ts';
-import { recommendedProducts, relatedTopics } from '../components/content';
-import { useCourseDescription, useCart, otherThemes, courseCurriculums, Comments } from '../components/content';
+import { useCourseDescription, useCart, otherThemes, Comments } from '../components/content';
+
+import { getCurrentUserId, getValidToken } from '@/utils/request';
+
+import { courseApi } from '@/api/course';
+import type { CourseVO, Chapter } from '@/api/course';
+import { convertMinutesToHoursAndMinutes } from '@/utils/common';
+
+const courseVo = ref<CourseVO | null>(null);
+const chapters = ref<Chapter[]>([]);
 
 const { width, height } = useWindowSize()
 const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();
@@ -20,238 +24,191 @@ const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
 // 获取userId
 const userId = ref<string | null>(null);
 
-onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+// 展开章节的id集合
+const expandedChapters = ref<number[]>([]);
+
+onMounted(async () => {
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  } else {
+    // 如果没有token，重定向到登录页面
+    window.location.href = '/login.html';
   }
+  const searchParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(searchParams.get('courseId')!);
+
+  //if(!searchParams.get('courseId')){return;}&&error
+
+  const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
+  courseVo.value = courseVoResponse.data;
+  console.log(courseVo.value);
+
+  const chaptersResponse = await courseApi.getChapterListById(courseId);
+  chapters.value = chaptersResponse.data;
+  chapters.value.forEach(chapter => { // 注意：这里是 users.value
+    let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
+    chapter.hours = result.hours;
+    chapter.minutes = result.minutes;
+  });
+  console.log(chapters.value);
+
+  //session to make great
+  const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
+  const firstChapter = chapters.value.find(chapter => chapter.chapterSortOrder === 1);
+  if (firstChapter) {
+    firstChapter.lessons! = lessonsResponse.data;
+    firstChapter.hasLoadedLessons = true;
+  } else {
+    console.warn("No chapters found");
+  }
+  getLessonListBySortOrder
 });
 
-const props = defineProps({
-  courseVideo: {
-    type: String,
-    default: '/src/images/image1.png'
-  },
-  currentPrice: {
-    type: String,
-    default: 'US$13.99'
-  },
-  originalPrice: {
-    type: String,
-    default: 'US$94.99'
-  },
-  discount: {
-    type: String,
-    default: '85% 折扣'
-  },
-  timeLeft: {
-    type: String,
-    default: '此优惠价格仅剩1天！'
-  },
-  featuresTitle: {
-    type: String,
-    default: '本课程包括：'
-  },
-  features: {
-    type: Array,
-    default: () => [
-      { text: '10.5小时长的随选视频', checked: true },
-      { text: '4篇文章', checked: true },
-      { text: '在移动设备和电视上观看', checked: true },
-      { text: '完整的永久访问权', checked: true },
-      { text: '结业证书', checked: true }
-    ]
-  },
-  shareText: {
-    type: String,
-    default: '分享'
-  },
-  giftText: {
-    type: String,
-    default: '将该课程作为礼物赠送'
+const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
+  const chooseChapter = chapters.value.find(chapter => chapter.chapterSortOrder === sortOrder);
+  if (!chooseChapter?.hasLoadedLessons) {
+    //true
+    const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
+    console.log("lessonsResponse" + lessonsResponse.data.map(lesson => lesson.title));
+    if (chooseChapter) {
+      chooseChapter.lessons! = lessonsResponse.data;
+      chooseChapter.hasLoadedLessons = true;
+    } else {
+      console.warn("No chapters found");
+    }
   }
-});
+}
+
+const toggleChapter = async (courseId: number, sortOrder: number) => {
+  const idx = expandedChapters.value.indexOf(sortOrder);
+  if (idx > -1) {
+    // 已展开则收起
+    expandedChapters.value.splice(idx, 1);
+  } else {
+    // 展开并加载lesson
+    await getLessonListBySortOrder(courseId, sortOrder);
+    expandedChapters.value.push(sortOrder);
+  }
+};
 
 const CourseDescriptionStyle = computed(() => ({
   height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
 }));
 
-const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon', 'couponApplied']);
+const handleShare = () => {
+  // 实现分享功能
+  if (navigator.share) {
+    navigator.share({
+      title: courseVo.value?.title || '课程',
+      text: courseVo.value?.highLights || '精彩课程',
+      url: window.location.href
+    });
+  } else {
+    // 降级处理：复制链接到剪贴板
+    navigator.clipboard.writeText(window.location.href);
+    alert('链接已复制到剪贴板');
+  }
+};
+
+const handleGift = () => {
+  // 实现礼物功能
+  alert('礼物功能开发中...');
+};
 </script>
 
 <template>
   <IconSprite />
+  <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
+  <MobileHeader :userId="userId" />
   <main>
-    <MobileHeader :userId="userId" />
     <div id="top-container">
       <div class="content">
         <div class="course-theme" v-if="width > 540">
-          <h6> 开发 数据科学 R（编程语言）</h6>
+          <h6>{{ courseVo?.categoryName }} {{ courseVo?.tagName }}</h6>
         </div>
-
         <div class="divider" v-if="width > 540"></div>
-
         <div class="course-title">
-          <h3> R Programming A-Z™: R For Data Science With Real Exercises!
-          </h3>
-
+          <h3>{{ courseVo?.title }}</h3>
         </div>
-
         <div class="course-introduction" v-if="width > 480">
-          <h5>Learn Programming In R And R Studio. Data Analytics, Data Science, Statistical Analysis, Packages,
-            Functions,
-            GGPlot2</h5>
-
+          <h5>{{ courseVo?.highLights }}</h5>
         </div>
-
         <div class="divider" v-if="width > 500"></div>
-
         <div class="update-time" v-if="width > 500">
-          <h6>上次更新时间：2025年1月</h6>
+          <h6>上次更新时间：{{ courseVo?.updateTime }}</h6>
         </div>
-
         <div class="language" v-if="width > 520">
-          <h6> 中文 , 英语</h6>
+          <h6>中文, 英语</h6>
         </div>
-
       </div>
-
       <div class="price-section">
         <div class="video-pictrue">
-          <img :src="courseVideo" alt="">
+          <img :src="courseVo?.coverImgUrl || '/src/images/image1.png'" alt="">
         </div>
-        <span class="current-price">{{ currentPrice }}</span>
-        <span class="original-price">{{ originalPrice }}</span>
-        <span class="discount">{{ discount }}</span>
-        <div class="time-left" v-if="timeLeft">{{ timeLeft }}</div>
+        <span class="current-price">{{ courseVo?.currentPrice ? 'US$' + courseVo.currentPrice : 'US$13.99'
+          }}</span>
+        <span class="original-price">{{ courseVo?.originalPrice ? 'US$' + courseVo.originalPrice : 'US$94.99'
+          }}</span>
+        <span class="discount">85% 折扣</span>
+        <div class="time-left">此优惠价格仅剩1天！</div>
         <div class="action-buttons">
-          <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
-          <button class="buy-now" @click="emit('buyNow')">立即购买</button>
+          <button class="add-to-cart" @click="addToCart(courseVo?.title || '课程')">添加至购物车</button>
+          <button class="buy-now" @click="">立即购买</button>
         </div>
 
+        <div class="divider"></div>
       </div>
-
     </div>
-
-
     <div id="course-detail">
       <div class="what-you-will-learn">
         <h1>您将会学到</h1>
-        <ul>
-          <li>從完全不會寫程式，做出10款應用程式</li>
-          <li>學習如何撰寫 Swift 程式碼</li>
-          <li>
-            學習紮實的程式觀念，從變數觀念教到類別、物件、協定與 MVC 程式設計
-          </li>
-        </ul>
+        <p>{{ courseVo?.whatYouWillLearn }}</p>
       </div>
-
       <div class="other-theme">
         <h1>浏览相关主题</h1>
         <button v-for="otherTheme in otherThemes">
           {{ otherTheme.title }}
         </button>
-
       </div>
-
       <div class="course-content">
         <h1>课程内容</h1>
-        <h3>10个章节·100个讲座·总时长10小时10分钟</h3>
+        <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟
+        </h3>
         <ul>
-          <li v-for="courseCurriculum in courseCurriculums">
-            <span class="curriculum-title">{{ courseCurriculum.title }}</span>
-            <span class="lectrue-duration">{{ courseCurriculum.lectures }}个讲座·{{ courseCurriculum.duration }}个小时</span>
-          </li>
+          <template v-for="courseCurriculum in chapters" :key="courseCurriculum.chapterSortOrder">
+            <li @click="toggleChapter(courseCurriculum.courseId, courseCurriculum.chapterSortOrder)">
+              <span>第{{ courseCurriculum.chapterSortOrder }}章 </span>
+              <span class="curriculum-title">{{ courseCurriculum.title }}</span>
+              <span class="lectrue-duration">
+                {{ courseCurriculum.lessonNum }}个讲座·
+                <template v-if="courseCurriculum.hours !== 0">
+                  {{ courseCurriculum.hours }}小时
+                </template>
+                <template v-if="courseCurriculum.minutes !== 0">
+                  {{ courseCurriculum.minutes }}分钟
+                </template>
+              </span>
+            </li>
+            <transition name="slide-lesson">
+              <ul class="lesson-list"
+                v-if="expandedChapters.includes(courseCurriculum.chapterSortOrder) && courseCurriculum.lessons">
+                <li v-for="lesson in courseCurriculum.lessons" :key="lesson.lessonId"
+                  style="padding-left:32px;list-style:circle;cursor:default;">
+                  {{ lesson.title }}
+                </li>
+              </ul>
+            </transition>
+          </template>
         </ul>
       </div>
-
       <div class="course-descrpition" :style="CourseDescriptionStyle">
         <h1>描述</h1>
-        <h4>您想找一份寫程式的工作嗎？
-          您想要開發自己的 iPhone App 嗎？
-          歡迎來到「深入淺出 iPhone 開發」課程。
-
-          我是魏巍。Udemy 大中華地區 iPhone 開發課程合作講師。
-          目前我已經上架了40 款 iPhone Apps。
-          包括曾登上台灣區冠軍的「黃色小鴨爆炸了」，
-          以及台灣區第二名的「指認嫌疑犯」。
-
-          我撰寫書籍，也在資策會、Alpha Camp、赫綵電腦與各大專院校教授程式課程。
-          完全沒有程式基礎也沒有關係，我會從最基礎的概念開始教，
-          我真的都會解釋地超清楚。
-          同時也會給同學很多練習機會。
-          不僅教您概念，
-          還真的帶您實際製作出10 款應用程式。
-          會教地圖、多媒體，以及連結網路 API。
-          我去年的 Swift3 課程在 Udemy 已經有超過 1300 多位同學報名，
-          除了線上學習，內容很豐富，同學留言問我問題，我也會回答。
-          超多人都留下了好評。
-
-          今年我準備更豐富、更超值的中文教學，
-          能夠省去您看英文書的時間。
-          不管您是想要找工作、想要接案，
-          或是自己想要做自己的 App，
-          都能以最簡單最快速的方式達到目的。
-          歡迎來學習全世界最爆炸成長的語言，
-          一起來做自己的 iPhone 應用程式吧！
-
-
-          製作 10 款 Apps
-
-          Hello Swift
-          解鎖大師
-          小小算命師
-          質數判斷
-          Color Finder
-          快樂鋼琴
-          待辦事項
-          電子書
-          使用者產生器
-          RSS閱讀器
-
-          課程內容包括:
-
-          安裝 Xcode
-          超詳細的 Swift 語言介紹
-          超實用的 UIKit 元件知識
-          完整的 AutoLayout 技巧
-          多場景應用程式製作(TabBar, Navigation)
-          表格視圖應用程式的開發
-          地圖
-          多媒體
-          連結網路與解析下載資料
-
-          課程要求
-
-          無須程式背景，一般人就可以學習
-          無需成為付費的 Apple 開發者，一般人就可以學習
-          需要蘋果電腦(iMac、MacBook Air、MacBook、MacBook Pro，Mac Mini 任一可)
-
-
-          可以學到什麼？
-
-          從完全不會寫程式，做出10款應用程式。
-          學習如何撰寫 Swift 程式碼。
-          學習紮實的程式觀念，從變數觀念教到類別、物件、協定與 MVC 程式設計。
-          培養程式的能力，找到更好、更多金的工作。
-
-          誰可以學？
-
-          只要有興趣，每個人都可以學。
-          想要學習寫程式的您。沒有寫程式的經驗也沒有關係。
-          想要找一份寫程式的工作，轉換工作跑道的追夢者。
-          此课程面向哪些人：
-          只要有興趣，每個人都可以學
-          想要學習寫程式的您。沒有寫程式的經驗也沒有關係
-          想要找一份寫程式的工作，轉換工作跑道的追夢者
-
-        </h4>
+        <h4>{{ courseVo?.description }}</h4>
       </div>
       <button @click="CourseDescriptionFlag = !CourseDescriptionFlag;" class="course-descrpitionbtn">{{
-        CourseDescription }}</button>
-
+        CourseDescription
+        }}</button>
       <h1>评论</h1>
       <div class="comment-container .container-scroll-x">
         <div class="comment">
@@ -275,8 +232,10 @@ const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon',
   padding: 10px;
 }
 
-.video-picture {
-  width: 80%;
+
+.video-picture img{
+  width: 100%;
+  height: 200px;
 }
 
 .current-price {
@@ -377,4 +336,29 @@ h1 {
   padding-left: 20px;
   margin-block: 10px;
 }
+
+.lesson-list {
+  border: none;
+  padding-left: 32px;
+  list-style: circle;
+  cursor: default;
+}
+
+.slide-lesson-enter-active,
+.slide-lesson-leave-active {
+  transition: max-height 0.3s cubic-bezier(.55, 0, .1, 1);
+  overflow: hidden;
+}
+
+.slide-lesson-enter-from,
+.slide-lesson-leave-to {
+  max-height: 0;
+}
+
+.slide-lesson-enter-to,
+.slide-lesson-leave-from {
+  max-height: 500px;
+}
+
+
 </style>
