@@ -7,7 +7,6 @@
     <div class="explore">
       <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">Explore</button>
 
-      <!-- 直接使用div实现浮窗，不使用HoverPopup组件 -->
       <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handlePopupEnter" @mouseleave="handlePopupLeave">
         <div class="explore-popup-content">
           <div class="categories-list">
@@ -77,7 +76,7 @@
 
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import IconSprite from '../Icon/IconSprite.vue';
 import './header.css'
 import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin, goToLearning, goToCourse } from './header.ts';
@@ -88,6 +87,8 @@ const exploreHoverFlag = ref(false)
 const hoveredCategory = ref<any>(null)
 const tagsHoverFlag = ref(false)
 let exploreHideTimer: number | null = null
+let categoryHideTimer: number | null = null
+let tagsHideTimer: number | null = null
 
 
 const categoryList = ref<CategoryList[]>([]);
@@ -99,31 +100,54 @@ onMounted(async () => {
     const TagResponse = await categoryApi.getTagListByCategoryId(category.categoryId!);
     category.tags = TagResponse.data;
   });
-
 });
 
+// 清理定时器
+onUnmounted(() => {
+  if (exploreHideTimer) {
+    clearTimeout(exploreHideTimer)
+  }
+  if (categoryHideTimer) {
+    clearTimeout(categoryHideTimer)
+  }
+  if (tagsHideTimer) {
+    clearTimeout(tagsHideTimer)
+  }
+});
 
 // 处理分类hover
 const handleCategoryHover = (category: any) => {
+  if (categoryHideTimer) {
+    clearTimeout(categoryHideTimer)
+    categoryHideTimer = null
+  }
   hoveredCategory.value = category
 }
 
 // 处理分类离开
 const handleCategoryLeave = () => {
   if (!tagsHoverFlag.value) {
-    hoveredCategory.value = null
+    categoryHideTimer = setTimeout(() => {
+      hoveredCategory.value = null
+    }, 200) // 200ms延迟
   }
 }
 
 // 处理tags浮窗hover
 const handleTagsHover = () => {
+  if (tagsHideTimer) {
+    clearTimeout(tagsHideTimer)
+    tagsHideTimer = null
+  }
   tagsHoverFlag.value = true
 }
 
 // 处理tags浮窗离开
 const handleTagsLeave = () => {
-  tagsHoverFlag.value = false
-  hoveredCategory.value = null
+  tagsHideTimer = setTimeout(() => {
+    tagsHoverFlag.value = false
+    hoveredCategory.value = null
+  }, 300) // 300ms延迟
 }
 
 // 跳转到分类页面
@@ -183,7 +207,7 @@ const handleExploreLeave = () => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 150) // 150ms延迟
+  }, 300) // 增加到300ms延迟
 }
 
 // 处理浮窗hover
@@ -199,7 +223,7 @@ const handlePopupLeave = () => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 150) // 150ms延迟
+  }, 500) // 增加到500ms延迟，给用户更多时间移动到子菜单
 }
 
 </script>
