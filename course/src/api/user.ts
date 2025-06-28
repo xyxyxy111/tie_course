@@ -1,16 +1,16 @@
-import { request } from '@/utils/request.ts';
+import { request } from '@/utils/request';
 // 登录/注册相关
-interface LoginByCaptchaParams {
+export interface LoginByCaptchaParams {
   phone: string;
   captcha: string;
 }
 
-interface LoginByPasswordParams {
+export interface LoginByPasswordParams {
   phone: string;
   password: string;
 }
 
-interface RegisterParams {
+export interface RegisterParams {
   phone: string;
   captcha: string;
 }
@@ -23,7 +23,7 @@ interface PhoneAvailabilityParams {
   phone: string;
 }
 
-interface UserProfile {
+export interface UserProfile {
   username: string;
   firstName: string;
   lastName: string;
@@ -33,7 +33,7 @@ interface UserProfile {
   allowSMSNotify?: boolean;
 }
 
-interface UserBindInfo{
+interface UserBindInfo {
   phone: string;
   email: string;
   passwordSet: boolean;
@@ -65,13 +65,13 @@ export interface UserLogVO {
   time: string;
 }
 
-interface ChangePhoneParams {
+export interface ChangePhoneParams {
   phone: string;
   newPhone: string;
   captcha: string;
 }
 
-interface ChangePasswordParams {
+export interface ChangePasswordParams {
   phone: string;
   newPassword: string;
   captcha: string;
@@ -200,9 +200,10 @@ export const userApi = {
 
   getBindInfo: () => {
     return request({
-      method:'GET',
-      url:'/account/user'
-    })  }
+      method: 'GET',
+      url: '/account/user'
+    })
+  }
 };
 
 export const profileApi = {

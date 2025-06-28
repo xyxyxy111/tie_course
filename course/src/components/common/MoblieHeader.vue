@@ -44,7 +44,7 @@
   </div>
 
   <!-- 侧边栏 -->
-  <SideBar v-model:isOpen="showSidebar" position="left" :width="260" :userId="userId">
+  <SideBar v-model:isOpen="showSidebar" position="left" :width="260" :userId="userId || undefined">
   </SideBar>
 </template>
 

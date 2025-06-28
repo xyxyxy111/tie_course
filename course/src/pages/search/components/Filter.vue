@@ -104,7 +104,7 @@ onMounted(async () => {
   align-items: center;
   padding: 10px 0;
   margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .sidebar-header div {
@@ -117,14 +117,14 @@ onMounted(async () => {
   list-style: none;
   padding: 0;
   margin: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .sidebar-title {
   font-weight: 700;
   font-size: 18px;
   padding: 15px 0 0px 20px;
-  color: #35495e;
+  color: var(--text-primary);
 }
 
 .sidebar-body button {
@@ -135,18 +135,18 @@ onMounted(async () => {
   background: none;
   text-align: left;
   cursor: pointer;
-  color: #35495e;
+  color: var(--text-primary);
   transition: all 0.2s linear;
 }
 
 .sidebar-body button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: var(--primary-color-light);
 }
 
 .sidebar-body button.active {
   font-weight: 600;
-  color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  color: var(--primary-color);
+  background-color: var(--primary-color-light);
 }
 
 .tag-list {
@@ -165,14 +165,14 @@ onMounted(async () => {
   margin: 0px 0;
   font-size: 14px;
   padding: 6px 10px;
-  color: #35495e;
+  color: var(--text-primary);
   border: none;
   text-align: left;
   transition: all 0.2s;
 }
 
 .tag-list button.active {
-  background: rgb(22, 92, 145);
-  color: #fff;
+  background: var(--primary-color);
+  color: var(--text-white);
 }
 </style>

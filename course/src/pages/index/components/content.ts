@@ -1,8 +1,7 @@
-import { Course } from "@/types/types.ts";
 import { toRef, ref, onMounted, defineComponent } from 'vue';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
-import { categoryApi, courseApi } from '@/api/course.ts';
-import type { Category, Tag, CourseListVO } from '@/api/course.ts';
+import { categoryApi, courseApi } from '@/api/course';
+import type { Category, Tag, CourseListVO } from '@/api/course';
 
 class NavigationButton {
   activeFlag: boolean = false;
@@ -19,27 +18,45 @@ class NavigationButton {
   }
 }
 
-export class CourseQuickView extends Course {
+export class CourseQuickView {
   hoverFlag: boolean = false;
+  courseId: number;
+  coverImgUrl: string;
+  title: string;
+  score: number;
+  originalPrice: number;
+  updateTime: Date;
+  totalMinutes: number;
+  description: string;
+  whatYouWillLearn: string;
 
   constructor(
-    public courseId: number,
-    public coverImgUrl: string,
-    public title: string,
-    public score: number,
-    public originalPrice: number,
-    public updateTime: Date,
-    public totalMinutes: number,
-    public description: string,
-    public whatYouWillLearn: string
+    courseId: number,
+    coverImgUrl: string,
+    title: string,
+    score: number,
+    originalPrice: number,
+    updateTime: Date,
+    totalMinutes: number,
+    description: string,
+    whatYouWillLearn: string
   ) {
-    super();
-    // this.price = parseFloat(price.toFixed(2)); 
+    this.courseId = courseId;
+    this.coverImgUrl = coverImgUrl;
+    this.title = title;
+    this.score = score;
+    this.originalPrice = originalPrice;
+    this.updateTime = updateTime;
+    this.totalMinutes = totalMinutes;
+    this.description = description;
+    this.whatYouWillLearn = whatYouWillLearn;
   }
 
   mouseEnter() {
     this.hoverFlag = true;
-  } mouseLeave() {
+  }
+
+  mouseLeave() {
     this.hoverFlag = false;
   }
 }

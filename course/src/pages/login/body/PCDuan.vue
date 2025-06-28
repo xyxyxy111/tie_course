@@ -30,10 +30,6 @@ const {
   handlePasswordLogin,
   handleRegister,
   handleWechatLogin,
-  closeWechatLogin,
-  refreshWechatQrCode,
-  clearError,
-  clearSuccess,
   isLoggedIn,
   redirectIfLoggedIn
 } = useLoginData();
@@ -79,10 +75,6 @@ const switchLoginMethod = () => {
   // 清空表单数据
   loginForm.email = '';
   loginForm.password = '';
-  // 重置登录状态
-  clearError();
-  clearSuccess();
-  // 重置验证码按钮
   captchaBtn.value = {
     text: '发送验证码',
     disabled: false,
@@ -319,7 +311,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <button type="submit" class="login-btn" :disabled="loginStatus.loading">
+          <button type="submit" class="login-button" :disabled="loginStatus.loading">
             <div class="icon">
               <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
                 <use href="#ic--outline-email" />
@@ -418,7 +410,7 @@ onMounted(() => {
 .password-wrapper .password {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
   font-size: 16px;
   outline: none;
@@ -427,7 +419,7 @@ onMounted(() => {
 
 .password-wrapper .phone:focus,
 .password-wrapper .password:focus {
-  border-color: #165c91;
+  border-color: var(--primary-color-hex);
 }
 
 /* 验证码输入框样式 */
@@ -441,7 +433,7 @@ onMounted(() => {
 .captcha-wrapper .phone {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
   font-size: 16px;
   outline: none;
@@ -449,7 +441,7 @@ onMounted(() => {
 }
 
 .captcha-wrapper .phone:focus {
-  border-color: #165c91;
+  border-color: var(--primary-color-hex);
 }
 
 .captcha-input-group {
@@ -463,7 +455,7 @@ onMounted(() => {
   width: calc(100% - 130px);
   border-radius: 10px 0px 0px 10px;
   padding: 5px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-secondary);
   height: 50px;
   outline: none;
   margin: 0;
@@ -473,7 +465,7 @@ onMounted(() => {
   width: 130px;
   margin: 0;
   border-radius: 0px 10px 10px 0px;
-  background-color: rgb(22, 92, 145);
+  background-color: var(--primary-color);
   color: white;
   border: none;
   height: 50px;
@@ -490,7 +482,7 @@ onMounted(() => {
   width: 40%;
   background: none;
   border: none;
-  color: #165c91;
+  color: var(--primary-color-hex);
   font-size: 14px;
   margin-inline: 8%;
   cursor: pointer;
@@ -502,9 +494,9 @@ onMounted(() => {
 }
 
 .switch-btn:hover {
-  color: #134a7a;
+  color: var(--secondary-color);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(22, 92, 145, 0.1);
+  box-shadow: 0 4px 12px var(--primary-color-light);
 }
 
 /* 微信登录按钮样式 */
@@ -512,7 +504,7 @@ onMounted(() => {
   width: 40%;
   height: 50px;
   background-color: white;
-  color: #07C160;
+  color: var(--wechat-color);
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -543,7 +535,7 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bg-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -565,21 +557,21 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .wx-login-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .close-btn {
   background: none;
   border: none;
   font-size: 24px;
-  color: #999;
+  color: var(--text-light);
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -592,8 +584,8 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .wx-login-body {
@@ -607,13 +599,13 @@ onMounted(() => {
 .qr-code {
   width: 200px;
   height: 200px;
-  border: 1px solid #eee;
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
 .qr-tip {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }

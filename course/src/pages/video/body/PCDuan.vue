@@ -199,6 +199,9 @@ export default {
   height: 1080px;
   position: relative;
   background: #000;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .video-player {
@@ -211,12 +214,20 @@ export default {
   justify-content: center;
   align-items: center;
   color: white;
+  width: 100%;
+  background: var(--bg-dark);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .video-info {
   text-align: center;
   padding: 20px;
   max-width: 80%;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .video-placeholder {
@@ -420,5 +431,141 @@ export default {
 
 .description-content li {
   margin-bottom: 8px;
+}
+
+.video-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.video-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.video-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-primary);
+}
+
+.video-stats {
+  display: flex;
+  gap: 20px;
+  color: var(--text-muted);
+}
+
+.video-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-like,
+.btn-share {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-like {
+  background-color: var(--primary-color);
+  color: var(--text-white);
+}
+
+.btn-like:hover {
+  background-color: var(--secondary-color);
+}
+
+.btn-share {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btn-share:hover {
+  background-color: var(--border-primary);
+}
+
+.video-list {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.video-list h3 {
+  margin-bottom: 15px;
+  color: var(--text-primary);
+}
+
+.video-item {
+  display: flex;
+  gap: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.video-item:hover {
+  background-color: var(--bg-secondary);
+}
+
+.video-item:last-child {
+  border-bottom: none;
+}
+
+.video-thumbnail {
+  width: 120px;
+  height: 67px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.video-item-info {
+  flex: 1;
+}
+
+.video-item-title {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--text-primary);
+}
+
+.video-item-duration {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .video-container {
+    padding: 10px;
+  }
+
+  .video-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .video-stats {
+    gap: 15px;
+  }
+
+  .video-item {
+    flex-direction: column;
+  }
+
+  .video-thumbnail {
+    width: 100%;
+    height: 150px;
+  }
 }
 </style>

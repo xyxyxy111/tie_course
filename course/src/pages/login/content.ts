@@ -9,9 +9,7 @@ import type {
   LoginByPasswordParams,
   RegisterParams,
   UserProfile,
-  ChangePhoneParams,
-  ChangePasswordParams
-} from '@/types/user';
+} from '@/api/user';
 import { ref, reactive } from 'vue';
 import { getValidToken } from '@/utils/request';
 
@@ -86,76 +84,16 @@ const checkPhoneAvailability = async () => {
   }
 };
 
-// 6. 修改手机号
-const handleChangePhone = async () => {
-  const params: ChangePhoneParams = {
-    phone: '13800138000',
-    newPhone: '13900139000',
-    captcha: '654321'
-  };
-
-  try {
-    await userApi.changePhone(params);
-    console.log('手机号修改成功');
-  } catch (error) {
-    console.error('修改失败:', error);
-  }
-};
-
-// 7. 修改密码
-const handleChangePassword = async () => {
-  const params: ChangePasswordParams = {
-    oldPassword: 'oldPassword123',
-    newPassword: 'newPassword456'
-  };
-
-  try {
-    await userApi.changePassword(params);
-    console.log('密码修改成功');
-  } catch (error) {
-    console.error('修改失败:', error);
-  }
-};
-
-// 8. 获取个人资料
-const fetchProfile = async () => {
-  try {
-    const response = await profileApi.getProfile();
-    console.log('个人资料:', response.data);
-  } catch (error) {
-    console.error('获取资料失败:', error);
-  }
-};
-
-// 9. 更新个人资料
-const updateUserProfile = async () => {
-  const params: UserProfile = {
-    username: 'newUsername',
-    avatarUrl: 'https://example.com/avatar.jpg',
-    allowEmailNotify: true
-  };
-
-  try {
-    await profileApi.updateProfile(params);
-    console.log('资料更新成功');
-  } catch (error) {
-    console.error('更新失败:', error);
-  }
-};
-
-// 共享的响应式数据
 const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
 
-// 登录表单数据
 const loginForm = reactive({
   email: '',
   password: '',
   rememberMe: false
 });
 
-// 注册表单数据
 const registerForm = reactive({
   email: '',
   password: '',
@@ -170,7 +108,6 @@ const wechatQrCode = ref<string>('');
 const wechatLoginStatus = ref<'waiting' | 'scanning' | 'success' | 'expired'>('waiting');
 const wechatPollingInterval = ref<number | null>(null);
 
-// 共享的登录逻辑
 export const useLoginData = () => {
   // 密码登录
   const handlePasswordLogin = async () => {
@@ -184,14 +121,14 @@ export const useLoginData = () => {
     success.value = null;
 
     try {
-      const response = await userApi.login({
-        email: loginForm.email,
+      const response = await authApi.loginByPassword({
+        phone: loginForm.email,
         password: loginForm.password
       });
 
-      if (response.code === 200) {
+      if (response.data) {
         // 保存token
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data);
         if (loginForm.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         }
@@ -214,55 +151,6 @@ export const useLoginData = () => {
     }
   };
 
-  // 注册
-  const handleRegister = async () => {
-    if (!registerForm.email || !registerForm.password || !registerForm.confirmPassword || !registerForm.username) {
-      error.value = '请填写所有必填字段';
-      return;
-    }
-
-    if (registerForm.password !== registerForm.confirmPassword) {
-      error.value = '两次输入的密码不一致';
-      return;
-    }
-
-    if (!registerForm.agreeToTerms) {
-      error.value = '请同意用户协议和隐私政策';
-      return;
-    }
-
-    loading.value = true;
-    error.value = null;
-    success.value = null;
-
-    try {
-      const response = await userApi.register({
-        email: registerForm.email,
-        password: registerForm.password,
-        username: registerForm.username
-      });
-
-      if (response.code === 200) {
-        success.value = '注册成功！请登录';
-        // 清空注册表单
-        Object.assign(registerForm, {
-          email: '',
-          password: '',
-          confirmPassword: '',
-          username: '',
-          agreeToTerms: false
-        });
-      } else {
-        error.value = response.message || '注册失败';
-      }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || '注册失败，请检查网络连接';
-      console.error('注册失败:', err);
-    } finally {
-      loading.value = false;
-    }
-  };
-
   // 微信登录
   const handleWechatLogin = async () => {
     showWechatLogin.value = true;
@@ -270,10 +158,10 @@ export const useLoginData = () => {
 
     try {
       // 获取微信登录二维码
-      const response = await userApi.getWechatQrCode();
-      if (response.code === 200) {
-        wechatQrCode.value = response.data.qrCodeUrl;
-        startWechatPolling(response.data.qrCodeId);
+      const response = await authApi.getWxLoginQrcode();
+      if (response.data) {
+        // wechatQrCode.value = response.data.qrCodeUrl;
+        // startWechatPolling(response.data.qrCodeId);
       } else {
         error.value = '获取微信登录二维码失败';
         showWechatLogin.value = false;
@@ -283,72 +171,6 @@ export const useLoginData = () => {
       showWechatLogin.value = false;
       console.error('获取微信二维码失败:', err);
     }
-  };
-
-  // 开始轮询微信登录状态
-  const startWechatPolling = (qrCodeId: string) => {
-    wechatPollingInterval.value = window.setInterval(async () => {
-      try {
-        const response = await userApi.checkWechatLoginStatus(qrCodeId);
-        if (response.code === 200) {
-          const status = response.data.status;
-
-          if (status === 'SCANNED') {
-            wechatLoginStatus.value = 'scanning';
-          } else if (status === 'CONFIRMED') {
-            wechatLoginStatus.value = 'success';
-            clearWechatPolling();
-
-            // 保存token
-            localStorage.setItem('token', response.data.token);
-            success.value = '微信登录成功！';
-
-            // 跳转到首页或之前的页面
-            const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
-            setTimeout(() => {
-              window.location.href = redirectUrl;
-            }, 1000);
-          } else if (status === 'EXPIRED') {
-            wechatLoginStatus.value = 'expired';
-            clearWechatPolling();
-          }
-        }
-      } catch (err) {
-        console.error('检查微信登录状态失败:', err);
-      }
-    }, 2000); // 每2秒检查一次
-  };
-
-  // 清除微信登录轮询
-  const clearWechatPolling = () => {
-    if (wechatPollingInterval.value) {
-      clearInterval(wechatPollingInterval.value);
-      wechatPollingInterval.value = null;
-    }
-  };
-
-  // 关闭微信登录弹窗
-  const closeWechatLogin = () => {
-    showWechatLogin.value = false;
-    clearWechatPolling();
-    wechatLoginStatus.value = 'waiting';
-    wechatQrCode.value = '';
-  };
-
-  // 刷新微信二维码
-  const refreshWechatQrCode = async () => {
-    closeWechatLogin();
-    await handleWechatLogin();
-  };
-
-  // 清空错误信息
-  const clearError = () => {
-    error.value = null;
-  };
-
-  // 清空成功信息
-  const clearSuccess = () => {
-    success.value = null;
   };
 
   // 检查是否已登录
@@ -377,10 +199,6 @@ export const useLoginData = () => {
     handlePasswordLogin,
     handleRegister,
     handleWechatLogin,
-    closeWechatLogin,
-    refreshWechatQrCode,
-    clearError,
-    clearSuccess,
     isLoggedIn,
     redirectIfLoggedIn
   };

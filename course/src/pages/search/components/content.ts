@@ -95,9 +95,9 @@ export const useSearchData = () => {
       } else {
         // 使用原有的搜索接口
         res = await searchCourseByMessage(currentPage.value, pageSize.value, searchKeyword.value);
-        const data = res.data as { records: CourseListVO[]; total: number };
-        console.log("data" + data);
-        searchResults.value = data?.records || [];
+      const data = res.data as { records: CourseListVO[]; total: number };
+      console.log("data" + data);
+      searchResults.value = data?.records || [];
         // 计算总页数：总条目数除以每页大小，向上取整
         totalPages.value = Math.ceil((data?.total || 0) / pageSize.value);
         total.value = data?.total || 0;

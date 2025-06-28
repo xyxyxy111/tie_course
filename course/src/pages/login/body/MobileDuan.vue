@@ -27,10 +27,6 @@ const {
   handlePasswordLogin,
   handleRegister,
   handleWechatLogin,
-  closeWechatLogin,
-  refreshWechatQrCode,
-  clearError,
-  clearSuccess,
   isLoggedIn,
   redirectIfLoggedIn
 } = useLoginData();
@@ -76,10 +72,6 @@ const switchLoginMethod = () => {
   // 清空表单数据
   loginForm.email = '';
   loginForm.password = '';
-  // 重置登录状态
-  clearError();
-  clearSuccess();
-  // 重置验证码按钮
   captchaBtn.value = {
     text: '发送验证码',
     disabled: false,

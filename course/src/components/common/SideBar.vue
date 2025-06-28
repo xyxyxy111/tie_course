@@ -74,59 +74,9 @@
 
 <script setup lang="ts">
 import { watch, ref, onMounted } from 'vue'
-import { goToLogin, goToMyInfo } from './header.ts';
-import { goToLearning } from './header.ts';
+import { goToLogin, goToMyInfo, goToLearning, goToWishlist, categoryList, expandedCategory, toggleCategory, goToCategory, fetchCategories } from './header.ts';
 import type { CategoryList } from '@/api/course.ts';
 import { categoryApi } from '@/api/course.ts';
-
-// 响应式数据
-const categoryList = ref<CategoryList[]>([]);
-const expandedCategory = ref<number | null>(null);
-
-// 获取categories数据
-const fetchCategories = async () => {
-  try {
-    const categoriesResponse = await categoryApi.getAllCategories();
-    categoryList.value = categoriesResponse.data;
-
-    // 为每个category获取对应的tags
-    for (const category of categoryList.value) {
-      if (category.categoryId) {
-        const tagsResponse = await categoryApi.getTagListByCategoryId(category.categoryId);
-        category.tags = tagsResponse.data;
-      }
-    }
-  } catch (error) {
-    console.error('获取categories失败:', error);
-  }
-};
-
-// 切换category展开状态
-const toggleCategory = (categoryId: number) => {
-  if (expandedCategory.value === categoryId) {
-    expandedCategory.value = null;
-  } else {
-    expandedCategory.value = categoryId;
-  }
-};
-
-// 跳转到search页面
-const goToCategory = (categoryId: number, tagId?: number) => {
-  const params = new URLSearchParams();
-  if (categoryId) {
-    params.set('categoryId', categoryId.toString());
-  }
-  if (tagId) {
-    params.set('tagId', tagId.toString());
-  }
-  const url = `/search.html?${params.toString()}`;
-  window.location.href = url;
-};
-
-// 跳转到心愿单
-const goToWishlist = () => {
-  window.location.href = "/learning.html#/learning/wishlist";
-};
 
 const props = defineProps({
   isOpen: Boolean,
@@ -171,7 +121,6 @@ watch(() => props.isOpen, (open) => {
   open ? emit('open') : emit('close')
 })
 
-// 组件挂载时获取categories数据
 onMounted(() => {
   fetchCategories();
 });
@@ -201,6 +150,7 @@ onMounted(() => {
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
+
 }
 
 .sidebar-left {
@@ -224,18 +174,15 @@ onMounted(() => {
 .sidebar-body {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-}
-
-.sidebar-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebar-body ul {
   list-style: none;
   padding-left: 0px;
-  border-bottom: 0.5px rgb(22, 92, 145) solid;
+  border-bottom: 0.5px var(--primary-color) solid;
 }
 
 .sidebar-body li {
@@ -246,7 +193,7 @@ onMounted(() => {
   font-weight: 700;
   font-size: 18px;
   padding: 15px 0 0px 20px;
-  color: #35495e;
+  color: var(--text-primary);
 }
 
 /* 用户状态区域样式 */
@@ -260,7 +207,7 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
+  background: var(--primary-gradient);
   color: white;
   border-radius: 8px;
   font-weight: 600;
@@ -268,9 +215,9 @@ onMounted(() => {
 }
 
 .login-section:hover {
-  background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
+  background: var(--primary-gradient-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 12px var(--primary-color-medium);
 }
 
 .user-info {
@@ -290,18 +237,18 @@ onMounted(() => {
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-primary);
   transition: all 0.3s ease;
 }
 
 .user-avatar:hover {
-  border-color: #165c91;
+  border-color: var(--primary-color-hex);
   transform: scale(1.05);
 }
 
 .user-id {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 16px;
 }
 
@@ -319,8 +266,8 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 10px 15px;
-  background: #f8f9fa;
-  color: #495057;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   border-radius: 6px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -329,11 +276,10 @@ onMounted(() => {
 }
 
 .action-item:hover {
-  background: rgba(22, 92, 145, 0.1);
-  color: #165c91;
+  background: var(--primary-color-light);
+  color: var(--primary-color-hex);
   transform: translateX(5px);
 }
-
 
 .category-btn {
   width: 100%;
@@ -343,18 +289,18 @@ onMounted(() => {
   background: none;
   text-align: left;
   cursor: pointer;
-  color: #35495e;
+  color: var(--text-primary);
   transition: all 0.2s linear;
 }
 
 .category-btn:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: var(--primary-color-light);
 }
 
 .category-btn.active {
   font-weight: 600;
-  color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  color: var(--primary-color);
+  background-color: var(--primary-color-light);
 }
 
 /* Tags列表样式 */
@@ -382,7 +328,7 @@ onMounted(() => {
   margin: 0;
   font-size: 14px;
   padding: 6px 10px;
-  color: #35495e;
+  color: var(--text-primary);
   border: none;
   text-align: left;
   transition: all 0.2s;
@@ -391,13 +337,13 @@ onMounted(() => {
 }
 
 .tag-btn:hover {
-  background-color: rgba(22, 92, 145, 0.1);
-  color: #165c91;
+  background-color: var(--primary-color-light);
+  color: var(--primary-color-hex);
 }
 
 .tag-btn.active {
-  background: rgb(22, 92, 145);
-  color: #fff;
+  background: var(--primary-color);
+  color: var(--text-white);
 }
 
 /* 过渡动画 */
@@ -412,9 +358,9 @@ onMounted(() => {
 }
 
 .tags-row {
-  background: #f6f8fa;
+  background: var(--bg-secondary);
   padding: 8px 0 8px 0;
-  border-left: 3px solid #165c91;
+  border-left: 3px solid var(--primary-color-hex);
   border-radius: 0 6px 6px 0;
 }
 
@@ -427,18 +373,24 @@ onMounted(() => {
 
 .tag-btn {
   font-size: 14px;
-  padding: 6px 16px;
-  color: #35495e;
-  border: none;
-  background: #e9eef5;
-  border-radius: 16px;
+  padding: 4px 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.tag-btn:hover,
+.tag-btn:hover {
+  background: var(--primary-color-light);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
 .tag-btn.active {
-  background: #165c91;
-  color: #fff;
+  background: var(--primary-color);
+  color: var(--text-white);
+  border-color: var(--primary-color);
 }
 </style>

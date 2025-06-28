@@ -1,9 +1,15 @@
- @import './base.css';
+@import './base.css';
+@import './colors.css';
 
- a{
+a {
   text-decoration: none;
-  color: rgb(22,92,145);
- }
+  color: var(--primary-color);
+}
+
+a:hover {
+  color: var(--secondary-color);
+}
+
 /* 
 #app {
   max-width: 1280px;

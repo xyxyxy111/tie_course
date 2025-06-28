@@ -78,11 +78,11 @@
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import IconSprite from '../Icon/IconSprite.vue';
+import IconSprite from '../Icon/IconSprite.vue'
 import './header.css'
-import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin, goToLearning, goToCourse } from './header.ts';
+import { goToLogin, goToMyInfo, goToLearning, goToWishlist, categoryList, expandedCategory, toggleCategory, goToCategory, fetchCategories, goToIndex, goToCart, Search ,searchQuery} from './header.ts';
 import type { CategoryList } from '@/api/course.ts';
-import { categoryApi } from '@/api/course.ts';
+import { categoryApi } from '@/api/course'
 
 const exploreHoverFlag = ref(false)
 const hoveredCategory = ref<any>(null)
@@ -92,7 +92,7 @@ let categoryHideTimer: number | null = null
 let tagsHideTimer: number | null = null
 
 
-const categoryList = ref<CategoryList[]>([]);
+
 onMounted(async () => {
   const categoriesResponse = await categoryApi.getAllCategories();
   categoryList.value = categoriesResponse.data;
@@ -151,11 +151,6 @@ const handleTagsLeave = () => {
   }, 300) // 300ms延迟
 }
 
-// 跳转到分类页面
-const goToCategory = (categoryId: number, tagId?: number) => {
-  const params = tagId ? `?category=${categoryId}&tag=${tagId}` : `?category=${categoryId}`
-  window.location.href = `/course.html${params}`
-}
 
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 200) / 2800));
@@ -191,9 +186,6 @@ const headerButtonStyle2 = computed(() => ({
 }));
 
 
-const goToWishlist = () => {
-  window.location.href = "/learning.html#/learning/wishlist";
-};
 
 defineProps<{
   userId: string | null
