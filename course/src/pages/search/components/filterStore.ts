@@ -69,6 +69,25 @@ export const useFilterStore = defineStore('filter', () => {
     selectedTag.value = tag.value
   }
 
+  // 根据URL参数初始化选中的category和tag
+  const initializeFromURL = async (categoryId?: number, tagId?: number) => {
+    if (categoryId) {
+      // 找到对应的category并选中
+      const category = categories.value.find(cat => cat.value === categoryId)
+      if (category) {
+        await selectCategory(category)
+
+        // 如果有tagId，也选中对应的tag
+        if (tagId) {
+          const tag = tags.value.find(t => t.value === tagId)
+          if (tag) {
+            selectTag(tag)
+          }
+        }
+      }
+    }
+  }
+
   return {
     // 状态
     sortBy,
@@ -89,6 +108,7 @@ export const useFilterStore = defineStore('filter', () => {
     fetchCategories,
     fetchTagsByCategory,
     selectCategory,
-    selectTag
+    selectTag,
+    initializeFromURL
   }
 })

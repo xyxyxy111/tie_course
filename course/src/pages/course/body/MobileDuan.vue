@@ -146,9 +146,9 @@ const handleGift = () => {
         <div class="video-pictrue">
           <img :src="courseVo?.coverImgUrl || '/src/images/image1.png'" alt="">
         </div>
-        <span class="current-price">{{ courseVo?.currentPrice ? 'US$' + courseVo.currentPrice : 'US$13.99'
+        <span class="current-price">{{ courseVo?.currentPrice ? '¥' + courseVo.currentPrice : '¥13.99'
           }}</span>
-        <span class="original-price">{{ courseVo?.originalPrice ? 'US$' + courseVo.originalPrice : 'US$94.99'
+        <span class="original-price">{{ courseVo?.originalPrice ? '¥' + courseVo.originalPrice : '¥94.99'
           }}</span>
         <span class="discount">85% 折扣</span>
         <div class="time-left">此优惠价格仅剩1天！</div>

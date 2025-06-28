@@ -8,6 +8,7 @@ import { useFilterStore } from '../components/filterStore'
 import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
+import { cartApi } from '@/api/cart';
 
 // 导入共享的数据和逻辑
 import { useSearchData, searchSortOptions, priceRanges } from '../components/content';
@@ -61,9 +62,28 @@ watch(
   { deep: true }
 )
 
-const addToCart = (courseId: number) => {
-  // TODO: 调用购物车接口
-  alert('加入购物车: ' + courseId);
+const addToCart = async (courseId: number) => {
+  try {
+    const response = await cartApi.addCourseToCart(courseId);
+    if (response.status === 1302) {
+      alert('添加至购物车成功！');
+    } else if (response.status === 2301) {
+      alert('该课程已在购物车中');
+    } else {
+      alert('添加至购物车失败，请重试');
+    }
+  } catch (error) {
+    console.error('添加至购物车失败:', error);
+    alert('添加至购物车失败，请重试');
+  }
+};
+
+// 计算总条目数
+const total = computed(() => totalPages.value * pageSize.value);
+
+// 处理分页变化
+const handleCurrentChange = (page: number) => {
+  handlePageChange(page);
 };
 
 // 侧边栏控制逻辑
@@ -114,16 +134,22 @@ const handleBackdropClick = () => {
             <div class="course-details">
               <div class="course-title">{{ course.title }}</div>
               <div class="course-instruction">By {{ course.categoryName }}</div>
-              <p class="price">{{ formatPrice(course.originalPrice) }}</p>
-              <button class="arrToCartBtn" @click="addToCart(course.courseId)">Add to Cart</button>
+            </div>
+            <div class="course-price">
+              <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
+              <button class="arrToCartBtn" @click="addToCart(course.courseId)">添加至购物车</button>
             </div>
           </div>
+          <div v-if="searchResults.length > 0" class="pagination-container">
+            <button @click="handleCurrentChange(currentPage - 1)" :disabled="currentPage <= 1">上一页</button>
+            <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
+            <button @click="handleCurrentChange(currentPage + 1)" :disabled="currentPage >= totalPages">下一页</button>
+          </div>
+          <div v-else-if="!searchResults.length && !loading" style="text-align:center;color:#888;">暂无课程</div>
+
         </div>
-        <div v-if="totalPages > currentPage && !loading" style="text-align:center;margin:20px 0;">
-          <button @click="handlePageChange(currentPage + 1)" :disabled="loading">{{ loading ? '加载中...' : '加载更多'
-          }}</button>
-        </div>
-        <div v-else-if="!searchResults.length && !loading" style="text-align:center;color:#888;">暂无课程</div>
+
+
       </div>
     </div>
     <div class="sidebar-system">
@@ -142,6 +168,7 @@ const handleBackdropClick = () => {
 <style scoped>
 .search-result-container {
   margin: 0 auto;
+  width: 100%;
 }
 
 .search-result-container .title {
@@ -155,6 +182,11 @@ const handleBackdropClick = () => {
   max-width: 1000px;
 }
 
+.search-result-container .content .search-result {
+  width: 100%;
+  max-width: 1000px;
+}
+
 .search-result-container .image-container {
   margin-right: 20px;
   display: flex;
@@ -162,8 +194,8 @@ const handleBackdropClick = () => {
 }
 
 .search-result-container .image-container img {
-  width: 240px;
-  height: 140px;
+  width: 180px;
+  height: 100px;
 }
 
 .search-result-container .course-details {
@@ -172,14 +204,38 @@ const handleBackdropClick = () => {
   justify-content: space-between;
 }
 
+.course-price {
+  position: absolute;
+  top: 20px;
+  right: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+}
+
+.search-result-container .price {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgb(22, 92, 145);
+  text-align: right;
+  display: block;
+}
+
+.search-result-container .arrToCartBtn {
+  position: absolute;
+  top: 55px;
+  right: 0px;
+}
+
 .search-result-container button {
   width: fit-content;
   margin-top: 10px;
   padding: 10px;
   border: none;
   height: 42px;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 400;
   white-space: nowrap;
   color: rgb(22, 92, 145);
   background-color: white;
@@ -224,5 +280,34 @@ const handleBackdropClick = () => {
   z-index: 1000;
   /* 在侧边栏下方 */
   pointer-events: auto;
+}
+
+.pagination-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  padding: 10px 0;
+  gap: 10px;
+}
+
+.pagination-container button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-container button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-container span {
+  margin: 0 10px;
+  color: #666;
 }
 </style>

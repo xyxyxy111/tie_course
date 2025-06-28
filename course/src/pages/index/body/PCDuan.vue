@@ -11,7 +11,7 @@ import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { useIndexData } from '../components/content.ts';
-import {  communityVoices} from '../components/content.ts';
+import { communityVoices } from '../components/content.ts';
 
 const { width, height } = useWindowSize()
 
@@ -94,7 +94,7 @@ function handleCourseAdded(event: any) {
                   {{ courseQuickView.score }} ★★★★ (2,187)
                 </div>
                 <div class="course-price">
-                  US${{ courseQuickView.originalPrice.toFixed(2) }}
+                  ¥{{ courseQuickView.originalPrice.toFixed(2) }}
                 </div>
               </div>
               <div class="popup-trigger-area"></div>

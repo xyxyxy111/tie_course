@@ -195,7 +195,7 @@ export const useOrderUtils = () => {
 
   // 格式化价格
   const formatPrice = (price: number) => {
-    return `US$${price.toFixed(2)}`;
+    return `¥${price.toFixed(2)}`;
   };
 
   // 格式化时间

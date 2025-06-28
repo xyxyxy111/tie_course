@@ -205,7 +205,7 @@ const recommendedProducts: Product[] = [
     rating: '4.6',
     reviewCount: '889',
     isPopular: true,
-    price: 'US$69.99'
+    price: '¥69.99'
   },
   {
     id: 2,
@@ -215,7 +215,7 @@ const recommendedProducts: Product[] = [
     rating: '4.7',
     reviewCount: '2,187',
     isPopular: true,
-    price: 'US$74.99'
+    price: '¥74.99'
   },
   {
     id: 3,
@@ -225,7 +225,7 @@ const recommendedProducts: Product[] = [
     rating: '4.8',
     reviewCount: '2,040',
     isPopular: true,
-    price: 'US$59.99'
+    price: '¥59.99'
   }
 ];
 

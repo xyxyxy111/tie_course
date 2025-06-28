@@ -5,7 +5,9 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
 import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
+import { ElPagination } from 'element-plus'
 import '../search.css'
+import { cartApi } from '@/api/cart';
 
 // 导入共享的数据和逻辑
 import { useSearchData } from '../components/content';
@@ -41,7 +43,6 @@ const {
 
 onMounted(async () => {
   await initializeData();
-  console.log('onMounted后searchResults:', searchResults.value);
 });
 
 const SearchResultWidth = computed(() => {
@@ -57,6 +58,30 @@ const SearchResultCourseTitleStyle = computed(() => ({
   width: `calc( 200px + 1px * ${SearchResultWidth.value})`
 }));
 
+// 计算总条目数
+const total = computed(() => totalPages.value * pageSize.value);
+
+// 处理分页变化
+const handleCurrentChange = (page: number) => {
+  handlePageChange(page);
+};
+
+// 添加至购物车
+const addToCart = async (courseId: number) => {
+  try {
+    const response = await cartApi.addCourseToCart(courseId);
+    if (response.status === 1302) {
+      alert('添加至购物车成功！');
+    } else if (response.status === 2301) {
+      alert('该课程已在购物车中');
+    } else {
+      alert('添加至购物车失败，请重试');
+    }
+  } catch (error) {
+    console.error('添加至购物车失败:', error);
+    alert('添加至购物车失败，请重试');
+  }
+};
 </script>
 
 <template>
@@ -77,20 +102,21 @@ const SearchResultCourseTitleStyle = computed(() => ({
           </div>
           <div class="course-price">
             <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
-            <button class="arrToCartBtn">Add to Cart</button>
+            <button class="arrToCartBtn" @click="addToCart(course.courseId)">添加至购物车</button>
           </div>
         </div>
-        <div class="pagination">
-          <button @click="handlePageChange(currentPage - 1)" :disabled="currentPage === 1">上一页</button>
-          <span>第{{ currentPage }}页 / 共{{ totalPages }}页</span>
-          <button @click="handlePageChange(currentPage + 1)" :disabled="currentPage === totalPages">下一页</button>
+
+        <!-- Element Plus 分页组件 -->
+        <div class="pagination-container">
+          <el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="total"
+            :page-sizes="[12, 24, 36, 48]" layout="total, sizes, prev, pager, next, jumper"
+            @current-change="handleCurrentChange" @size-change="(size) => { pageSize = size; handlePageChange(1); }"
+            background hide-on-single-page />
         </div>
       </div>
     </div>
 
   </div>
-
-  <div style="color:red;">DEBUG: {{ searchResults }}</div>
 
 </template>
 
@@ -122,13 +148,11 @@ const SearchResultCourseTitleStyle = computed(() => ({
 }
 
 .search-result .course-item button {
-  margin-top: 80px;
   width: fit-content;
-  height: 42px;
-  padding: 10px;
+  height: 40px;
   border: none;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 400;
   white-space: nowrap;
   color: rgb(22, 92, 145);
   background-color: white;
@@ -147,31 +171,12 @@ const SearchResultCourseTitleStyle = computed(() => ({
   font-weight: 600;
 }
 
-.pagination {
+.pagination-container {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
   margin-top: 24px;
-}
-
-.pagination button {
-  background: #165c91;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 6px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  white-space: nowrap;
-  width: fit-content;
-  transition: background 0.2s;
-}
-
-.pagination button:disabled {
-  background: #eee;
-  color: #aaa;
-  cursor: not-allowed;
+  padding: 20px 0;
 }
 </style>

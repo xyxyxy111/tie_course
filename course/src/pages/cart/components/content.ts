@@ -154,7 +154,7 @@ export function useCartLogic() {
 export const useCartUtils = () => {
   // 格式化价格
   const formatPrice = (price: number) => {
-    return `US$${price.toFixed(2)}`;
+    return `¥${price.toFixed(2)}`;
   };
 
   // 格式化折扣百分比

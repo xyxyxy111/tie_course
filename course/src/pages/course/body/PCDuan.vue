@@ -101,13 +101,42 @@ const CourseDescriptionStyle = computed(() => ({
   height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
 }));
 
+const handleAddToCart = async () => {
+  try {
+    // 从URL获取courseId
+    const searchParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(searchParams.get('courseId') || '0');
+
+    if (!courseId) {
+      alert('课程ID无效');
+      return;
+    }
+
+    // 调用购物车API
+    const { cartApi } = await import('@/api/cart');
+    const response = await cartApi.addCourseToCart(courseId);
+
+    if (response.status === 1302) {
+      alert('添加至购物车成功！');
+      showCart.value = true;
+    } else if (response.status === 2301) {
+      alert('该课程已在购物车中');
+    } else {
+      alert('添加至购物车失败，请重试');
+    }
+  } catch (error) {
+    console.error('添加至购物车失败:', error);
+    alert('添加至购物车失败，请重试');
+  }
+};
+
 </script>
 
 <template>
   <IconSprite />
   <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
   <PCHeader :userId="userId" />
-  <FloatingBox @addToCart="showCart = true" />
+  <FloatingBox @addToCart="handleAddToCart" />
   <div id="top-container">
     <div class="content">
       <div class="course-theme">

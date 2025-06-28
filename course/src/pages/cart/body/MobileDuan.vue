@@ -148,7 +148,7 @@ const removeFromCart = async (courseId: number) => {
             <!-- 内容区域 -->
             <div class="course-content-section">
               <h2 class="course-title">{{ course.courseName }}</h2>
-              <div class="course-price">${{ course.currentPrice }}</div>
+              <div class="course-price">¥{{ course.currentPrice }}</div>
             </div>
 
             <!-- 按钮区域 -->
@@ -178,11 +178,11 @@ const removeFromCart = async (courseId: number) => {
           </div>
           <div class="summary-item">
             <span>小计:</span>
-            <span class="subtotal">US${{ totalPrice.toFixed(2) }}</span>
+            <span class="subtotal">¥{{ totalPrice.toFixed(2) }}</span>
           </div>
           <div class="summary-item total-row">
             <span>总计:</span>
-            <span class="total-price">US${{ totalPrice.toFixed(2) }}</span>
+            <span class="total-price">¥{{ totalPrice.toFixed(2) }}</span>
           </div>
           <button class="checkout-btn" @click="goToCheckout">去结算</button>
         </div>

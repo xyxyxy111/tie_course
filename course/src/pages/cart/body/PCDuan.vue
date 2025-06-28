@@ -144,7 +144,7 @@ const handleClearCart = async () => {
                 <div class="course-info">
                   <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
                   <p class="course-instructor" :style="CourseInstructorStyle()">讲师信息</p>
-                  <div class="course-price">US${{ item.currentPrice.toFixed(2) }}</div>
+                  <div class="course-price">¥{{ item.currentPrice.toFixed(2) }}</div>
                 </div>
                 <div class="course-actions">
                   <button class="wishlist-btn" @click="addToWishlist(item.courseId)">
@@ -172,11 +172,11 @@ const handleClearCart = async () => {
               </div>
               <div class="summary-item">
                 <span>小计:</span>
-                <span class="subtotal">US${{ totalPrice.toFixed(2) }}</span>
+                <span class="subtotal">¥{{ totalPrice.toFixed(2) }}</span>
               </div>
               <div class="summary-item total-row">
                 <span>总计:</span>
-                <span class="total-price">US${{ totalPrice.toFixed(2) }}</span>
+                <span class="total-price">¥{{ totalPrice.toFixed(2) }}</span>
               </div>
               <button class="checkout-btn" @click="goToCheckout">去结算</button>
 
@@ -566,5 +566,4 @@ const handleClearCart = async () => {
     width: 60px;
   }
 }
-
 </style>

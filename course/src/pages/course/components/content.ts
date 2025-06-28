@@ -20,9 +20,34 @@ function useCart() {
   const showCart = ref(false);
   const cartTitle = ref('');
 
-  const addToCart = (course: string) => {
-    cartTitle.value = course;
-    showCart.value = true;
+  const addToCart = async (course: string) => {
+    try {
+      // 从URL获取courseId
+      const searchParams = new URLSearchParams(window.location.search);
+      const courseId = parseInt(searchParams.get('courseId') || '0');
+
+      if (!courseId) {
+        alert('课程ID无效');
+        return;
+      }
+
+      // 调用购物车API
+      const { cartApi } = await import('@/api/cart');
+      const response = await cartApi.addCourseToCart(courseId);
+
+      if (response.status === 1302) {
+        alert('添加至购物车成功！');
+        cartTitle.value = course;
+        showCart.value = true;
+      } else if (response.status === 2301) {
+        alert('该课程已在购物车中');
+      } else {
+        alert('添加至购物车失败，请重试');
+      }
+    } catch (error) {
+      console.error('添加至购物车失败:', error);
+      alert('添加至购物车失败，请重试');
+    }
   };
 
   const goToCheckout = (courseVideo: string, currentPrice: number) => {
@@ -47,28 +72,6 @@ function useCart() {
     goToCheckout
   };
 }
-
-// 相关主题数据
-const otherThemes = [
-  { title: '主题1', url: 'url1' },
-  { title: '主题2', url: 'url2' },
-  { title: '主题1', url: 'url1' },
-  { title: '主题2', url: 'url2' },
-];
-
-// 课程大纲数据
-const courseCurriculums = [
-  { title: '第一章：入门基础', lectures: 5, duration: 120 },
-  { title: '第二章：核心概念', lectures: 8, duration: 180 },
-  { title: '第三章：实战项目', lectures: 10, duration: 240 },
-  { title: '第四章：高级技巧', lectures: 6, duration: 150 },
-  { title: '第五章：性能优化', lectures: 7, duration: 165 },
-  { title: '第六章：测试与调试', lectures: 4, duration: 90 },
-  { title: '第七章：部署上线', lectures: 3, duration: 60 },
-  { title: '第八章：安全防护', lectures: 5, duration: 120 },
-  { title: '第九章：扩展学习', lectures: 9, duration: 210 },
-  { title: '第十章：总结回顾', lectures: 2, duration: 45 }
-];
 
 // 评论数据
 const Comments = [
@@ -142,7 +145,7 @@ const recommendedProducts = [
     coverImgUrl: '/src/images/python-course.jpg',
     rating: 4.8,
     reviewCount: 1245,
-    price: 'US$89.99'
+    price: '¥89.99'
   },
   {
     id: 2,
@@ -150,7 +153,7 @@ const recommendedProducts = [
     coverImgUrl: '/src/images/ml-course.jpg',
     rating: 4.9,
     reviewCount: 987,
-    price: 'US$99.99'
+    price: '¥99.99'
   },
   {
     id: 3,
@@ -158,7 +161,7 @@ const recommendedProducts = [
     coverImgUrl: '/src/images/web-course.jpg',
     rating: 4.7,
     reviewCount: 1567,
-    price: 'US$79.99'
+    price: '¥79.99'
   }
 ];
 
@@ -174,8 +177,6 @@ const relatedTopics = [
 export {
   useCourseDescription,
   useCart,
-  otherThemes,
-  courseCurriculums,
   Comments,
   recommendedProducts,
   relatedTopics

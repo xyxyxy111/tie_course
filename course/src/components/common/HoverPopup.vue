@@ -16,31 +16,32 @@
         <!-- 否则显示默认的课程信息 -->
         <template v-else>
 
-<div class="course-info">          <!-- 课程标题 -->
-          <div class="course-title">{{ courseInfo?.title || courseName }}</div>
+          <div class="course-info"> <!-- 课程标题 -->
+            <div class="course-title">{{ courseInfo?.title || courseName }}</div>
 
-          <!-- 课程信息 -->
-          <div>
-            <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
-            <span class="course-duration">
-              总共{{ courseInfo?.duration || '0' }}小时
-            </span>
+            <!-- 课程信息 -->
+            <div>
+              <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
+              <span class="course-duration">
+                总共{{ courseInfo?.duration || '0' }}小时
+              </span>
+            </div>
+
+            <!-- 课程描述 -->
+            <div class="course-description">
+              {{ courseInfo?.description || '课程描述加载中...' }}
+            </div>
+
+            <!-- 学习要点 -->
+            <div class="course-learning-points">
+              <h4>你将学到：</h4>
+              <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
+            </div>
           </div>
-
-          <!-- 课程描述 -->
-          <div class="course-description">
-            {{ courseInfo?.description || '课程描述加载中...' }}
-          </div>
-
-          <!-- 学习要点 -->
-          <div class="course-learning-points">
-            <h4>你将学到：</h4>
-            <p>{{ courseInfo?.whatYouWillLearn || '学习要点加载中...' }}</p>
-          </div></div>
           <!-- 操作按钮 -->
           <div class="popupBtn">
             <button class="addToCartBtn" @click="addToCart" :disabled="loading">
-              {{ loading ? '添加中...' : '添加到购物车' }}
+              {{ loading ? '添加中...' : '添加至购物车' }}
             </button>
             <button class="addToWishlistBtn" @click="addToWishlist">
               <div class="icon">
@@ -158,10 +159,10 @@ export default defineComponent({
 
     // 根据courseName获取课程信息
     const fetchCourseInfo = async () => {
-      if (!props.courseName||!props.courseId) return;
+      if (!props.courseName || !props.courseId) return;
       const courseVoResponse = await courseApi.getSingleCourseDetail((props.courseId!));
       try {
- // 这里可以根据courseName调用API获取课程详细信息
+        // 这里可以根据courseName调用API获取课程详细信息
         // 暂时使用模拟数据
         courseInfo.value = {
           title: courseVoResponse.data.title,
@@ -250,7 +251,7 @@ export default defineComponent({
         let errorMessage = '添加课程到购物车失败';
         let errorType = 'unknown';
 
-      
+
 
         // 触发事件通知父组件
         emit('course-added', {
@@ -523,9 +524,9 @@ export default defineComponent({
 }
 
 /* 课程内容样式 */
-.course-info{
+.course-info {
   width: 100%;
-  margin:0 auto;
+  margin: 0 auto;
   height: 265px;
   overflow: hidden;
 }

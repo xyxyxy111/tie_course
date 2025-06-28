@@ -113,7 +113,7 @@ const CourseBtnStyle = (flag: boolean) => ({
               </div>
             </div>
             <div class="total-section">
-              <p class="total-price">总计： US$204.97</p>
+              <p class="total-price">总计： ¥204.97</p>
               <button class="add-all-btn">全部添加至购物车</button>
             </div>
           </div>
@@ -149,7 +149,7 @@ const CourseBtnStyle = (flag: boolean) => ({
               {{ courseQuickView.score }} ★★★★ (2,187)
             </div>
             <div class="course-price">
-              US${{ courseQuickView.originalPrice.toFixed(2) }}
+              ¥{{ courseQuickView.originalPrice.toFixed(2) }}
             </div>
             <HoverPopup v-model="courseQuickView.hoverFlag" width="270px" height="310px" transition="slide"
               :show-delay="150" :hide-delay="150" class="custom-popup-right">
@@ -173,7 +173,7 @@ const CourseBtnStyle = (flag: boolean) => ({
                   <p>{{ courseQuickView.whatYouWillLearn }}</p>
                 </div>
                 <div class="popupBtn">
-                  <button class="addToCartBtn" @click.stop="addToCart(courseQuickView.title)">添加到购物车</button>
+                  <button class="addToCartBtn" @click.stop="addToCart(courseQuickView.title)">添加至购物车</button>
                   <button class="addToWishlistBtn">
                     <div class="icon">
                       <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
@@ -190,8 +190,7 @@ const CourseBtnStyle = (flag: boolean) => ({
       <div class="title" :style="titleStyle()">Voices across Commnities</div>
       <div class="voice-container container-scroll-x">
         <div class="inContainer">
-          <div v-for="(communityVoice, index) in communityVoices" class="comment"
-            :style="voiceStyle(index)">
+          <div v-for="(communityVoice, index) in communityVoices" class="comment" :style="voiceStyle(index)">
             <div>
               <svg width="70" height="35" viewBox="0 -10 48 48" fill="#35495e">
                 <use href="#raphael--quote" />

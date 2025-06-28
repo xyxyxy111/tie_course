@@ -127,9 +127,9 @@ const handlePayment = () => {
     return;
   }
 
-  console.log(`使用${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付 US$${finalPrice.value.toFixed(2)}`);
+  console.log(`使用${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付 ¥${finalPrice.value.toFixed(2)}`);
   // 这里可以添加实际的支付逻辑
-  alert(`正在跳转到${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付页面...`);
+  alert('支付功能开发中...');
 };
 
 // 组件挂载时加载购物车数据
@@ -168,7 +168,7 @@ onMounted(() => {
           <li v-for="(course, index) in cartCourses" :key="index" class="course-item">
             <img :src="course.image" alt="">
             <span class="title">{{ course.title }}</span>
-            <span class="price">US${{ course.price.toFixed(2) }}</span>
+            <span class="price">¥{{ course.price.toFixed(2) }}</span>
           </li>
         </ul>
       </div>
@@ -181,23 +181,23 @@ onMounted(() => {
         <h3>价格明细</h3>
         <div class="price-item">
           <span>小计:</span>
-          <span>US${{ cartTotal.toFixed(2) }}</span>
+          <span>¥{{ cartTotal.toFixed(2) }}</span>
         </div>
         <div class="price-item" v-if="cartSaved > 0">
           <span>节省:</span>
-          <span class="saved">-US${{ cartSaved.toFixed(2) }}</span>
+          <span class="saved">-¥{{ cartSaved.toFixed(2) }}</span>
         </div>
         <div class="price-item" v-if="discountAmount > 0">
           <span>优惠:</span>
-          <span class="discount">-US${{ discountAmount.toFixed(2) }}</span>
+          <span class="discount">-¥{{ discountAmount.toFixed(2) }}</span>
         </div>
         <div class="price-item total">
           <span>总计:</span>
-          <span class="final-price">US${{ finalPrice.toFixed(2) }}</span>
+          <span class="final-price">¥{{ finalPrice.toFixed(2) }}</span>
         </div>
       </div>
 
-      <button class="pay-button" @click="handlePayment">支付 US${{ finalPrice.toFixed(2) }}</button>
+      <button class="pay-button" @click="handlePayment">支付 ¥{{ finalPrice.toFixed(2) }}</button>
 
       <!-- 优惠券输入 -->
       <div class="coupon-section">

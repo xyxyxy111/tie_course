@@ -38,6 +38,7 @@ export const useSearchData = () => {
       const searchParams = new URLSearchParams(window.location.search);
       const keyword = searchParams.get('keyword');
       const categoryId = searchParams.get('categoryId');
+      const tagId = searchParams.get('tagId');
       const tagIds = searchParams.get('tagIds');
       const page = searchParams.get('page');
 
@@ -49,7 +50,9 @@ export const useSearchData = () => {
         const tagsResponse = await categoryApi.getTagListByCategoryId(selectedCategoryId.value);
         tags.value = tagsResponse.data;
       }
-      if (tagIds) {
+      if (tagId) {
+        selectedTagIds.value = [parseInt(tagId)];
+      } else if (tagIds) {
         selectedTagIds.value = tagIds.split(',').map(id => parseInt(id));
       }
       if (page) {
@@ -69,7 +72,7 @@ export const useSearchData = () => {
     try {
       const res = await searchCourseByMessage(currentPage.value, pageSize.value, searchKeyword.value);
       const data = res.data as { records: CourseListVO[]; total: number };
-      console.log("data"+data);
+      console.log("data" + data);
       searchResults.value = data?.records || [];
       totalPages.value = data?.total || 0;
       updateURLParams();
@@ -88,13 +91,17 @@ export const useSearchData = () => {
     if (selectedCategoryId.value) {
       searchParams.set('categoryId', selectedCategoryId.value.toString());
     }
-    if (selectedTagIds.value.length > 0) {
+    if (selectedTagIds.value.length === 1) {
+      // 如果只有一个tag，使用tagId参数
+      searchParams.set('tagId', selectedTagIds.value[0].toString());
+    } else if (selectedTagIds.value.length > 1) {
+      // 如果有多个tag，使用tagIds参数
       searchParams.set('tagIds', selectedTagIds.value.join(','));
     }
     if (currentPage.value > 1) {
       searchParams.set('page', currentPage.value.toString());
     }
-    
+
     const newURL = `${window.location.pathname}?${searchParams.toString()}`;
     window.history.pushState({}, '', newURL);
   };
@@ -155,7 +162,7 @@ export const useSearchData = () => {
   };
 
   const formatPrice = (price: number) => {
-    return `US$${price.toFixed(2)}`;
+    return `¥${price.toFixed(2)}`;
   };
 
   const formatDuration = (minutes: number) => {

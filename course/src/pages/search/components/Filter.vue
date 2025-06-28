@@ -74,11 +74,17 @@ import { useFilterStore } from './filterStore';
 
 const filterStore = useFilterStore()
 
-onMounted(() => {
-  filterStore.fetchCategories().then(() => {
-  }).catch((error) => {
-    console.error("fetchCategories 调用失败:", error)
-  });
+onMounted(async () => {
+  await filterStore.fetchCategories();
+
+  // 从URL参数初始化选中的category和tag
+  const searchParams = new URLSearchParams(window.location.search);
+  const categoryId = searchParams.get('categoryId');
+  const tagId = searchParams.get('tagId');
+
+  if (categoryId) {
+    await filterStore.initializeFromURL(parseInt(categoryId), tagId ? parseInt(tagId) : undefined);
+  }
 });
 
 // 控制页面滚动
