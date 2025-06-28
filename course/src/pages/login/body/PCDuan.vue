@@ -91,28 +91,114 @@ const switchLoginMethod = () => {
 };
 
 const sendCaptcha = async () => {
-  if (!loginForm.email) {
-    alert('请输入邮箱');
+  if (!formData.value.phone) {
+    alert('请输入手机号');
     return;
   }
   captchaBtn.value.disabled = true;
   try {
-    // TODO: 实现发送验证码逻辑
-    alert('验证码发送功能待实现');
+    const response = await authApi.sendCaptcha(formData.value.phone);
+
+    if (successCodes.includes(response.status)) {
+      // 开始倒计时
+      const timer = setInterval(() => {
+        captchaBtn.value.countdown--;
+        captchaBtn.value.text = `${captchaBtn.value.countdown}s后重新获取`;
+        if (captchaBtn.value.countdown <= 0) {
+          clearInterval(timer);
+          captchaBtn.value = {
+            text: '发送验证码',
+            disabled: false,
+            countdown: 60
+          };
+        }
+      }, 1000);
+    } else {
+      alert(response.message || '发送验证码失败');
+      captchaBtn.value.disabled = false;
+    }
+  } catch (error: any) {
     captchaBtn.value.disabled = false;
-  } catch (error) {
-    captchaBtn.value.disabled = false;
-    alert(error || '发送验证码失败');
+    alert(error.message || '发送验证码失败');
+  }
+};
+
+// 密码登录
+const handleLocalPasswordLogin = async () => {
+  if (!formData.value.phone || !formData.value.password) {
+    alert('请输入手机号和密码');
+    return;
+  }
+
+  loginStatus.value.loading = true;
+  loginStatus.value.error = null;
+
+  try {
+    const response = await authApi.loginByPassword({
+      phone: formData.value.phone,
+      password: formData.value.password
+    });
+
+    if (successCodes.includes(response.status)) {
+      // 保存token
+      localStorage.setItem('token', response.data);
+      loginStatus.value.success = true;
+
+      // 跳转到首页
+      setTimeout(() => {
+        goToIndex();
+      }, 1000);
+    } else {
+      loginStatus.value.error = response.message || '登录失败';
+    }
+  } catch (error: any) {
+    loginStatus.value.error = error.message || '登录失败，请检查网络连接';
+  } finally {
+    loginStatus.value.loading = false;
+  }
+};
+
+// 验证码登录
+const handleCaptchaLogin = async () => {
+  if (!formData.value.phone || !formData.value.captcha) {
+    alert('请输入手机号和验证码');
+    return;
+  }
+
+  loginStatus.value.loading = true;
+  loginStatus.value.error = null;
+
+  try {
+    const response = await authApi.loginByCaptcha({
+      phone: formData.value.phone,
+      captcha: formData.value.captcha
+    });
+
+    if (successCodes.includes(response.status)) {
+      // 保存token
+      localStorage.setItem('token', response.data);
+      loginStatus.value.success = true;
+
+      // 跳转到首页
+      setTimeout(() => {
+        goToIndex();
+      }, 1000);
+    } else {
+      loginStatus.value.error = response.message || '登录失败';
+    }
+  } catch (error: any) {
+    loginStatus.value.error = error.message || '登录失败，请检查网络连接';
+  } finally {
+    loginStatus.value.loading = false;
   }
 };
 
 // 登录提交
 const handleLogin = async () => {
   if (loginMethod.value === 'password') {
-    await handlePasswordLogin();
+    await handleLocalPasswordLogin();
   } else {
-    // TODO: 实现验证码登录逻辑
-    alert('验证码登录功能待实现');
+    await handleCaptchaLogin();
   }
 };
 
@@ -215,20 +301,30 @@ onMounted(() => {
         </div>
         <form @submit.prevent="handleLogin">
           <div class="input-group">
-            <input v-model="loginForm.email" placeholder="邮箱" class="email">
+            <!-- 验证码登录方式 -->
+            <div v-if="loginMethod === 'captcha'" class="captcha-wrapper">
+              <input v-model="formData.phone" placeholder="手机号" class="phone">
+              <div class="captcha-input-group">
+                <input v-model="formData.captcha" type="text" placeholder="验证码" class="captcha">
+                <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+                  {{ captchaBtn.text }}
+                </button>
+              </div>
+            </div>
 
             <!-- 密码登录方式 -->
-            <div class="password-wrapper">
-              <input v-model="loginForm.password" type="password" placeholder="密码" class="password">
+            <div v-else class="password-wrapper">
+              <input v-model="formData.phone" placeholder="手机号" class="phone">
+              <input v-model="formData.password" type="password" placeholder="密码" class="password">
             </div>
           </div>
 
-          <button type="submit" class="login-btn" :disabled="loading">
+          <button type="submit" class="login-btn" :disabled="loginStatus.loading">
             <div class="icon">
               <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
                 <use href="#ic--outline-email" />
               </svg>
-              {{ loading ? '登录中...' : '登录' }}
+              {{ loginStatus.loading ? '登录中...' : '登录' }}
             </div>
           </button>
 
@@ -313,8 +409,75 @@ onMounted(() => {
 /* 密码输入框样式 */
 .password-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 15px;
   margin-top: 15px;
+}
+
+.password-wrapper .phone,
+.password-wrapper .password {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.password-wrapper .phone:focus,
+.password-wrapper .password:focus {
+  border-color: #165c91;
+}
+
+/* 验证码输入框样式 */
+.captcha-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.captcha-wrapper .phone {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.captcha-wrapper .phone:focus {
+  border-color: #165c91;
+}
+
+.captcha-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 15px;
+}
+
+.captcha-input-group .captcha {
+  width: calc(100% - 130px);
+  border-radius: 10px 0px 0px 10px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  height: 50px;
+  outline: none;
+  margin: 0;
+}
+
+.captcha-input-group .send-msg {
+  width: 130px;
+  margin: 0;
+  border-radius: 0px 10px 10px 0px;
+  background-color: rgb(22, 92, 145);
+  color: white;
+  border: none;
+  height: 50px;
+  cursor: pointer;
 }
 
 .login-method-switch {

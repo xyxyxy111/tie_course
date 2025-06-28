@@ -150,29 +150,115 @@ const closeWxLogin = () => {
 
 // 发送验证码
 const sendCaptcha = async () => {
-  if (!loginForm.email) {
-    alert('请输入邮箱');
+  if (!formData.value.phone) {
+    alert('请输入手机号');
     return;
   }
 
   try {
     captchaBtn.value.disabled = true;
-    // TODO: 实现发送验证码逻辑
-    alert('验证码发送功能待实现');
+    const response = await authApi.sendCaptcha(formData.value.phone);
+
+    if (successCodes.includes(response.status)) {
+      // 开始倒计时
+      const timer = setInterval(() => {
+        captchaBtn.value.countdown--;
+        captchaBtn.value.text = `${captchaBtn.value.countdown}s后重新获取`;
+        if (captchaBtn.value.countdown <= 0) {
+          clearInterval(timer);
+          captchaBtn.value = {
+            text: '发送验证码',
+            disabled: false,
+            countdown: 60
+          };
+        }
+      }, 1000);
+    } else {
+      alert(response.message || '发送验证码失败');
+      captchaBtn.value.disabled = false;
+    }
+  } catch (error: any) {
     captchaBtn.value.disabled = false;
-  } catch (error) {
-    captchaBtn.value.disabled = false;
-    alert('验证码发送失败，请重试');
+    alert(error.message || '发送验证码失败，请重试');
+  }
+};
+
+// 密码登录
+const handleLocalPasswordLogin = async () => {
+  if (!formData.value.phone || !formData.value.password) {
+    alert('请输入手机号和密码');
+    return;
+  }
+
+  loginStatus.value.loading = true;
+  loginStatus.value.error = null;
+
+  try {
+    const response = await authApi.loginByPassword({
+      phone: formData.value.phone,
+      password: formData.value.password
+    });
+
+    if (successCodes.includes(response.status)) {
+      // 保存token
+      localStorage.setItem('token', response.data);
+      loginStatus.value.success = true;
+
+      // 跳转到首页
+      setTimeout(() => {
+        goToIndex();
+      }, 1000);
+    } else {
+      loginStatus.value.error = response.message || '登录失败';
+    }
+  } catch (error: any) {
+    loginStatus.value.error = error.message || '登录失败，请检查网络连接';
+  } finally {
+    loginStatus.value.loading = false;
+  }
+};
+
+// 验证码登录
+const handleCaptchaLogin = async () => {
+  if (!formData.value.phone || !formData.value.captcha) {
+    alert('请输入手机号和验证码');
+    return;
+  }
+
+  loginStatus.value.loading = true;
+  loginStatus.value.error = null;
+
+  try {
+    const response = await authApi.loginByCaptcha({
+      phone: formData.value.phone,
+      captcha: formData.value.captcha
+    });
+
+    if (successCodes.includes(response.status)) {
+      // 保存token
+      localStorage.setItem('token', response.data);
+      loginStatus.value.success = true;
+
+      // 跳转到首页
+      setTimeout(() => {
+        goToIndex();
+      }, 1000);
+    } else {
+      loginStatus.value.error = response.message || '登录失败';
+    }
+  } catch (error: any) {
+    loginStatus.value.error = error.message || '登录失败，请检查网络连接';
+  } finally {
+    loginStatus.value.loading = false;
   }
 };
 
 // 登录提交
 const handleLogin = async () => {
   if (loginMethod.value === 'password') {
-    await handlePasswordLogin();
+    await handleLocalPasswordLogin();
   } else {
-    // TODO: 实现验证码登录逻辑
-    alert('验证码登录功能待实现');
+    await handleCaptchaLogin();
   }
 };
 
@@ -184,7 +270,7 @@ onMounted(() => {
 <!-- html -->
 <template>
   <IconSprite />
-  <MobileHeader :userId="userId" />
+  <MobileHeader :userId="null" />
   <div class="login-container">
     <div class="content">
       <div class="login-form">
@@ -197,18 +283,20 @@ onMounted(() => {
         </div>
         <form @submit.prevent="handleLogin">
           <div class="input-group">
-            <input v-model="formData.phone" placeholder="电话号码" class="phone-number">
-
             <!-- 验证码登录方式 -->
             <div v-if="loginMethod === 'captcha'" class="captcha-wrapper">
-              <input v-model="formData.captcha" type="text" placeholder="验证码" class="captcha">
-              <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
-                {{ captchaBtn.text }}
-              </button>
+              <input v-model="formData.phone" placeholder="手机号" class="phone">
+              <div class="captcha-input-group">
+                <input v-model="formData.captcha" type="text" placeholder="验证码" class="captcha">
+                <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+                  {{ captchaBtn.text }}
+                </button>
+              </div>
             </div>
 
             <!-- 密码登录方式 -->
             <div v-else class="password-wrapper">
+              <input v-model="formData.phone" placeholder="手机号" class="phone">
               <input v-model="formData.password" type="password" placeholder="密码" class="password">
             </div>
           </div>
@@ -290,11 +378,13 @@ onMounted(() => {
 /* 密码输入框样式 */
 .password-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 15px;
   margin-top: 15px;
 }
 
-.password {
+.password-wrapper .phone,
+.password-wrapper .password {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid #ddd;
@@ -304,30 +394,287 @@ onMounted(() => {
   transition: border-color 0.3s ease;
 }
 
-.password:focus {
+.password-wrapper .phone:focus,
+.password-wrapper .password:focus {
   border-color: #165c91;
+}
+
+/* 验证码输入框样式 */
+.captcha-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.captcha-wrapper .phone {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.captcha-wrapper .phone:focus {
+  border-color: #165c91;
+}
+
+.captcha-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 15px;
+}
+
+.captcha-input-group .captcha {
+  width: calc(100% - 130px);
+  border-radius: 10px 0px 0px 10px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  height: 50px;
+  outline: none;
+  margin: 0;
+}
+
+.captcha-input-group .send-msg {
+  width: 130px;
+  margin: 0;
+  border-radius: 0px 10px 10px 0px;
+  background-color: rgb(22, 92, 145);
+  color: white;
+  border: none;
+  height: 50px;
+  cursor: pointer;
 }
 
 /* 登录方式切换按钮样式 */
 .login-method-switch {
+  display: flex;
   margin-top: 20px;
   text-align: center;
+  gap: 10px;
 }
 
 .switch-btn {
+  flex: 1;
   background: none;
   border: none;
   color: #165c91;
   font-size: 14px;
   cursor: pointer;
-  text-decoration: underline;
+  border-radius: 8px;
   transition: color 0.3s ease;
   padding: 8px 16px;
   border-radius: 4px;
+  transition: all 0.3s;
 }
 
 .switch-btn:hover {
   color: #134a7a;
-  background-color: rgba(22, 92, 145, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 92, 145, 0.1);
+}
+
+/* 微信登录按钮样式 */
+.wx-login-btn {
+  flex: 1;
+  height: 50px;
+  background-color: white;
+  color: #07C160;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.wx-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(7, 193, 96, 0.3);
+}
+
+.wx-login-btn .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 微信登录弹窗样式 */
+.wx-login-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.wx-login-content {
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  animation: slideUp 0.3s ease;
+}
+
+.wx-login-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.wx-login-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.close-btn:hover {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.wx-login-body {
+  padding: 30px;
+  text-align: center;
+}
+
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.qr-code {
+  width: 200px;
+  height: 200px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.qr-tip {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+}
+
+.status-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #07C160;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.success-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #07C160;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.error-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.retry-btn {
+  background-color: #07C160;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.retry-btn:hover {
+  background-color: #06ad56;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -17,38 +17,105 @@ export const isValidToken = (token: string | null): boolean => {
 // 获取有效的token
 export const getValidToken = (): string | null => {
   const token = localStorage.getItem('token');
-  return isValidToken(token) ? token : null;
+  if (!isValidToken(token)) return null;
+
+  // 对于JWT token，进行额外的过期检查
+  try {
+    const parts = token!.split('.');
+    if (parts.length === 3) {
+      const payload = JSON.parse(atob(parts[1]));
+
+      // 检查token是否过期
+      if (payload.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (currentTime > payload.exp) {
+          console.log('JWT token已过期，清除本地token');
+          localStorage.removeItem('token');
+          return null;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('检查token过期时出错:', error);
+    // 如果检查失败，清除可能损坏的token
+    localStorage.removeItem('token');
+    return null;
+  }
+
+  return token;
+};
+
+// 检查token是否过期
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const payload = JSON.parse(atob(parts[1]));
+
+      if (payload.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        return currentTime > payload.exp;
+      }
+    }
+    return false; // 如果不是JWT格式或没有过期时间，认为未过期
+  } catch (error) {
+    console.error('检查token过期时出错:', error);
+    return true; // 解析失败认为已过期
+  }
+};
+
+// 清理过期的token
+export const clearExpiredToken = (): void => {
+  const token = localStorage.getItem('token');
+  if (token && isTokenExpired(token)) {
+    console.log('检测到过期token，正在清除...');
+    localStorage.removeItem('token');
+  }
 };
 
 // 从token中解析用户信息
 export const getUserFromToken = (): { userId?: string; username?: string } | null => {
   const token = getValidToken();
   if (!token) return null;
-  
+
   try {
     // 如果token是JWT格式，尝试解析payload
     const parts = token.split('.');
     if (parts.length === 3) {
       const payload = JSON.parse(atob(parts[1]));
       console.log('Token payload:', payload);
+
+      // 检查token是否过期
+      if (payload.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (currentTime > payload.exp) {
+          console.log('JWT token已过期，清除本地token');
+          localStorage.removeItem('token');
+          return null;
+        }
+      }
+
       return {
         userId: payload.userId || payload.sub || payload.id,
         username: payload.username || payload.name
       };
     }
-    
+
     // 如果不是JWT格式，尝试解析为简单格式
     // 假设token格式为: userId:username 或其他格式
     if (token.includes(':')) {
       const [userId, username] = token.split(':');
       return { userId, username };
     }
-    
+
     // 如果都不匹配，返回null
     console.log('Token格式无法识别:', token.substring(0, 20) + '...');
     return null;
   } catch (error) {
     console.error('解析token失败:', error);
+    // 如果解析失败，可能是token格式错误，清除无效token
+    console.log('清除无效token');
+    localStorage.removeItem('token');
     return null;
   }
 };
@@ -127,7 +194,7 @@ instance.interceptors.response.use(
       console.log('response.data:', response.data);
       return Promise.reject(response.data.message);
     }
-   return response.data;
+    return response.data;
   },
   (error) => {
     // 处理token相关错误
@@ -163,3 +230,67 @@ instance.interceptors.response.use(
 export const request = <T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> => {
   return instance(config);
 };
+
+// Token管理工具类
+export class TokenManager {
+  private static checkInterval: number | null = null;
+  private static readonly CHECK_INTERVAL = 5 * 60 * 1000; // 每5分钟检查一次
+
+  // 启动定期检查
+  static startPeriodicCheck(): void {
+    if (this.checkInterval) {
+      return; // 已经在运行
+    }
+
+    this.checkInterval = window.setInterval(() => {
+      clearExpiredToken();
+    }, this.CHECK_INTERVAL);
+
+    console.log('Token定期检查已启动，每5分钟检查一次');
+  }
+
+  // 停止定期检查
+  static stopPeriodicCheck(): void {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval);
+      this.checkInterval = null;
+      console.log('Token定期检查已停止');
+    }
+  }
+
+  // 立即检查并清理过期token
+  static checkAndClear(): void {
+    clearExpiredToken();
+  }
+
+  // 获取token剩余有效时间（秒）
+  static getTokenRemainingTime(): number | null {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1]));
+
+        if (payload.exp) {
+          const currentTime = Math.floor(Date.now() / 1000);
+          const remainingTime = payload.exp - currentTime;
+          return remainingTime > 0 ? remainingTime : 0;
+        }
+      }
+    } catch (error) {
+      console.error('获取token剩余时间时出错:', error);
+    }
+
+    return null;
+  }
+
+  // 检查token是否即将过期（默认5分钟内）
+  static isTokenExpiringSoon(warningMinutes: number = 5): boolean {
+    const remainingTime = this.getTokenRemainingTime();
+    if (remainingTime === null) return false;
+
+    return remainingTime <= warningMinutes * 60;
+  }
+}

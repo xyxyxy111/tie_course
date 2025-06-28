@@ -1,5 +1,5 @@
 <script lang="ts" setup name="App">
-import { RouterView, RouterLink } from 'vue-router';
+import { RouterView, RouterLink, useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
@@ -10,6 +10,7 @@ import './myLearn.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const { width, height } = useWindowSize()
+const route = useRoute();
 
 // 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
@@ -36,16 +37,16 @@ onMounted(() => {
         <h1>我的学习</h1>
         <nav class="learning-nav">
           <router-link to="/learning/all-courses" class="nav-link"
-            :class="{ active: $route.path.includes('all-courses') }">
+            :class="{ active: route.path.includes('all-courses') }">
             所有课程
           </router-link>
-          <router-link to="/learning/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
+          <router-link to="/learning/my-list" class="nav-link" :class="{ active: route.path.includes('my-list') }">
             我的列表
           </router-link>
-          <router-link to="/learning/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
+          <router-link to="/learning/wishlist" class="nav-link" :class="{ active: route.path.includes('wishlist') }">
             心愿单
           </router-link>
-          <router-link to="/learning/log" class="nav-link" :class="{ active: $route.path.includes('log') }">
+          <router-link to="/learning/log" class="nav-link" :class="{ active: route.path.includes('log') }">
             个人日志
           </router-link>
         </nav>
@@ -66,7 +67,7 @@ onMounted(() => {
   width: 100%;
   padding-top: 20px;
   background-color: rgb(4, 35, 58);
-  
+
 }
 
 .my-learning-container {

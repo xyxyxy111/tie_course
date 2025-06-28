@@ -50,15 +50,47 @@ onMounted(async () => {
   await initializeData();
 });
 
+// 购物车数据
+const cartData = ref<any>(null);
+const cartCourses = ref<any[]>([]);
+const cartTotal = ref(0);
+const cartOriginalTotal = ref(0);
+const cartSaved = ref(0);
+
 // 响应式数据
 const selectedPayment = ref('alipay'); // 默认选择支付宝
 const couponCode = ref(''); // 优惠券码
 const discountAmount = ref(0); // 优惠金额
 const finalPrice = ref(0); // 最终价格
 
+// 从localStorage读取购物车数据
+const loadCartData = () => {
+  try {
+    const storedData = localStorage.getItem('tempCartData');
+    if (storedData) {
+      cartData.value = JSON.parse(storedData);
+      cartCourses.value = cartData.value.courses || [];
+      cartTotal.value = cartData.value.total || 0;
+      cartOriginalTotal.value = cartData.value.originalTotal || 0;
+      cartSaved.value = cartData.value.saved || 0;
+
+      // 初始化最终价格
+      finalPrice.value = cartTotal.value;
+
+      console.log('购物车数据加载成功:', cartData.value);
+    } else {
+      console.log('没有找到购物车数据');
+      // 如果没有购物车数据，可以重定向回购物车页面
+      // window.location.href = '/cart.html';
+    }
+  } catch (error) {
+    console.error('读取购物车数据失败:', error);
+  }
+};
+
 // 计算最终价格
 const calculateFinalPrice = () => {
-  finalPrice.value = totalOrders - discountAmount.value;
+  finalPrice.value = cartTotal.value - discountAmount.value;
 };
 
 // 处理付款方式选择
@@ -76,7 +108,7 @@ const applyCoupon = () => {
   // 这里可以添加实际的优惠券验证逻辑
   // 示例：简单的优惠券逻辑
   if (couponCode.value.toLowerCase() === 'discount10') {
-    discountAmount.value = totalOrders * 0.1; // 10%折扣
+    discountAmount.value = cartTotal.value * 0.1; // 10%折扣
     calculateFinalPrice();
     alert('优惠券应用成功！获得10%折扣');
   } else if (couponCode.value.toLowerCase() === 'save5') {
@@ -100,9 +132,9 @@ const handlePayment = () => {
   alert(`正在跳转到${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付页面...`);
 };
 
-// 初始化最终价格
+// 组件挂载时加载购物车数据
 onMounted(() => {
-  calculateFinalPrice();
+  loadCartData();
 });
 </script>
 
@@ -131,12 +163,12 @@ onMounted(() => {
       </div>
 
       <div class="order-summary">
-        <h3>订单详细信息 ( {{ orders.length }} 个课程)</h3>
+        <h3>订单详细信息 ( {{ cartCourses.length }} 个课程)</h3>
         <ul class="course-list">
-          <li v-for="(order, index) in orders" class="course-item">
-            <img :src="order.image" alt="">
-            <span class="title">{{ order.title }}</span>
-            <span class="price">{{ order.price }}</span>
+          <li v-for="(course, index) in cartCourses" :key="index" class="course-item">
+            <img :src="course.image" alt="">
+            <span class="title">{{ course.title }}</span>
+            <span class="price">US${{ course.price.toFixed(2) }}</span>
           </li>
         </ul>
       </div>
@@ -149,7 +181,11 @@ onMounted(() => {
         <h3>价格明细</h3>
         <div class="price-item">
           <span>小计:</span>
-          <span>US${{ totalOrders.toFixed(2) }}</span>
+          <span>US${{ cartTotal.toFixed(2) }}</span>
+        </div>
+        <div class="price-item" v-if="cartSaved > 0">
+          <span>节省:</span>
+          <span class="saved">-US${{ cartSaved.toFixed(2) }}</span>
         </div>
         <div class="price-item" v-if="discountAmount > 0">
           <span>优惠:</span>
@@ -339,6 +375,10 @@ label {
 
 .discount {
   color: #dc3545;
+}
+
+.saved {
+  color: #28a745;
 }
 
 .final-price {
