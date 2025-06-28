@@ -25,7 +25,7 @@
   display: flex;
 }
 
-.search-result-container .course-title{
+.search-result-container .course-title {
   font-size: 18px;
   font-weight: 500;
   margin-bottom: 10px;
@@ -55,4 +55,46 @@
   width: 48px;
   height: 48px;
   padding: 7px 8px;
+}
+
+/* 共有的分页样式 */
+.pagination-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  padding: 20px 0;
+}
+
+.page-info {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 共有的按钮样式 */
+.search-result-container button {
+  width: fit-content;
+  border: none;
+  font-size: 16px;
+  font-weight: 400;
+  white-space: nowrap;
+  color: rgb(22, 92, 145);
+  background-color: white;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.search-result-container button:hover {
+  background-color: rgba(22, 92, 145, 0.1);
+}
+
+/* 共有的课程价格样式 */
+.search-result-container .course-price {
+  width: 80px;
+  padding: 0px 5px;
+  font-size: 20px;
+  font-weight: 600;
 }

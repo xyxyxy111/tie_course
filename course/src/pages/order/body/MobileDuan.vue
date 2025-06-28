@@ -171,9 +171,9 @@ onMounted(() => {
       <!-- 价格明细 -->
       <div class="price-breakdown">
         <h3>价格明细</h3>
-        <div class="price-item">
-          <span>小计:</span>
-          <span>¥{{ cartTotal.toFixed(2) }}</span>
+        <div class="price-item" v-if="cartOriginalTotal > cartTotal">
+          <span>原价:</span>
+          <span class="original-price">¥{{ cartOriginalTotal.toFixed(2) }}</span>
         </div>
         <div class="price-item" v-if="cartSaved > 0">
           <span>节省:</span>

@@ -14,6 +14,7 @@ const loading = ref(false);
 const totalPages = ref(1);
 const currentPage = ref(1);
 const pageSize = ref(12);
+const total = ref(0); // 总条目数
 
 // 搜索相关状态
 const searchKeyword = ref('');
@@ -52,8 +53,14 @@ export const useSearchData = () => {
       }
       if (tagId) {
         selectedTagIds.value = [parseInt(tagId)];
+        // 同步到filterStore
+        filterStore.selectedTag = parseInt(tagId);
       } else if (tagIds) {
         selectedTagIds.value = tagIds.split(',').map(id => parseInt(id));
+        // 如果有多个tag，选择第一个
+        if (selectedTagIds.value.length > 0) {
+          filterStore.selectedTag = selectedTagIds.value[0];
+        }
       }
       if (page) {
         currentPage.value = parseInt(page);
@@ -70,11 +77,32 @@ export const useSearchData = () => {
   const performSearch = async () => {
     loading.value = true;
     try {
-      const res = await searchCourseByMessage(currentPage.value, pageSize.value, searchKeyword.value);
-      const data = res.data as { records: CourseListVO[]; total: number };
-      console.log("data" + data);
-      searchResults.value = data?.records || [];
-      totalPages.value = data?.total || 0;
+      let res;
+      const filterStore = useFilterStore();
+
+      // 如果有选中的tag，使用按tag筛选的接口
+      if (filterStore.selectedTag) {
+        res = await courseApi.getCourseListByTagId(filterStore.selectedTag);
+        // 将结果转换为分页格式
+        const courses = res.data || [];
+        total.value = courses.length;
+        totalPages.value = Math.ceil(courses.length / pageSize.value);
+
+        // 手动处理分页
+        const startIndex = (currentPage.value - 1) * pageSize.value;
+        const endIndex = startIndex + pageSize.value;
+        searchResults.value = courses.slice(startIndex, endIndex);
+      } else {
+        // 使用原有的搜索接口
+        res = await searchCourseByMessage(currentPage.value, pageSize.value, searchKeyword.value);
+        const data = res.data as { records: CourseListVO[]; total: number };
+        console.log("data" + data);
+        searchResults.value = data?.records || [];
+        // 计算总页数：总条目数除以每页大小，向上取整
+        totalPages.value = Math.ceil((data?.total || 0) / pageSize.value);
+        total.value = data?.total || 0;
+      }
+
       updateURLParams();
     } catch (error) {
       console.error('搜索失败:', error);
@@ -98,6 +126,12 @@ export const useSearchData = () => {
       // 如果有多个tag，使用tagIds参数
       searchParams.set('tagIds', selectedTagIds.value.join(','));
     }
+
+    // 同步filterStore中的tag信息
+    if (filterStore.selectedTag) {
+      searchParams.set('tagId', filterStore.selectedTag.toString());
+    }
+
     if (currentPage.value > 1) {
       searchParams.set('page', currentPage.value.toString());
     }
@@ -147,6 +181,7 @@ export const useSearchData = () => {
 
   const handlePageChange = (page: number) => {
     currentPage.value = page;
+    // 如果是tag筛选模式，需要重新获取数据来处理分页
     performSearch();
   };
 
@@ -158,6 +193,10 @@ export const useSearchData = () => {
     sortBy.value = 'relevance';
     currentPage.value = 1;
     tags.value = [];
+
+    // 清除filterStore中的选择
+    filterStore.clearTagSelection();
+
     performSearch();
   };
 
@@ -178,7 +217,9 @@ export const useSearchData = () => {
       const res = await searchCourseByMessage(currentPage.value, pageSize.value, searchKeyword.value);
       const data = res.data as { records: CourseListVO[]; total: number };
       searchResults.value = data?.records || [];
-      totalPages.value = data?.total || 0;
+      // 计算总页数：总条目数除以每页大小，向上取整
+      totalPages.value = Math.ceil((data?.total || 0) / pageSize.value);
+      total.value = data?.total || 0;
     } finally {
       loading.value = false;
     }
@@ -191,7 +232,9 @@ export const useSearchData = () => {
       const res = await searchLatestCourse(currentPage.value, pageSize.value);
       const data = res.data as { records: CourseListVO[]; total: number };
       searchResults.value = data?.records || [];
-      totalPages.value = data?.total || 0;
+      // 计算总页数：总条目数除以每页大小，向上取整
+      totalPages.value = Math.ceil((data?.total || 0) / pageSize.value);
+      total.value = data?.total || 0;
     } finally {
       loading.value = false;
     }
@@ -206,6 +249,7 @@ export const useSearchData = () => {
     totalPages,
     currentPage,
     pageSize,
+    total,
     searchKeyword,
     selectedCategoryId,
     selectedTagIds,

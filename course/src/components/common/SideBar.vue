@@ -24,7 +24,7 @@
 
           <li v-else class="user-section">
             <div class="user-info">
-              <div class="user-header">
+              <div class="user-header" @click="goToMyInfo">
                 <img src="/src/images/userPic.png" alt="用户头像" class="user-avatar">
                 <span class="user-id">{{ userId }}</span>
               </div>

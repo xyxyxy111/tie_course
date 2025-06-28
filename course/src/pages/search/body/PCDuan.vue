@@ -5,14 +5,16 @@ import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
 import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
-import { ElPagination } from 'element-plus'
 import '../search.css'
 import { cartApi } from '@/api/cart';
 
 // 导入共享的数据和逻辑
 import { useSearchData } from '../components/content';
+import { useFilterStore } from '../components/filterStore';
 
 const { width, height } = useWindowSize()
+
+const filterStore = useFilterStore()
 
 // 使用共享的数据和逻辑
 const {
@@ -24,6 +26,7 @@ const {
   totalPages,
   currentPage,
   pageSize,
+  total,
   searchKeyword,
   selectedCategoryId,
   selectedTagIds,
@@ -45,6 +48,13 @@ onMounted(async () => {
   await initializeData();
 });
 
+watch(
+  () => filterStore.selectedTag,
+  () => {
+    performSearch();
+  }
+);
+
 const SearchResultWidth = computed(() => {
   const calculatedValue = (width.value - 900);
   return Math.min(600, Math.max(0, calculatedValue));
@@ -58,10 +68,6 @@ const SearchResultCourseTitleStyle = computed(() => ({
   width: `calc( 200px + 1px * ${SearchResultWidth.value})`
 }));
 
-// 计算总条目数
-const total = computed(() => totalPages.value * pageSize.value);
-
-// 处理分页变化
 const handleCurrentChange = (page: number) => {
   handlePageChange(page);
 };
@@ -93,12 +99,12 @@ const addToCart = async (courseId: number) => {
       <Filter />
 
       <div class="search-result" :style="SearchResultStyle">
-        <div class="title">"{{ searchKeyword }}"的1000个结果</div>
+        <div class="title">"{{ searchKeyword }}"的{{ searchResults.length }}个结果</div>
         <div v-for="course in searchResults" :key="course.courseId" class="course-item">
           <img :src="course.coverImgUrl" alt="" class="course-img">
           <div>
             <div class="course-title" :style="SearchResultCourseTitleStyle">{{ course.title }}</div>
-            <div class="course-instruction">By {{ course.categoryName }}</div>
+            <div class="course-instruction"> {{ course.categoryName }}</div>
           </div>
           <div class="course-price">
             <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
@@ -106,13 +112,12 @@ const addToCart = async (courseId: number) => {
           </div>
         </div>
 
-        <!-- Element Plus 分页组件 -->
-        <div class="pagination-container">
-          <el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="total"
-            :page-sizes="[12, 24, 36, 48]" layout="total, sizes, prev, pager, next, jumper"
-            @current-change="handleCurrentChange" @size-change="(size) => { pageSize = size; handlePageChange(1); }"
-            background hide-on-single-page />
+        <div v-if="total > 0" class="pagination-container">
+          <el-pagination :current-page="currentPage" :page-size="pageSize" :total="total" layout="prev, pager, next"
+            @current-change="handleCurrentChange" />
+          <div class="page-info">共 {{ totalPages }} 页</div>
         </div>
+        <div v-else-if="!loading" style="text-align:center;color:#888;">暂无课程</div>
       </div>
     </div>
 
@@ -148,35 +153,22 @@ const addToCart = async (courseId: number) => {
 }
 
 .search-result .course-item button {
-  width: fit-content;
   height: 40px;
-  border: none;
-  font-size: 16px;
-  font-weight: 400;
-  white-space: nowrap;
-  color: rgb(22, 92, 145);
-  background-color: white;
-  border-radius: 8px;
-
-}
-
-.search-result .course-item button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
-}
-
-.search-result .course-item .course-price {
-  width: 80px;
-  padding: 0px 5px;
-  font-size: 20px;
-  font-weight: 600;
 }
 
 .pagination-container {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 24px;
   padding: 20px 0;
+}
+
+.page-info {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
 }
 </style>

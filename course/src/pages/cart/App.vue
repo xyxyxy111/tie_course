@@ -13,7 +13,7 @@ const { width, height } = useWindowSize()
 <template>
   <main>
     <div class="app">
-      <PCDuan v-if="width > 1000" />
+      <PCDuan v-if="width > 800" />
       <MobileDuan v-else />
     </div>
   </main>

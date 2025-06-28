@@ -116,20 +116,16 @@ const handleClearCart = async () => {
   <PCHeader :userId="userId" />
   <div class="cart-container">
     <div class="content" :style="headerSpaceStyle">
-      <!-- 加载状态 -->
       <div v-if="loading" class="loading">
         <div class="loading-spinner"></div>
         <p>加载中...</p>
       </div>
 
-      <!-- 空购物车状态 -->
       <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
         <div class="empty-icon">🛒</div>
         <h2>购物车为空</h2>
         <p>您还没有添加任何课程到购物车</p>
       </div>
-
-      <!-- 购物车内容 -->
       <div v-else class="cart-layout">
         <div class="cart-title">
           <h1>购物车</h1>
@@ -170,9 +166,13 @@ const handleClearCart = async () => {
                 <span>课程数量:</span>
                 <span>{{ cart.cartItemList.length }} 门课程</span>
               </div>
-              <div class="summary-item">
-                <span>小计:</span>
-                <span class="subtotal">¥{{ totalPrice.toFixed(2) }}</span>
+              <div class="summary-item" v-if="savedAmount > 0">
+                <span>原价:</span>
+                <span class="original-price">¥{{ totalOriginalPrice.toFixed(2) }}</span>
+              </div>
+              <div class="summary-item" v-if="savedAmount > 0">
+                <span>节省:</span>
+                <span class="saved-amount">-¥{{ savedAmount.toFixed(2) }}</span>
               </div>
               <div class="summary-item total-row">
                 <span>总计:</span>
@@ -285,6 +285,15 @@ const handleClearCart = async () => {
   color: rgb(22, 92, 145);
 }
 
+.shopping-cart-container .checkout-section .checkout-btn {
+  margin-bottom: 10px;
+  width: 120px;
+  margin-left: calc(100% - 120px);
+  white-space: nowrap;
+  padding: 8px 0px;
+  background: rgb(22, 92, 145);
+}
+
 .wishlist-btn:hover {
   color: red;
 }
@@ -330,7 +339,7 @@ const handleClearCart = async () => {
 }
 
 .cart-items-section {
-  flex: 0 0 70%;
+  flex: 0 0 65%;
   padding-bottom: 60px;
   background: white;
   border-radius: 8px;
@@ -346,7 +355,6 @@ const handleClearCart = async () => {
 
 
 .checkout-btn {
-  width: 100%;
   background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
   color: white;
   border: none;
@@ -461,109 +469,5 @@ const handleClearCart = async () => {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
   background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
-}
-
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .cart-main-content {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .cart-items-section {
-    flex: none;
-    width: 100%;
-  }
-
-  .checkout-section {
-    flex: none;
-    width: 100%;
-    position: static;
-  }
-
-  .content {
-    max-width: 100%;
-    padding: 0 15px;
-  }
-}
-
-@media (max-width: 768px) {
-  .cart-container {
-    padding: 10px 0;
-  }
-
-  .cart-main-content {
-    gap: 15px;
-  }
-
-  .cart-items-section {
-    border-radius: 6px;
-  }
-
-  .checkout-summary {
-    padding: 20px;
-  }
-
-  .summary-item {
-    padding: 10px 0;
-  }
-
-  .course-image {
-    width: 100px;
-    height: 70px;
-  }
-
-  .course-title {
-    font-size: 1.1rem;
-  }
-
-  .course-actions {
-    gap: 6px;
-  }
-
-  .wishlist-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    width: 70px;
-  }
-
-  .remove-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    width: 70px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .course-image {
-    width: 100%;
-    height: 120px;
-    margin-right: 0;
-  }
-
-  .course-actions {
-    align-self: flex-end;
-    margin-left: 0;
-    gap: 6px;
-    flex-direction: column;
-  }
-
-  .wishlist-btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    width: 60px;
-  }
-
-  .remove-btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    width: 60px;
-  }
 }
 </style>

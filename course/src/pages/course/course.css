@@ -138,8 +138,38 @@
   text-align: right;
 }
 
-
 .container-scroll-y {
   overflow-y: auto;
   /* max-height: 400px; */
+}
+
+/* 共有的课程列表样式 */
+.lesson-list {
+  border: none;
+  padding-left: 32px;
+  list-style: circle;
+  cursor: default;
+}
+
+/* 共有的动画样式 */
+.slide-lesson-enter-active,
+.slide-lesson-leave-active {
+  transition: max-height 0.3s cubic-bezier(.55, 0, .1, 1);
+  overflow: hidden;
+}
+
+.slide-lesson-enter-from,
+.slide-lesson-leave-to {
+  max-height: 0;
+}
+
+.slide-lesson-enter-to,
+.slide-lesson-leave-from {
+  max-height: 500px;
+}
+
+/* 共有的分割线样式 */
+.divider {
+  height: 1px;
+  background-color: #e1e1e1;
 }

@@ -199,6 +199,26 @@ hr {
   font-size: 1.4rem;
 }
 
+.checkout-section .checkout-btn {
+  margin-bottom: 10px;
+  width: 180px;
+  margin-left: calc(100% - 180px);
+  white-space: nowrap;
+  padding: 8px 0px;
+  background: rgb(22, 92, 145);
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9em;
+}
+
+.saved-amount {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
 .clear-cart-btn {
   position: absolute;
   right: 24px;
@@ -218,12 +238,108 @@ hr {
   transition: all 0.2s;
 }
 
-.clear-cart-btn:hover:not(:disabled) ,.clearcart-btn:hover:not(:disabled){
+.clear-cart-btn:hover:not(:disabled),
+.clearcart-btn:hover:not(:disabled) {
   background: #dc35467d;
   color: #fff;
 }
 
-.clear-cart-btn:disabled ,.clearcart-btn:disabled {
+.clear-cart-btn:disabled,
+.clearcart-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* 共有的加载状态样式 */
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #165c91;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 共有的错误状态样式 */
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #dc3545;
+}
+
+.error button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.error button:hover {
+  background: #c82333;
+}
+
+/* 共有的空购物车样式 */
+.empty-cart {
+  text-align: center;
+  padding: 80px 20px;
+  color: #666;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.empty-cart h2 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 24px;
+}
+
+.empty-cart p {
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+/* 共有的浏览按钮样式 */
+.browse-btn {
+  background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
+}
+
+.browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
+  background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
 }

@@ -9,15 +9,12 @@ import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
 import { cartApi } from '@/api/cart';
-
-// 导入共享的数据和逻辑
 import { useSearchData, searchSortOptions, priceRanges } from '../components/content';
 
 const filterStore = useFilterStore()
-const showFilter = ref(true)
+const showFilter = ref(false)
 const { width, height } = useWindowSize()
 
-// 使用共享的数据和逻辑
 const {
   searchResults,
   categories,
@@ -27,6 +24,7 @@ const {
   totalPages,
   currentPage,
   pageSize,
+  total,
   searchKeyword,
   selectedCategoryId,
   selectedTagIds,
@@ -47,6 +45,13 @@ const {
 onMounted(async () => {
   await initializeData();
 });
+
+watch(
+  () => filterStore.selectedTag,
+  () => {
+    performSearch();
+  }
+);
 
 watch(
   () => [
@@ -78,15 +83,10 @@ const addToCart = async (courseId: number) => {
   }
 };
 
-// 计算总条目数
-const total = computed(() => totalPages.value * pageSize.value);
-
-// 处理分页变化
 const handleCurrentChange = (page: number) => {
   handlePageChange(page);
 };
 
-// 侧边栏控制逻辑
 const emit = defineEmits(['update:isOpen', 'open', 'close', 'filter-change'])
 const props = defineProps({
   isOpen: Boolean,
@@ -116,14 +116,13 @@ const handleBackdropClick = () => {
 }
 </script>
 
-<!-- html -->
 <template>
   <IconSprite />
   <main>
     <MobileHeader :userId="userId" />
     <div class="search-result-container">
       <div class="title">“{{ searchKeyword }}”的{{ searchResults.length }}个结果
-        <button @click="showFilter = true">Filter</button>
+        <button @click="showFilter = true">筛选</button>
       </div>
       <div class="content">
         <div class="search-result">
@@ -133,23 +132,20 @@ const handleBackdropClick = () => {
             </div>
             <div class="course-details">
               <div class="course-title">{{ course.title }}</div>
-              <div class="course-instruction">By {{ course.categoryName }}</div>
+              <div class="course-instruction"> {{ course.categoryName }}</div>
             </div>
             <div class="course-price">
               <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
               <button class="arrToCartBtn" @click="addToCart(course.courseId)">添加至购物车</button>
             </div>
           </div>
-          <div v-if="searchResults.length > 0" class="pagination-container">
-            <button @click="handleCurrentChange(currentPage - 1)" :disabled="currentPage <= 1">上一页</button>
-            <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
-            <button @click="handleCurrentChange(currentPage + 1)" :disabled="currentPage >= totalPages">下一页</button>
+          <div v-if="total > 0" class="pagination-container">
+            <el-pagination :current-page="currentPage" :page-size="pageSize" :total="total" layout="prev, pager, next"
+              @current-change="handleCurrentChange" />
+            <div class="page-info">共 {{ totalPages }} 页</div>
           </div>
-          <div v-else-if="!searchResults.length && !loading" style="text-align:center;color:#888;">暂无课程</div>
-
+          <div v-else-if="!loading" style="text-align:center;color:#888;">暂无课程</div>
         </div>
-
-
       </div>
     </div>
     <div class="sidebar-system">
@@ -163,7 +159,6 @@ const handleBackdropClick = () => {
       </transition>
     </div>
   </main>
-
 </template>
 <style scoped>
 .search-result-container {
@@ -175,7 +170,6 @@ const handleBackdropClick = () => {
   min-width: fit-content;
   white-space: nowrap;
 }
-
 
 .search-result-container .content {
   width: 100%;
@@ -211,7 +205,6 @@ const handleBackdropClick = () => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-
 }
 
 .search-result-container .price {
@@ -229,23 +222,10 @@ const handleBackdropClick = () => {
 }
 
 .search-result-container button {
-  width: fit-content;
   margin-top: 10px;
   padding: 10px;
-  border: none;
   height: 42px;
-  font-size: 16px;
-  font-weight: 400;
-  white-space: nowrap;
-  color: rgb(22, 92, 145);
-  background-color: white;
-  border-radius: 8px;
   align-self: flex-start;
-  transition: all 0.2s;
-}
-
-.search-result-container button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
 }
 
 .slide-right-enter-active,
@@ -278,36 +258,22 @@ const handleBackdropClick = () => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  /* 在侧边栏下方 */
   pointer-events: auto;
 }
 
 .pagination-container {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 20px 0;
-  padding: 10px 0;
-  gap: 10px;
+  margin-top: 24px;
+  padding: 20px 0;
 }
 
-.pagination-container button {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.pagination-container button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-container span {
-  margin: 0 10px;
+.page-info {
+  margin-top: 10px;
   color: #666;
+  font-size: 14px;
 }
 </style>

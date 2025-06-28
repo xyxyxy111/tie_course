@@ -60,13 +60,18 @@ export const useFilterStore = defineStore('filter', () => {
     category.isSelected = true
     selectedCategory.value = category.value
     fetchTagsByCategory(category.value)
-    selectedTag.value = null
+    clearTagSelection()
   }
 
   const selectTag = (tag: typeof tags.value[0]) => {
     tags.value.forEach(t => t.isSelected = false)
     tag.isSelected = true
     selectedTag.value = tag.value
+  }
+
+  const clearTagSelection = () => {
+    tags.value.forEach(t => t.isSelected = false)
+    selectedTag.value = null
   }
 
   // 根据URL参数初始化选中的category和tag
@@ -109,6 +114,7 @@ export const useFilterStore = defineStore('filter', () => {
     fetchTagsByCategory,
     selectCategory,
     selectTag,
+    clearTagSelection,
     initializeFromURL
   }
 })

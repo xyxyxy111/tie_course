@@ -176,9 +176,13 @@ const removeFromCart = async (courseId: number) => {
             <span>课程数量:</span>
             <span>{{ cart.cartItemList.length }} 门课程</span>
           </div>
-          <div class="summary-item">
-            <span>小计:</span>
-            <span class="subtotal">¥{{ totalPrice.toFixed(2) }}</span>
+          <div class="summary-item" v-if="savedAmount > 0">
+            <span>原价:</span>
+            <span class="original-price">¥{{ totalOriginalPrice.toFixed(2) }}</span>
+          </div>
+          <div class="summary-item" v-if="savedAmount > 0">
+            <span>节省:</span>
+            <span class="saved-amount">-¥{{ savedAmount.toFixed(2) }}</span>
           </div>
           <div class="summary-item total-row">
             <span>总计:</span>
@@ -286,7 +290,6 @@ const removeFromCart = async (courseId: number) => {
   }
 }
 
-/* 错误状态样式 */
 .error {
   text-align: center;
   padding: 40px;
@@ -307,7 +310,6 @@ const removeFromCart = async (courseId: number) => {
   background: #c82333;
 }
 
-/* 空购物车样式 */
 .empty-cart {
   text-align: center;
   padding: 80px 20px;
@@ -333,31 +335,10 @@ const removeFromCart = async (courseId: number) => {
   font-size: 16px;
 }
 
-.browse-btn {
-  background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
-}
-
-.browse-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
-  background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
-}
-
-/* 课程项目容器 */
 .course-items-container {
   padding: 0 20px;
 }
 
-/* 课程项目布局 */
 .course-item {
   display: flex;
   align-items: flex-start;
@@ -369,7 +350,6 @@ const removeFromCart = async (courseId: number) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 图片区域 */
 .course-image-section {
   flex: 0 0 120px;
   margin-right: 15px;
@@ -383,7 +363,6 @@ const removeFromCart = async (courseId: number) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 内容区域 */
 .course-content-section {
   flex: 1;
   min-width: 0;
@@ -493,6 +472,7 @@ const removeFromCart = async (courseId: number) => {
   cursor: pointer;
   transition: all 0.2s;
 }
+
 
 /* 响应式设计 */
 @media (max-width: 480px) {
