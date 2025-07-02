@@ -14,10 +14,10 @@ import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart } from '@/components/common/header.ts';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription, useCart, otherThemes, courseCurriculums, Comments } from '../components/content';
-import {
-  courseTitles, NavigationButton,
-  courseQuickViews, communityVoices,
-} from '../components/content.ts';
+// import {
+//   courseTitles, NavigationButton,
+//   courseQuickViews, communityVoices,
+// } from '../components/content.ts';
 
 
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course.ts';

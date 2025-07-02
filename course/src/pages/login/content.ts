@@ -11,7 +11,7 @@ import type {
   UserProfile,
   ChangePhoneParams,
   ChangePasswordParams
-} from '@/types/user';
+} from '@/api/user';
 
 // 1. 发送验证码
 const handleSendCaptcha = async () => {
@@ -102,17 +102,17 @@ const handleChangePhone = async () => {
 
 // 7. 修改密码
 const handleChangePassword = async () => {
-  const params: ChangePasswordParams = {
-    oldPassword: 'oldPassword123',
-    newPassword: 'newPassword456'
-  };
+  // const params: ChangePasswordParams = {
+  //   oldPassword: 'oldPassword123',
+  //   newPassword: 'newPassword456'
+  // };
 
-  try {
-    await userApi.changePassword(params);
-    console.log('密码修改成功');
-  } catch (error) {
-    console.error('修改失败:', error);
-  }
+  // try {
+  //   await userApi.changePassword(params);
+  //   console.log('密码修改成功');
+  // } catch (error) {
+  //   console.error('修改失败:', error);
+  // }
 };
 
 // 8. 获取个人资料
@@ -127,18 +127,18 @@ const fetchProfile = async () => {
 
 // 9. 更新个人资料
 const updateUserProfile = async () => {
-  const params: UserProfile = {
-    username: 'newUsername',
-    avatarUrl: 'https://example.com/avatar.jpg',
-    allowEmailNotify: true
-  };
+  // const params: UserProfile = {
+  //   username: 'newUsername',
+  //   avatarUrl: 'https://example.com/avatar.jpg',
+  //   allowEmailNotify: true
+  // };
 
-  try {
-    await profileApi.updateProfile(params);
-    console.log('资料更新成功');
-  } catch (error) {
-    console.error('更新失败:', error);
-  }
+  // try {
+  //   await profileApi.updateProfile(params);
+  //   console.log('资料更新成功');
+  // } catch (error) {
+  //   console.error('更新失败:', error);
+  // }
 };
 
 

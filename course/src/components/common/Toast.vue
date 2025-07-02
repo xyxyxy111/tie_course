@@ -144,7 +144,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  delete window.$toast
+  // delete window.$toast
 })
 
 // 暴露给组件使用

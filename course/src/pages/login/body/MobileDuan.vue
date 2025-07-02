@@ -182,7 +182,7 @@ const handleLogin = async () => {
 <!-- html -->
 <template>
   <IconSprite />
-  <MobileHeader :userId="userId"/>
+  <MobileHeader />
   <div class="login-container">
     <div class="content">
       <div class="login-form">

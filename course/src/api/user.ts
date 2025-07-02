@@ -1,29 +1,29 @@
 import { request } from '@/utils/request.ts';
 // 登录/注册相关
-interface LoginByCaptchaParams {
+export interface LoginByCaptchaParams {
   phone: string;
   captcha: string;
 }
 
-interface LoginByPasswordParams {
+export interface LoginByPasswordParams {
   phone: string;
   password: string;
 }
 
-interface RegisterParams {
+export interface RegisterParams {
   phone: string;
   captcha: string;
 }
 
-interface CaptchaParams {
+export interface CaptchaParams {
   phone: string;
 }
 
-interface PhoneAvailabilityParams {
+export interface PhoneAvailabilityParams {
   phone: string;
 }
 
-interface UserProfile {
+export interface UserProfile {
   username: string;
   firstName: string;
   lastName: string;
@@ -33,7 +33,7 @@ interface UserProfile {
   allowSMSNotify?: boolean;
 }
 
-interface UserBindInfo{
+export interface UserBindInfo{
   phone: string;
   email: string;
   passwordSet: boolean;
@@ -41,7 +41,7 @@ interface UserBindInfo{
   qqInfo: string;
 }
 
-interface UploadAvatarResponse {
+export interface UploadAvatarResponse {
   avatarUrl: string;
 }
 
@@ -65,13 +65,13 @@ export interface UserLogVO {
   time: string;
 }
 
-interface ChangePhoneParams {
+export interface ChangePhoneParams {
   phone: string;
   newPhone: string;
   captcha: string;
 }
 
-interface ChangePasswordParams {
+export interface ChangePasswordParams {
   phone: string;
   newPassword: string;
   captcha: string;

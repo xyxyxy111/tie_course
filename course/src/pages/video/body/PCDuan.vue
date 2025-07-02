@@ -4,8 +4,8 @@
     <div class="video-container">
       <div class="video-player">
         <div v-if="currentLesson" class="video-info">
-          <h2>{{ currentLesson.name }}</h2>
-          <p>时长: {{ currentLesson.duration }}</p>
+          <!-- <h2>{{ currentLesson.name }}</h2>
+          <p>时长: {{ currentLesson.duration }}</p> -->
         </div>
         <div v-else class="video-placeholder">
           <p>请从左侧选择课程</p>
@@ -111,10 +111,7 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import { getCurrentUserId, getValidToken } from '@/utils/request'
 
 export default {
-<<<<<<< HEAD
   name: 'PCDuan',
-=======
-  name: 'CoursePage',
   components: {
     PCHeader
   },
@@ -137,7 +134,6 @@ export default {
       userId
     }
   },
->>>>>>> b3e3f63ec04ae81ba8256396a19e5e84efed8fbf
   data() {
     return {
       currentLesson: null,

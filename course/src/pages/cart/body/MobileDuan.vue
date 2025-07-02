@@ -82,7 +82,7 @@ const removeFromCart = async (courseId: number) => {
     <!-- 错误状态 -->
     <div v-else-if="error" class="error">
       <p>{{ error }}</p>
-      <button @click="() => (window as any).location.reload()">重试</button>
+      <!-- <button @click="() => (window as any).location.reload()">重试</button> -->
     </div>
 
     <!-- 空购物车状态 -->
@@ -90,7 +90,7 @@ const removeFromCart = async (courseId: number) => {
       <div class="empty-icon">🛒</div>
       <h2>购物车为空</h2>
       <p>您还没有添加任何课程到购物车</p>
-      <button class="browse-btn" @click="() => (window as any).location.href = '/course.html'">浏览课程</button>
+      <!-- <button class="browse-btn" @click="() => (window as any).location.href = '/course.html'">浏览课程</button> -->
     </div>
 
     <!-- 购物车内容 -->
