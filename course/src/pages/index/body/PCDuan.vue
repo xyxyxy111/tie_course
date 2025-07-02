@@ -46,7 +46,6 @@ onMounted(async () => {
   //session?
   if (!searchParams.get('categoryId')) {
     categoryId = 1;
-    // flag; tag is default 
   } else {
     categoryId = parseInt(searchParams.get('categoryId')!);
     console.log(categoryId);
@@ -55,6 +54,7 @@ onMounted(async () => {
   const categoriesResponse = await categoryApi.getAllCategories();
   categories.value = categoriesResponse.data;
   console.log(categories.value);
+  console.log("we get!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
   const singleCategoryResponse = await categoryApi.getCategoryDetail(categoryId);
   singleCategory.value = singleCategoryResponse.data;
