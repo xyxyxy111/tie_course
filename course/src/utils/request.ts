@@ -66,7 +66,7 @@ export const getCurrentUsername = (): string | null => {
 };
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5173/api',
+  baseURL: import.meta.env.VITE_APP_API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
