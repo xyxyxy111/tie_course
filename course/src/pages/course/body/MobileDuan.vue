@@ -6,7 +6,7 @@ import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
-import { useCourseDescription, useCart, otherThemes, Comments } from '../components/content';
+import { useCourseDescription, useCart, Comments } from '../components/content';
 
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
@@ -167,9 +167,9 @@ const handleGift = () => {
       </div>
       <div class="other-theme">
         <h1>浏览相关主题</h1>
-        <button v-for="otherTheme in otherThemes">
+        <!-- <button v-for="otherTheme in otherThemes">
           {{ otherTheme.title }}
-        </button>
+        </button> -->
       </div>
       <div class="course-content">
         <h1>课程内容</h1>

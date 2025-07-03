@@ -1,40 +1,4 @@
-.title {
-  min-width: fit-content;
-  text-align: center;
-  font-weight: 600;
-  font-family: 'Times New Roman', Times, serif
-}
-
-.navigate {
-  display: flex;
-  justify-items: center;
-  justify-content: center;
-}
-
-.container,
-.voice-container {
-  width: 100%;
-  margin-bottom: 50px;
-}
-
-.navigate button {
-  font-size: 16px;
-  display: inline-block;
-  padding: 0px 24px;
-  min-width: fit-content;
-  border-radius: 25px;
-  background-color: gainsboro;
-  text-decoration: none;
-  color: rgb(22, 92, 145);
-  letter-spacing: 1px;
-  border: 0;
-  cursor: pointer;
-  font-family: 微软雅黑;
-  font-weight: bolder;
-  transition: all 0.3s ease;
-}
-
-.course button {
+.course-card button {
   position: relative;
   justify-content: center;
   display: inline-flex;
@@ -53,32 +17,6 @@
   font-family: 微软雅黑;
 }
 
-.navigate button:hover {
-  color: rgb(22, 92, 145);
-  box-shadow: 0 4px 4px rgb(22, 92, 145, 0.1);
-  background-color: rgba(128, 128, 128, 0.5);
-}
-
-.course button:hover {
-  background-color: rgb(255, 255, 255);
-  color: rgb(22, 92, 145);
-  box-shadow: 0 4px 4px rgb(22, 92, 145, 0.1);
-}
-
-.course img {
-  position: relative;
-  box-shadow: 0 0 10px rgba(22, 92, 145, 0.3);
-  transition: all 0.5s ease;
-  margin: 0 auto;
-  width: 100%;
-  height: 50%;
-  border-radius: 18px 18px 0px 0px;
-  transition: all 0.3s;
-}
-
-.course:hover img {
-  opacity: 0.5;
-}
 
 .content {
   margin: 0 auto;
@@ -88,23 +26,12 @@
 
 .custom-popup-right {
   width: fit-content;
-  z-index: 100;
+  z-index: 1000;
   border-radius: 30px;
   width: 100%;
   height: 20%;
 }
 
-.title {
-  margin-bottom: 20px;
-}
-
-.course,
-.comment {
-  display: inline-block;
-  overflow: hidden;
-  border: rgba(22, 92, 145, 0.1) 2px solid;
-  border-radius: 20px;
-}
 
 .icon-demo {
   display: inline-block;
@@ -118,28 +45,6 @@
   height: 48px;
   padding: 7px 8px;
 }
-
-.voice-comment {
-  margin: 15px;
-  overflow: hidden;
-  color: rgba(22, 92, 145, 0.7);
-}
-
-.voice-img {
-  height: 70px;
-  margin-left: 10px;
-}
-
-.voice-link {
-  padding-left: 20px;
-  color: gray;
-  font-size: 24px;
-}
-
-.voice-link:hover {
-  color: rgb(22, 92, 145);
-}
-
 
 .container-scroll-x {
   overflow-x: auto;
@@ -178,7 +83,6 @@
   background: #b0b0b0;
 }
 
-/* 首页样式 */
 .index-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -300,19 +204,6 @@
   gap: 24px;
 }
 
-.course-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
 
 .course-image {
   width: 100%;
@@ -412,109 +303,4 @@
   background: var(--primary-color-light);
   border-color: var(--primary-color);
   color: var(--primary-color);
-}
-
-.categories-section {
-  margin-bottom: 40px;
-}
-
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.category-card {
-  background: white;
-  border-radius: 12px;
-  padding: 30px 20px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.category-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--primary-color-light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  font-size: 24px;
-  color: var(--primary-color);
-}
-
-.category-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.category-count {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .index-container {
-    padding: 10px;
-  }
-
-  .hero-section {
-    padding: 40px 20px;
-  }
-
-  .hero-title {
-    font-size: 32px;
-  }
-
-  .hero-subtitle {
-    font-size: 16px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hero-btn {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .course-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .category-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-  }
-
-  .category-card {
-    padding: 20px 15px;
-  }
-
-  .category-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
 }

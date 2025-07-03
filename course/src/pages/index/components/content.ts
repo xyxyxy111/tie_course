@@ -1,18 +1,15 @@
 import { toRef, ref, onMounted, defineComponent } from 'vue';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { categoryApi, courseApi } from '@/api/course';
-import type { Category, Tag, CourseListVO } from '@/api/course';
+import type { CategoryList, Tag, CourseListVO } from '@/api/course';
 
 class NavigationButton {
   activeFlag: boolean = false;
   hoverFlag: boolean = false;
-
-  constructor(public text: string, public tagId: number) { }
-
+  constructor(public title: string, public id: number) { }
   mouseEnter() {
     this.hoverFlag = true;
   }
-
   mouseLeave() {
     this.hoverFlag = false;
   }
@@ -69,59 +66,31 @@ class CommunityVoice {
     public course: string) { }
 }
 
-// 共享的响应式数据
-const categories = ref<Category[]>([]);
-const singleCategory = ref<Category | null>(null);
-const tags = ref<Tag[]>([]);
-const courseListVos = ref<CourseListVO[]>([]);
 const userId = ref<string | null>(null);
+const categories = ref<CategoryList[]>([]);
+const selectedCategoryId = ref<number | null>(null);
+const tags = ref<Tag[]>([]);
 const selectedTagId = ref<number | null>(null);
-
-const courseTitles = ref<NavigationButton[]>([]);
+const courseListVos = ref<CourseListVO[]>([]);
+const categoryTitles = ref<NavigationButton[]>([]);
+const tagTitles = ref<NavigationButton[]>([]);
 const courseQuickViews = ref<CourseQuickView[]>([]);
 
-// 共享的数据获取逻辑
 export const useIndexData = () => {
   const initializeData = async () => {
-    // 获取userId
     const token = getValidToken();
     if (token) {
       userId.value = getCurrentUserId();
     }
-
-    const searchParams = new URLSearchParams(window.location.search);
-    let categoryId;
-    if (!searchParams.get('categoryId')) {
-      categoryId = 1;
-    } else {
-      categoryId = parseInt(searchParams.get('categoryId')!);
-    }
-
-    const categoriesResponse = await categoryApi.getAllCategories();
-    categories.value = categoriesResponse.data;
-
-    const singleCategoryResponse = await categoryApi.getCategoryDetail(categoryId);
-    singleCategory.value = singleCategoryResponse.data;
-
-    const tagsResponse = await categoryApi.getTagListByCategoryId(categoryId);
-    tags.value = tagsResponse.data;
-    courseTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
-
-    let tagId;
-    if (!searchParams.get('tagId')) {
-      let firstTag = tags.value[0];
-      tagId = firstTag.tagId;
-    } else {
-      tagId = parseInt(searchParams.get('tagId')!);
-    }
-    selectedTagId.value = tagId;
-    await getCourseListByTagId(tagId);
-    if (courseTitles.value.length > 0) courseTitles.value[0].activeFlag = true;
-  };
-
-  const getCourseListByTagId = async (tagId: number) => {
-    const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
-    courseListVos.value = courseListVosResponse.data;
+    await fetchCategories();
+    selectedCategoryId.value = 1;
+    await getTagListByCategoryId(1);
+    categoryTitles.value = categories.value.map(category => new NavigationButton(category.name.toString(), category.categoryId!));
+    categoryTitles.value[0].activeFlag = true;
+    tagTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
+    tagTitles.value[0].activeFlag = true;
+    selectedTagId.value = tagTitles.value[0].id;
+    await getCourseListByTagId(tagTitles.value[0].id);
     courseQuickViews.value = courseListVos.value.map(course => {
       return new CourseQuickView(
         course.courseId,
@@ -136,28 +105,15 @@ export const useIndexData = () => {
       );
     });
   };
-
-  const changeCourseTheme = (i: NavigationButton) => {
-    courseTitles.value.forEach(element => {
-      element.activeFlag = false;
-    });
-    i.activeFlag = true;
-    selectedTagId.value = i.tagId;
-    getCourseListByTagId(i.tagId);
-  };
-
   return {
     categories,
-    singleCategory,
     tags,
     courseListVos,
     userId,
+    selectedCategoryId,
     selectedTagId,
-    courseTitles,
     courseQuickViews,
-    initializeData,
-    getCourseListByTagId,
-    changeCourseTheme
+    initializeData
   };
 };
 
@@ -213,48 +169,89 @@ interface Product {
 }
 
 
-const recommendedProducts: Product[] = [
-  {
-    id: 1,
-    coverImgUrl: '/src/images/image3.png',
-    name: '来杯Java吧! 2025 Java 入門到精通課程',
-    author: 'Wilson Ren',
-    rating: '4.6',
-    reviewCount: '889',
-    isPopular: true,
-    price: '¥69.99'
-  },
-  {
-    id: 2,
-    coverImgUrl: '/src/images/image4.png',
-    name: '2025 Python全攻略',
-    author: 'Wilson Ren',
-    rating: '4.7',
-    reviewCount: '2,187',
-    isPopular: true,
-    price: '¥74.99'
-  },
-  {
-    id: 3,
-    coverImgUrl: '/src/images/image5.png',
-    name: '2025 網頁全端開發',
-    author: 'Wilson Ren',
-    rating: '4.8',
-    reviewCount: '2,040',
-    isPopular: true,
-    price: '¥59.99'
+const fetchCategories = async () => {
+  try {
+    const categoriesResponse = await categoryApi.getAllCategories();
+    categories.value = categoriesResponse.data;
+    console.log("categories:" + categories.value.map(category => category.name));
+    for (const category of categories.value) {
+      if (category.categoryId) {
+        const tagsResponse = await categoryApi.getTagListByCategoryId(category.categoryId);
+        (category as any).tags = tagsResponse.data;
+      }
+    }
+  } catch (error) {
+    console.error('获取categories失败:', error);
   }
-];
+};
 
-const relatedTopics = [
-  'Spring Boot',
-  'Spring Framework',
-  'Selenium WebDriver'
-];
 
+
+const changeCategory = async (i: NavigationButton) => {
+  try {
+    categoryTitles.value.forEach(element => {
+      element.activeFlag = false;
+    });
+    i.activeFlag = true;
+    selectedCategoryId.value = i.id;
+    await getTagListByCategoryId(i.id);
+    tagTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
+    tagTitles.value[0].activeFlag = true;
+    console.log("第一个标签已选中:", tagTitles.value[0]);
+    changeTag(tagTitles.value[0]);
+  } catch (error) {
+    console.error("获取标签列表失败:", error);
+  }
+};
+
+const changeTag = async (i: NavigationButton) => {
+  tagTitles.value.forEach(element => {
+    element.activeFlag = false;
+  });
+  i.activeFlag = true;
+  selectedTagId.value = i.id;
+  await getCourseListByTagId(i.id);
+  courseQuickViews.value = courseListVos.value.map(course => {
+    return new CourseQuickView(
+      course.courseId,
+      course.coverImgUrl,
+      course.title,
+      course.score,
+      course.originalPrice,
+      new Date(course.updateTime || new Date()),
+      course.totalMinutes,
+      course.description,
+      course.whatYouWillLearn
+    );
+  });
+  console.log("courseQuickViews:" + courseQuickViews.value.map(course => course.title));
+};
+
+const getCourseListByTagId = async (tagId: number) => {
+  const courseListVosResponse = await courseApi.getCourseListByTagId(tagId);
+  courseListVos.value = courseListVosResponse.data;
+  courseQuickViews.value = courseListVos.value.map(course => {
+    return new CourseQuickView(
+      course.courseId,
+      course.coverImgUrl,
+      course.title,
+      course.score,
+      course.originalPrice,
+      new Date(course.updateTime || new Date()),
+      course.totalMinutes,
+      course.description,
+      course.whatYouWillLearn
+    );
+  });
+};
+
+const getTagListByCategoryId = async (categoryId: number) => {
+  const tagsResponse = await categoryApi.getTagListByCategoryId(categoryId);
+  tags.value = tagsResponse.data;
+};
 
 export {
-  courseTitles, NavigationButton,
   courseQuickViews, communityVoices,
-  recommendedProducts, relatedTopics
+  fetchCategories, changeCategory,
+  changeTag, categoryTitles, tagTitles
 }

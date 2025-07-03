@@ -2,10 +2,12 @@
   <IconSprite />
   <div class="header">
     <div :style="headerSpaceStyle"></div>
-    <div id="logo" :style="headerButtonStyle" @click="goToIndex()">Course</div>
+    <div id="logo" :style="headerButtonStyle" @click="goToIndex()">
+      <img src="/src/images/itie_logo.png" alt="">
+    </div>
     <div :style="headerSpaceStyle"></div>
     <div class="explore">
-      <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">Explore</button>
+      <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">探索</button>
 
       <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handlePopupEnter" @mouseleave="handlePopupLeave">
         <div class="explore-popup-content">
@@ -65,7 +67,7 @@
     </button>
 
 
-    <button v-if="!userId" :style="headerButtonStyle2" @click="goToLogin">Login</button>
+    <button v-if="!userId" :style="headerButtonStyle2" @click="goToLogin">登录</button>
 
     <div v-if="userId" :style="headerButtonStyle">
       <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
@@ -80,7 +82,11 @@ import { useWindowSize } from '@/useWindowSize'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import IconSprite from '../Icon/IconSprite.vue'
 import './header.css'
-import { goToLogin, goToMyInfo, goToLearning, goToWishlist, categoryList, expandedCategory, toggleCategory, goToCategory, fetchCategories, goToIndex, goToCart, Search ,searchQuery} from './header.ts';
+import {
+  goToLogin, goToMyInfo, goToLearning, goToWishlist,
+  categoryList, expandedCategory, toggleCategory,
+  goToCategory, fetchCategories, goToIndex, goToCart, Search, searchQuery
+} from './header.ts';
 import type { CategoryList } from '@/api/course.ts';
 import { categoryApi } from '@/api/course'
 
@@ -91,16 +97,8 @@ let exploreHideTimer: number | null = null
 let categoryHideTimer: number | null = null
 let tagsHideTimer: number | null = null
 
-
-
 onMounted(async () => {
-  const categoriesResponse = await categoryApi.getAllCategories();
-  categoryList.value = categoriesResponse.data;
-  console.log(categoryList);
-  categoryList.value.map(async category => {
-    const TagResponse = await categoryApi.getTagListByCategoryId(category.categoryId!);
-    category.tags = TagResponse.data;
-  });
+  await fetchCategories();
 });
 
 // 清理定时器
@@ -337,7 +335,8 @@ img {
   position: relative;
 }
 
-.category-item,.tag-item {
+.category-item,
+.tag-item {
   position: relative;
   padding: 14px 20px;
   cursor: pointer;
@@ -348,8 +347,9 @@ img {
   margin: 2px 0px;
 }
 
-.category-item:hover ,.tag-item:hover{
-  background: linear-gradient(105deg, white 70%,rgba(22, 92, 145, 0.2) 100%);
+.category-item:hover,
+.tag-item:hover {
+  background: linear-gradient(105deg, white 70%, rgba(22, 92, 145, 0.2) 100%);
   color: #495057;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -373,7 +373,7 @@ img {
 
 .category-item:hover .category-icon {
   opacity: 1;
- transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .category-arrow {

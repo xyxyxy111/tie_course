@@ -229,8 +229,6 @@ const openWxLogin = async () => {
 };
 
 const startWxLoginPolling = () => {
-  // 这里需要根据实际的后端API调整
-  // 假设后端返回的state用于轮询
   const pollInterval = setInterval(async () => {
     try {
       const response = await authApi.getWxLoginStatus(wxState.value);
@@ -284,7 +282,7 @@ onMounted(() => {
         <img src="/src/images/login_signup.png" :style="ImgStyle()">
       </div>
       <div class="login-form">
-        <h1>Log in to continue your learning journey</h1>
+        <h1>登录以继续您的学习之旅</h1>
         <div v-if="loginStatus.error" class="error-message">
           {{ loginStatus.error }}
         </div>
@@ -395,7 +393,8 @@ onMounted(() => {
 
 .login-container .login-form {
   z-index: 200;
-  min-width: 450px;
+  width: 460px;
+  height: 468px;
 }
 
 /* 密码输入框样式 */

@@ -11,7 +11,7 @@ import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
 import { goToCart } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
-import { useCourseDescription, useCart, otherThemes, courseCurriculums, Comments } from '../components/content';
+import { useCourseDescription, useCart, Comments } from '../components/content';
 
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
@@ -140,10 +140,8 @@ const handleAddToCart = async () => {
   <div id="top-container">
     <div class="content">
       <div class="course-theme">
-        <h6> {{ courseVo?.categoryName }} {{ courseVo?.tagName }}</h6>
+        <h6> {{ courseVo?.categoryName }} &nbsp; > &nbsp; {{ courseVo?.tagName }}</h6>
       </div>
-
-      <div class="divider"></div>
 
       <div class="course-title">
         <h3> {{ courseVo?.title }}
@@ -154,11 +152,40 @@ const handleAddToCart = async () => {
         <h5>{{ courseVo?.highLights }}</h5>
 
       </div>
-
-      <div class="divider"></div>
-
-      <div class="update-time">
-        <h6>上次更新时间：{{ courseVo?.updateTime }}</h6>
+      <div class="course-meta-row">
+        <span class="hot-tag">热门课程</span>
+        <span class="rating-score">4.9</span>
+        <span class="stars">
+          <svg v-for="i in 4" :key="i" class="star" viewBox="0 0 20 20" width="22" height="22" fill="#FFC800">
+            <polygon points="10,1 12.5,7.5 19,7.5 14,12 16,19 10,15 4,19 6,12 1,7.5 7.5,7.5" />
+          </svg>
+          <!-- 半星 -->
+          <svg class="star" viewBox="0 0 20 20" width="22" height="22">
+            <defs>
+              <linearGradient id="half">
+                <stop offset="50%" stop-color="#FFC800" />
+                <stop offset="50%" stop-color="#222" />
+              </linearGradient>
+            </defs>
+            <polygon points="10,1 12.5,7.5 19,7.5 14,12 16,19 10,15 4,19 6,12 1,7.5 7.5,7.5" fill="url(#half)"
+              stroke="#FFC800" stroke-width="1" />
+          </svg>
+        </span>
+        <a class="review-link" href="#">(1,025个评分)</a>
+        <span class="student-count">3,796 个学生</span>
+      </div>
+      <div class="course-meta-row">
+        <span>创建者</span>
+        <a class="creator-link" href="#">iClass</a>
+      </div>
+      <div class="course-meta-row">
+        <span class="clock-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="9" stroke="#fff" stroke-width="2" />
+            <path d="M10 5v5l3 3" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span>上次更新时间：{{ courseVo?.updateTime }}</span>
       </div>
 
     </div>
@@ -173,9 +200,9 @@ const handleAddToCart = async () => {
 
     <div class="other-theme">
       <h1>浏览相关主题</h1>
-      <button v-for="otherTheme in otherThemes">
+      <!-- <button v-for="otherTheme in otherThemes">
         {{ otherTheme.title }}
-      </button>
+      </button> -->
 
     </div>
 
@@ -218,28 +245,14 @@ const handleAddToCart = async () => {
     </div>
     <button @click="CourseDescriptionFlag = !CourseDescriptionFlag" class="course-descrpitionbtn">显示更多</button>
 
-    <h1>评论</h1>
-    <div class="comment-container .container-scroll-x">
-
-      <div class="comment">
-        <div v-for="(comment, index) in Comments" class="ones-comment">
-          <div class="user">
-            <img :src="comment.userpicture" alt="" class="user-picture">
-            <span>{{ comment.username }}</span>
-          </div>
-          <div class="comment-content">{{ comment.content }}</div>
-          <div class="comment-datetime">{{ comment.datetime }}</div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <style scoped>
 #top-container {
   display: flex;
-  background-color: rgb(4, 35, 58);
-  color: rgb(200, 230, 255);
+  background-color: #101010;
+  color: #fff;
   width: 100%;
   padding: 20px 0px 20px 10px;
   font-size: 20px;
@@ -248,22 +261,97 @@ const handleAddToCart = async () => {
 
 .content {
   margin: 0 auto;
-  width: calc(30% + 680px);
+  width: calc(30% + 660px);
   min-width: 650px;
   max-width: 1320px;
   padding: 20px;
   padding-right: 340px;
 }
 
-.content h3 {
-  color: white;
+.content .course-theme {
+  color: #A3C7FD;
   font-weight: bold;
 }
 
-.divider {
-  height: 1px;
-  background-color: #e1e1e1;
-  margin: 10px 20px 10px 0px;
+.content .course-title {
+  color: #fff;
+  font-weight: bold;
+  font-size: 32px;
+}
+
+.content .course-introduction {
+  color: #fff;
+  font-size: 18px;
+  height: 90px;
+  overflow: hidden;
+}
+
+
+.course-meta-row {
+  margin: 15px 0px 0px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.hot-tag {
+  background: #eaf6ff;
+  color: #165c91;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 2px 10px;
+
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.rating-score {
+  color: #FFC800;
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 2px;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  margin-right: 6px;
+}
+
+.star {
+  margin-right: -2px;
+}
+
+.review-link {
+  color: #7cb1ff;
+  font-size: 16px;
+  margin-right: 8px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.student-count {
+  color: #fff;
+  font-size: 16px;
+  margin-left: 4px;
+}
+
+.creator-link {
+  color: #7cb1ff;
+  font-size: 16px;
+  margin-left: 4px;
+  text-decoration: underline;
+}
+
+.clock-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
 }
 
 #course-detail {
