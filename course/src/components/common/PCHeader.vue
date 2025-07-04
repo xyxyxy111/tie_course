@@ -25,7 +25,6 @@
                     @click="goToCategory(category.categoryId!, tag.tagId)">
                     {{ tag.name }}
                   </span>
-
                 </div>
               </div>
             </div>

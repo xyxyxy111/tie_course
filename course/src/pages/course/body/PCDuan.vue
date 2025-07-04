@@ -26,7 +26,6 @@ const { width, height } = useWindowSize()
 const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();
 const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
 
-// 获取userId
 const userId = ref<string | null>(null);
 
 // 展开章节的id集合

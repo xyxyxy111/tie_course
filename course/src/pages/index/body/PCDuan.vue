@@ -20,15 +20,15 @@ const { width, height } = useWindowSize()
 
 const {
   selectedCategoryId, selectedTagId,
-  userId,
+  userId, userInfo,
   courseQuickViews,
   initializeData
 } = useIndexData();
 
 onMounted(async () => {
   await initializeData();
-  console.log("categoryTitles:" + categoryTitles.value.map(category => category.title));
 });
+
 const showCart = ref(false);
 const selectedCourse = ref<{ title: string; courseId: number } | null>(null);
 function addToCart(course: any) {
@@ -43,6 +43,34 @@ function handleCourseAdded(event: any) {
   console.log('课程已添加到购物车:', event);
   showCart.value = true;
 }
+
+const currentIndex = ref(0)
+const itemsPerPage = 4;
+const displayCourses = computed(() => {
+  return courseQuickViews.value.slice(currentIndex.value, currentIndex.value + itemsPerPage)
+});
+function Prev() {
+  if (currentIndex.value > 0) {
+    currentIndex.value -= itemsPerPage;
+  }
+}
+function Next() {
+  if (currentIndex.value < courseQuickViews.value.length - itemsPerPage) { currentIndex.value += itemsPerPage; }
+}
+const PrevButtonStyle = computed(() => ({
+  opacity: currentIndex.value > 0 ? '1' : '0.5'
+}));
+
+const NextButtonStyle = computed(() => ({
+  opacity: currentIndex.value < courseQuickViews.value.length - itemsPerPage
+    ? '1' : '0.5'
+}));
+
+const courseSliderStyle = computed(() => ({
+  left: `calc(${currentIndex.value} * -320px)`
+}));
+
+
 </script>
 
 <template>
@@ -53,6 +81,12 @@ function handleCourseAdded(event: any) {
     <PCHeader :userId="userId" />
 
     <div id="main-content">
+      <div v-if="userId" class="user">
+        <span><img :src="userInfo.avatarUrl" alt=""></span>
+        <span class="welcome">
+          欢迎回来,{{ userInfo.username }}
+        </span>
+      </div>
       <Swiper />
       <div class="navigator">
         <h1>将您需要的所有技能集中在一个地方</h1>
@@ -73,74 +107,54 @@ function handleCourseAdded(event: any) {
             <div class="category-tab-desc">1k 以上的学习者</div>
           </div>
         </div>
-
-        <div class="course-slider">
-
-          <div v-for="(courseQuickView, index) in courseQuickViews" class="course-card"
-            @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
-            <HoverPopup v-model="courseQuickView.hoverFlag" transition="slide" width="300px" height="360px"
-              :show-delay="200" :hide-delay="200" class="custom-popup-right" :userId="userId || undefined"
-              :courseName="courseQuickView.title" :courseId="courseQuickView.courseId"
-              @course-added="handleCourseAdded">
-              <template #trigger>
-                <div class="popup-trigger-area">
-                  <div @click="goToCourse(courseQuickView.courseId)">
-                    <img :src="courseQuickView.coverImgUrl" alt="">
-                    <div class="course-title">
-                      {{ courseQuickView.title }}
-                    </div>
-                    <div class="course-author">
-                      iClass
-                    </div>
-                    <div class="course-rating">
-                      {{ courseQuickView.score }} ★★★★ (2,187)
-                    </div>
-                    <div class="course-price">
-                      ¥{{ courseQuickView.originalPrice.toFixed(2) }}
+        <div class="course-slider-container">
+          <button class="button-prev" :style="PrevButtonStyle" @click="Prev">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <use href="#grommet-icons--previous" />
+              </svg>
+            </span>
+          </button>
+          <div class="course-slider" :style="courseSliderStyle">
+            <div v-for="(courseQuickView, index) in courseQuickViews" class="course-card"
+              @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
+              <HoverPopup v-model="courseQuickView.hoverFlag" transition="slide" width="300px" height="360px"
+                :index="index" :show-delay="200" :hide-delay="200" :userId="userId || undefined"
+                :courseName="courseQuickView.title" :courseId="courseQuickView.courseId"
+                @course-added="handleCourseAdded">
+                <template #trigger>
+                  <div>
+                    <div @click="goToCourse(courseQuickView.courseId)">
+                      <img :src="courseQuickView.coverImgUrl" alt="">
+                      <div class="course-title">
+                        {{ courseQuickView.title }}
+                      </div>
+                      <div class="course-author">
+                        iClass
+                      </div>
+                      <div class="course-rating">
+                        {{ courseQuickView.score }} ★★★★ (2,187)
+                      </div>
+                      <div class="course-price">
+                        ¥{{ courseQuickView.originalPrice }}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </template>
-            </HoverPopup>
+                </template>
+              </HoverPopup>
+            </div>
           </div>
-
-
-
-          <!-- 右侧箭头按钮 -->
-          <button class="slider-arrow">
-            <span>›</span>
+          <button class="button-next" :style="NextButtonStyle" @click="Next">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+                <use href="#ooui--next-ltr" />
+              </svg>
+            </span>
           </button>
         </div>
-
         <button class="show-all-btn">显示所有 {{}} 课程</button>
 
 
-        <div v-for="(courseQuickView, index) in courseQuickViews" class="course-card"
-          @mouseenter="courseQuickView.mouseEnter()" @mouseleave="courseQuickView.mouseLeave()">
-          <HoverPopup v-model="courseQuickView.hoverFlag" transition="slide" width="300px" height="360px"
-            :show-delay="200" :hide-delay="200" class="custom-popup-right" :userId="userId || undefined"
-            :courseName="courseQuickView.title" :courseId="courseQuickView.courseId" @course-added="handleCourseAdded">
-            <template #trigger>
-              <div class="popup-trigger-area">
-                <div @click="goToCourse(courseQuickView.courseId)">
-                  <img :src="courseQuickView.coverImgUrl" alt="">
-                  <div class="course-title">
-                    {{ courseQuickView.title }}
-                  </div>
-                  <div class="course-author">
-                    iClass
-                  </div>
-                  <div class="course-rating">
-                    {{ courseQuickView.score }} ★★★★ (2,187)
-                  </div>
-                  <div class="course-price">
-                    ¥{{ courseQuickView.originalPrice.toFixed(2) }}
-                  </div>
-                </div>
-              </div>
-            </template>
-          </HoverPopup>
-        </div>
 
       </div>
 
@@ -155,6 +169,31 @@ function handleCourseAdded(event: any) {
 #main-content {
   margin: 0 auto;
   max-width: 1400px;
+}
+
+#main-content .user {
+  display: flex;
+  padding-left: 50px;
+}
+
+#main-content .user img {
+  height: 80px;
+  width: 80px;
+  border-radius: 40px;
+  margin-right: 20px;
+}
+
+#main-content .user span {
+  font-family: 'PingFangSC', sans-serif;
+  font-weight: bold;
+  font-style: normal;
+  color: #101010;
+  font-size: 24px;
+  letter-spacing: auto;
+  line-height: 34px;
+  word-spacing: 5px;
+  text-align: left;
+  vertical-align: middle;
 }
 
 .navigator {
@@ -235,7 +274,7 @@ function handleCourseAdded(event: any) {
   display: flex;
   justify-content: left;
   gap: 24px;
-  margin: 0px 0 32px 30px;
+  margin-left: 30px;
 }
 
 .category-tab {
@@ -251,7 +290,7 @@ function handleCourseAdded(event: any) {
   font-weight: 500;
   font-size: 18px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s;
   margin-bottom: 8px;
   user-select: none;
 }
@@ -279,28 +318,35 @@ function handleCourseAdded(event: any) {
   opacity: 1;
 }
 
+.course-slider-container {
+  margin: 0 auto;
+  padding-left: 5px;
+  width: 100%;
+  overflow: hidden;
+}
+
 .course-slider {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 20px;
-  margin: 0 auto 16px auto;
-  max-width: 1200px;
-  min-width: 900px;
+  padding-inline: 15px;
+  margin: 0 auto;
+  width: fit-content;
+  transition: all 0.3s;
 }
 
 .course-card {
   position: relative;
-  /* 确保弹窗可以相对此容器定位 */
-  width: 300px;
+  width: 300px !important;
   height: 350px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-  display: flex;
-  flex-direction: column;
   overflow: visible;
-  border: 2px solid #e0e0e0;
+  border: 1px solid #a3c7fd52;
 }
+
 
 .course-card img {
   width: 100%;
@@ -335,31 +381,54 @@ function handleCourseAdded(event: any) {
   margin: 0px 20px;
 }
 
-.slider-arrow {
-  position: absolute;
-  right: -32px;
-  top: 50%;
-  transform: translateY(-50%);
+.button-next,
+.button-prev {
+  position: relative;
+  color: #222;
   background: #fff;
-  border: 2px solid #e5eaf3;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  border: 2px solid #e5eaf3;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  color: #222;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-  cursor: pointer;
-  z-index: 10;
-  transition: background 0.2s, color 0.2s, border 0.2s;
+  font-size: 30px;
+  transition: all 0.2s;
+  z-index: 300;
+  padding-bottom: 7px;
+}
+
+.button-prev {
+  top: 212px;
+  left: -5px;
+  padding-top: 12px;
+  padding-right: 12px;
+}
+
+.button-next {
+  top: -198px;
+  padding-top: 6px;
+  padding-left: 10px;
+  left: 1245px;
+}
+
+.button-next:hover,
+.button-prev:hover {
+  background: rgb(242, 242, 242);
+}
+
+.button-next:after,
+.button-prev:after {
+  font-size: 22px;
+  font-weight: bold;
 }
 
 .show-all-btn {
   background: #fff;
   color: #165c91;
-  border: #165c91  1px solid;
+  border: #165c91 1px solid;
   width: fit-content;
   border-radius: 6px;
   margin-left: 30px;
@@ -369,7 +438,6 @@ function handleCourseAdded(event: any) {
   height: 40px;
   font-size: 15px;
   cursor: pointer;
-  margin-top: 6px;
   transition: all 0.2s;
 }
 

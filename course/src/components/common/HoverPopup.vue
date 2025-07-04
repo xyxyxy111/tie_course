@@ -29,13 +29,6 @@
             <button class="addToCartBtn" @click="addToCart" :disabled="loading">
               {{ loading ? '添加中...' : '添加至购物车' }}
             </button>
-            <button class="addToWishlistBtn" @click="addToWishlist">
-              <div class="icon">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="#35495e">
-                  <use href="#line-md--heart-filled" />
-                </svg>
-              </div>
-            </button>
           </div>
         </template>
       </div>
@@ -50,12 +43,11 @@ import { cartApi } from '@/api/cart';
 import type { CourseVO } from '@/api/course';
 import { courseApi } from '@/api/course';
 import { convertMinutesToHours } from '@/utils/common';
-import { userApi, wishlistApi } from '@/api/user';
+import { wishlistApi } from '@/api/user';
 
 type Position = 'right' | 'left' | 'top' | 'bottom';
 type TransitionType = 'fade' | 'slide' | 'scale';
 
-// 定义课程信息接口
 interface CourseInfo {
   title: string;
   description: string;
@@ -70,6 +62,10 @@ interface CourseInfo {
 export default defineComponent({
   name: 'HoverPopup',
   props: {
+    index: {
+      type: Number,
+      default: 1
+    },
     position: {
       type: String as PropType<Position>,
       default: 'right',
@@ -108,7 +104,6 @@ export default defineComponent({
       type: Boolean,
       default: undefined
     },
-    // 新增属性
     userId: {
       type: String,
       default: undefined
@@ -130,7 +125,13 @@ export default defineComponent({
     let showTimer: number | null = null;
     let hideTimer: number | null = null;
 
-    const positionClass = computed(() => `position-${props.position}`);
+    let positionClass = computed(() => {
+      if ((props.index + 1) % 4 === 0) {
+        return 'position-left';
+      } else {
+        return 'position-right';
+      }
+    });
     const transitionName = computed(() => `popup-${props.transition}`);
 
     const contentStyle = computed(() => ({
@@ -161,46 +162,6 @@ export default defineComponent({
       }
     };
 
-
-    // 临时解决方案：使用本地存储作为备用
-    const addToCartLocal = (courseInfo: CourseInfo) => {
-      try {
-        const localCart = JSON.parse(localStorage.getItem('localCart') || '[]');
-        const existingItem = localCart.find((item: any) => item.courseId === courseInfo.courseId);
-
-        if (existingItem) {
-          alert('ℹ️ 该课程已在购物车中');
-          return;
-        }
-
-        const cartItem = {
-          courseId: courseInfo.courseId,
-          courseName: courseInfo.title,
-          courseImage: courseInfo.coverImgUrl,
-          price: courseInfo.price,
-          addedAt: new Date().toISOString(),
-          userId: props.userId
-        };
-
-        localCart.push(cartItem);
-        localStorage.setItem('localCart', JSON.stringify(localCart));
-
-        alert(`✅ 课程 "${courseInfo.title}" 已添加到本地购物车\n\n注意：由于系统维护，数据暂时存储在本地。`);
-
-        // 触发事件通知父组件
-        emit('course-added', {
-          courseId: courseInfo.courseId,
-          courseName: courseInfo.title,
-          userId: props.userId,
-          success: true,
-          isLocalStorage: true
-        });
-
-      } catch (err) {
-        console.error('本地存储失败:', err);
-        alert('❌ 本地存储失败，请稍后重试');
-      }
-    };
 
     // 添加课程到购物车
     const addToCart = async () => {
@@ -252,38 +213,6 @@ export default defineComponent({
       }
     };
 
-    const addToWishlist = async () => {
-      if (!props.userId || !courseInfo.value?.courseId) {
-        console.warn('缺少用户ID或课程ID');
-        alert('缺少用户ID或课程ID');
-        return;
-      }
-      try {
-        await wishlistApi.addToWishlist(courseInfo.value.courseId);
-        alert(`✅ "${courseInfo.value.title}" 已添加到心愿单！`);
-        emit('course-wishlisted', {
-          courseId: courseInfo.value.courseId,
-          courseName: courseInfo.value.title,
-          userId: props.userId,
-          success: true
-        });
-      } catch (err: any) {
-        let errorMessage = '添加到心愿单失败';
-        if (err && err.response && err.response.data && err.response.data.message) {
-          errorMessage = err.response.data.message;
-        } else if (err && err.message) {
-          errorMessage = err.message;
-        };
-        console.log(courseInfo.value);
-        emit('course-wishlisted', {
-          courseId: courseInfo.value.courseId,
-          courseName: courseInfo.value.title,
-          userId: props.userId,
-          success: false,
-          error: err
-        });
-      }
-    };
 
     watch(() => props.modelValue, (newVal) => {
       if (newVal !== undefined) {
@@ -362,7 +291,6 @@ export default defineComponent({
       courseInfo,
       loading,
       addToCart,
-      addToWishlist,
       handleMouseEnter,
       handleMouseLeave,
       handlePopupEnter,
@@ -375,6 +303,7 @@ export default defineComponent({
 <style scoped>
 .hover-popup-container {
   display: inline-block;
+  width: 100%;
 }
 
 .trigger-area {
@@ -383,6 +312,7 @@ export default defineComponent({
   display: inline-block;
   cursor: pointer;
   width: 100%;
+  height: 100%;
 }
 
 .popup-content {
@@ -390,11 +320,10 @@ export default defineComponent({
   left: 0;
   top: 0;
   z-index: 9999;
-  /* 确保它在 course-card 上方 */
   display: inline-block;
-  background-color: rgb(23, 1, 1);
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
   padding: 16px;
   width: 100%;
   height: 100%;
@@ -402,7 +331,7 @@ export default defineComponent({
 
 .position-right {
   left: 100%;
-  top: -12px;
+  top: -20px;
   z-index: 1000;
 }
 
@@ -418,12 +347,11 @@ export default defineComponent({
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
   border-right: 13px solid #fff;
-  filter: drop-shadow(-2px 0 1px rgba(0, 0, 0, 0.1));
 }
 
 .position-left {
-  right: 102%;
-  top: -100%;
+  left: -108%;
+  top: -12px;
 }
 
 .position-left::before {
@@ -438,7 +366,6 @@ export default defineComponent({
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
   border-left: 13px solid #fff;
-  filter: drop-shadow(-2px 0 1px rgba(0, 0, 0, 0.1));
 }
 
 .position-top {
@@ -494,7 +421,7 @@ export default defineComponent({
 .course-info {
   width: 100%;
   margin: 0 auto;
-  height: 265px;
+  height: 290px;
   overflow: hidden;
 }
 
@@ -549,52 +476,28 @@ export default defineComponent({
   white-space: pre-line;
 }
 
-.popupBtn {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
 .addToCartBtn {
-  flex: 1;
-  height: 30px;
-  padding: 4px 12px;
+  margin-top: 12px;
+  height: 32px;
+  width: 100%;
+  padding-top: 9px;
   background-color: rgb(22, 92, 145);
   color: white;
   border: none;
-  border-radius: 40px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bolder;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .addToCartBtn:hover:not(:disabled) {
   background-color: white;
+  color: rgb(22, 92, 145)
 }
 
 .addToCartBtn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-.addToWishlistBtn {
-  height: 30px;
-  padding: 8px;
-  background-color: white;
-  color: rgb(22, 92, 145);
-  border-radius: 40px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.addToWishlistBtn:hover {
-  color: red;
-}
-
-.addToWishlistBtn .icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

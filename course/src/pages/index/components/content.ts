@@ -1,7 +1,17 @@
-import { toRef, ref, onMounted, defineComponent } from 'vue';
+import { toRef, ref, onMounted, defineComponent, reactive } from 'vue';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { categoryApi, courseApi } from '@/api/course';
 import type { CategoryList, Tag, CourseListVO } from '@/api/course';
+import { profileApi } from '@/api';
+const userInfo = reactive({
+  username: '',
+  firstName: '',
+  lastName: '',
+  major: '',
+  avatarUrl: '',
+  allowEmailNotify: false,
+  allowSMSNotify: false
+})
 
 class NavigationButton {
   activeFlag: boolean = false;
@@ -69,6 +79,7 @@ class CommunityVoice {
 const userId = ref<string | null>(null);
 const categories = ref<CategoryList[]>([]);
 const selectedCategoryId = ref<number | null>(null);
+let selectedCategoryTitle = ref("");
 const tags = ref<Tag[]>([]);
 const selectedTagId = ref<number | null>(null);
 const courseListVos = ref<CourseListVO[]>([]);
@@ -77,16 +88,19 @@ const tagTitles = ref<NavigationButton[]>([]);
 const courseQuickViews = ref<CourseQuickView[]>([]);
 
 export const useIndexData = () => {
+
   const initializeData = async () => {
     const token = getValidToken();
     if (token) {
       userId.value = getCurrentUserId();
     }
+    await fetchProfile();
     await fetchCategories();
     selectedCategoryId.value = 1;
     await getTagListByCategoryId(1);
     categoryTitles.value = categories.value.map(category => new NavigationButton(category.name.toString(), category.categoryId!));
     categoryTitles.value[0].activeFlag = true;
+    selectedCategoryTitle.value = categoryTitles.value[0].title;
     tagTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
     tagTitles.value[0].activeFlag = true;
     selectedTagId.value = tagTitles.value[0].id;
@@ -113,7 +127,8 @@ export const useIndexData = () => {
     selectedCategoryId,
     selectedTagId,
     courseQuickViews,
-    initializeData
+    initializeData,
+    userInfo
   };
 };
 
@@ -121,39 +136,7 @@ const communityVoices = ref<CommunityVoice[]>([
   new CommunityVoice(
     "Manus AI彻底改变了我的工作流程。相比ChatGPT等工具，它能完整执行从规划到交付的整个项目流程，就像拥有一个AI团队。",
     'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice(
-    "作为技术主管，我最欣赏Manus的结构化输出能力。它不仅能回答问题，还能提供可直接交付客户的专业报告。",
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice(
-    "在尝试了市面上所有主流AI工具后，Manus的端到端任务处理能力是独一无二的。特别是对复杂研究任务的拆解和执行令人惊艳。",
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
-  new CommunityVoice('I\'ve used ChatGPT, Claude, Gemini, andPerplexity daily but Manus impressed mein a way the others didn\'t. l gave it acomplex Al CPTO research and validationtask, and it handled everything: planning,researching, executing, and deliveringstructured results like a team of smartanalysts with a Course manager in charge.It\'s not just another Al tool, it actually getsthings done.',
-    'User', '/src/images/userPic.png', 'course'
-  ),
+  )
 ])
 
 
@@ -168,12 +151,19 @@ interface Product {
   price: string;
 }
 
+const fetchProfile = async () => {
+  try {
+    const { data } = await profileApi.getProfile()
+    Object.assign(userInfo, data)
+  } catch (error) {
+    console.error('获取个人信息失败:', error)
+  }
+}
 
 const fetchCategories = async () => {
   try {
     const categoriesResponse = await categoryApi.getAllCategories();
     categories.value = categoriesResponse.data;
-    console.log("categories:" + categories.value.map(category => category.name));
     for (const category of categories.value) {
       if (category.categoryId) {
         const tagsResponse = await categoryApi.getTagListByCategoryId(category.categoryId);
@@ -251,6 +241,7 @@ const getTagListByCategoryId = async (categoryId: number) => {
 };
 
 export {
+  userId,
   courseQuickViews, communityVoices,
   fetchCategories, changeCategory,
   changeTag, categoryTitles, tagTitles
