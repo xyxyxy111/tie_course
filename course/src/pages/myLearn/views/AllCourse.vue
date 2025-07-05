@@ -20,7 +20,7 @@
 
     <div class="mycourses-container">
       <div class="course-card" v-for="(course, index) in mylist" :key="index" @mouseenter="hoverIndex = index"
-        @mouseleave="hoverIndex = null">
+        @mouseleave="hoverIndex = -1">
         <div class="img-wrapper" :class="{ 'hovered': hoverIndex === index }">
           <img :src="course.coverImgUrl" alt="" />
           <div v-if="hoverIndex === index" class="overlay">
@@ -48,7 +48,7 @@ export default defineComponent({
   setup() {
     const mylist = ref<MyListVO[]>([]);
     const loading = ref(true);
-    const hoverIndex = ref(null);
+    const hoverIndex = ref(0);
     const fetchMylist = async () => {
       try {
         loading.value = true;
@@ -163,7 +163,6 @@ button:hover {
   width: 100%;
   height: 176px;
   overflow: hidden;
-  border-radius: 6px 6px 0 0;
   background: #f5f5f5;
   transition: all 0.2s;
 }
@@ -202,5 +201,4 @@ button:hover {
   align-items: center;
   justify-content: center;
 }
-
 </style>
