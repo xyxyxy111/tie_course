@@ -12,11 +12,10 @@ import { successCodes } from '@/utils/request';
 import { goToIndex } from '@/components/common/header.ts';
 
 import {
-  captchaBtn,
+  captchaBtn, qrCodeUrl,
   loginMethod,
   sendCaptcha,
-  switchLoginMethod,
-  wechatPollingInterval, useFormValidation, useLoginData, loginStatus
+  switchLoginMethod, useFormValidation, useLoginData, loginStatus
 } from '../content';
 
 const {
@@ -24,9 +23,6 @@ const {
   error,
   success,
   loginForm,
-  showWechatLogin,
-  wechatQrCode,
-  wechatLoginStatus,
   handleLogin,
   handleCaptchaLogin,
   handlePasswordLogin,
@@ -127,8 +123,8 @@ onMounted(() => {
 
           <!-- 微信登录方式 -->
           <div v-if="loginMethod === 'wechat'" class="wechat-wrapper">
-            <div v-if="wxLoginStatus === 'waiting'" class="qr-code-container">
-              <img v-if="wxQrCode" :src="wxQrCode" alt="微信登录二维码" class="qr-code">
+            <div v-if="qrCodeUrl">
+              <img :src="qrCodeUrl" alt="微信登录二维码" />
             </div>
             <div v-else-if="wxLoginStatus === 'scanning'" class="status-message">
               <div class="loading-spinner"></div>
