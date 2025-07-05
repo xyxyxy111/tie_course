@@ -19,9 +19,17 @@
     </div>
 
     <div class="mycourses-container">
-      <div class="course-card" v-for="(course, index) in courses" :key="index">
-        <img :src="course.coverimg" alt="">
-        <h5>Git/GitHub/GitLab完全教程（包括Git底层原理）</h5>
+      <div class="course-card" v-for="(course, index) in mylist" :key="index" @mouseenter="hoverIndex = index"
+        @mouseleave="hoverIndex = null">
+        <div class="img-wrapper" :class="{ 'hovered': hoverIndex === index }">
+          <img :src="course.coverImgUrl" alt="" />
+          <div v-if="hoverIndex === index" class="overlay">
+            <svg width="50" height="50" viewBox="0 0 16 16" fill="#eee">
+              <use href="#solar--play-broken" />
+            </svg>
+          </div>
+        </div>
+        <h5>{{ course.title }}</h5>
         <div class="progress-bar">
           <div class="in-progressbar"></div>
         </div>
@@ -32,44 +40,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-
+import { defineComponent, ref, onMounted } from 'vue';
+import { myListApi } from '@/api/user';
+import type { MyListVO } from '@/api/user';
 export default defineComponent({
   name: 'AllCourse',
   setup() {
-    const courses = ref([
-      {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }, {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }, {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }, {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }, {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }, {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }, {
-        coverimg: '/src/images/git.png',
-        title: 'Git/GitHub/GitLab完全教程（包括Git底层原理）',
-        progress: 50
-      }
-    ]);
+    const mylist = ref<MyListVO[]>([]);
+    const loading = ref(true);
+    const hoverIndex = ref(null);
+    const fetchMylist = async () => {
+      try {
+        loading.value = true;
+        const response = await myListApi.getMyList();
+        console.log('愿望单API响应:', response);
 
-    return { courses };
+        // 根据API返回的数据更新Mylist
+        if (response && response.data && Array.isArray(response.data)) {
+          console.log('愿望单数据:', response.data);
+          mylist.value = response.data as MyListVO[];
+
+          // 检查每个课程的ID字段
+          mylist.value.forEach((course, index) => {
+            console.log(`课程 ${index} 完整数据:`, course);
+            console.log(`课程 ${index} 所有属性:`, Object.keys(course));
+          });
+        } else {
+          console.log('愿望单数据为空或格式不正确');
+          mylist.value = [];
+        }
+      } catch (error) {
+        console.error('获取愿望单失败:', error);
+        mylist.value = [];
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    onMounted(() => {
+      fetchMylist();
+    });
+
+    return { mylist, hoverIndex };
   }
 });
 </script>
@@ -82,7 +94,6 @@ export default defineComponent({
 .learning-progress,
 .learning-schedule,
 .mycourses-container {
-  background-color: #f8f9fa;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
@@ -129,28 +140,67 @@ button:hover {
   background-color: rgba(22, 92, 145, 0.8);
 }
 
-.start-btn {
-  background-color: white;
-  color: rgb(22, 92, 145);
-  border: 1px rgb(22, 92, 145) solid;
-}
-
-.start-btn:hover {
-  background-color: rgba(22, 92, 145, 0.08);
-}
 
 .mycourses-container {
+  width: 1260px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(24%, 280px));
+  grid-template-columns: repeat(4, 320px);
 }
 
 .course-card {
-  width: 240px;
-  padding: 10px;
+  width: 300px;
+  height: 308px;
+  display: inline-block;
+  margin: 0 20px 30px 0;
+  vertical-align: top;
+  background: #fff;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.course-card img {
+.img-wrapper {
+  position: relative;
   width: 100%;
-  height: fit-content;
+  height: 176px;
+  overflow: hidden;
+  border-radius: 6px 6px 0 0;
+  background: #f5f5f5;
+  transition: all 0.2s;
 }
+
+.img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.img-wrapper .overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.img-wrapper.hovered .overlay {
+  transition: all 0.3s;
+  display: flex;
+  color: #eee;
+}
+
+.play-btn {
+  font-size: 48px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 </style>

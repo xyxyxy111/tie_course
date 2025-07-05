@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { goToCart } from '@/components/common/header';
 import { useWindowSize } from '@/useWindowSize'
 
@@ -55,15 +55,15 @@ onMounted(() => {
 const props = defineProps({
   courseVideo: {
     type: String,
-    default:'/src/images/image1.png'
+    default: '/src/images/image1.png'
   },
   currentPrice: {
     type: String,
-    default: 'US$13.99'
+    default: '¥13.99'
   },
   originalPrice: {
     type: String,
-    default: 'US$94.99'
+    default: '¥94.99'
   },
   discount: {
     type: String,
@@ -102,7 +102,7 @@ const props = defineProps({
 
 const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon', 'couponApplied']);
 const floatingBoxStyle = () => ({
-  top:(scrollY.value>120)?'10px':`${120-scrollY.value}`+"px"
+  top: (scrollY.value > 120) ? '10px' : `${120 - scrollY.value}` + "px"
 })
 </script>
 
@@ -120,7 +120,7 @@ const floatingBoxStyle = () => ({
   z-index: 100;
 }
 
-.floating-box img{
+.floating-box img {
   width: 100%;
   height: 140px;
 }
@@ -167,26 +167,27 @@ const floatingBoxStyle = () => ({
   font-weight: bold;
   cursor: pointer;
   border: none;
-   width: 100%;
+  width: 100%;
   margin: 0 auto;
   transition: all 0.3s;
 }
 
 .add-to-cart {
   background-color: #fff;
-  color: rgb(22,92,145);
-  border: 1px solid rgb(22,92,145);
+  color: rgb(22, 92, 145);
+  border: 1px solid rgb(22, 92, 145);
 }
 
-.add-to-cart:hover{
-  background-color: rgba(22,92,145,0.1);
+.add-to-cart:hover {
+  background-color: rgba(22, 92, 145, 0.1);
 }
 
 .buy-now {
-  background-color: rgb(22,92,145);
+  background-color: rgb(22, 92, 145);
   color: white;
 }
-.buy-now:hover{
+
+.buy-now:hover {
   background-color: rgba(22, 92, 145, 0.8);
 
 }
@@ -225,7 +226,7 @@ const floatingBoxStyle = () => ({
 }
 
 .action-links a {
-  color: rgb(22,92,145);
+  color: rgb(22, 92, 145);
   text-decoration: underline;
   font-size: 14px;
   cursor: pointer;

@@ -38,7 +38,7 @@
               </div>
             </div>
             <div class="total-section">
-              <p class="total-price">总计： US${{ totalPrice }}</p>
+              <p class="total-price">总计： ¥{{ totalPrice }}</p>
               <button class="add-all-btn" @click="addAllToCart">全部添加至购物车</button>
             </div>
           </div>
@@ -102,29 +102,29 @@ export default defineComponent({
     const recommendedProducts = ref([
       {
         id: 1,
-        name: 'JavaScript 完整指南',
-        coverImgUrl: '/src/images/image1.png',
-        rating: 4.8,
-        reviewCount: 1250,
-        price: 'US$49.99',
+        name: 'Python 数据分析',
+        coverImgUrl: '/src/images/image3.png',
+        rating: '4.6',
+        reviewCount: '889',
+        price: '¥49.99',
         courseId: 101
       },
       {
         id: 2,
-        name: 'React 实战开发',
-        coverImgUrl: '/src/images/image2.png',
-        rating: 4.7,
-        reviewCount: 890,
-        price: 'US$39.99',
+        name: '机器学习实战',
+        coverImgUrl: '/src/images/image4.png',
+        rating: '4.7',
+        reviewCount: '2,187',
+        price: '¥39.99',
         courseId: 102
       },
       {
         id: 3,
-        name: 'Vue.js 从入门到精通',
-        coverImgUrl: '/src/images/image3.png',
-        rating: 4.9,
-        reviewCount: 1100,
-        price: 'US$44.99',
+        name: 'Web 开发全栈课程',
+        coverImgUrl: '/src/images/image5.png',
+        rating: '4.8',
+        reviewCount: '2,040',
+        price: '¥44.99',
         courseId: 103
       }
     ]);
@@ -135,7 +135,7 @@ export default defineComponent({
     // 计算总价
     const totalPrice = computed(() => {
       return recommendedProducts.value.reduce((sum, product) => {
-        const price = parseFloat(product.price.replace('US$', ''));
+        const price = parseFloat(product.price.replace('¥', ''));
         return sum + price;
       }, 0).toFixed(2);
     });
@@ -152,7 +152,7 @@ export default defineComponent({
           courseName: props.courseName,
           courseImage: '/src/images/image6.png',
           courseId: props.courseId,
-          price: 'US$99.99'
+          price: '¥99.99'
         };
       } catch (err) {
         error.value = '获取课程信息失败';

@@ -3,22 +3,47 @@ import { ref, computed, onMounted } from 'vue';
 import { useWindowSize } from '@/useWindowSize';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import MobileHeader from '@/components/common/MoblieHeader.vue';
-import { useCartLogic } from '../components/content';
+
+// 导入共享的数据和逻辑
+import { useCartLogic, useCartUtils } from '../components/content';
 import { wishlistApi } from '@/api/user';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { cartApi } from '@/api/cart';
 import '../cart.css';
 
 const { width, height } = useWindowSize();
-const { cart, totalPrice, goToCheckout, loading, error, removeCourseFromCart } = useCartLogic();
 
-// 获取userId
-const userId = ref<string | null>(null);
+// 使用共享的数据和逻辑
+const {
+  cart,
+  userId,
+  loading,
+  error,
+  totalPrice,
+  totalOriginalPrice,
+  savedAmount,
+  fetchCart,
+  addCourseToCart,
+  removeCourseFromCart,
+  clearCart,
+  goToCheckout
+} = useCartLogic();
+
+const {
+  formatPrice,
+  formatDiscount,
+  formatTime,
+  isCartEmpty,
+  getCartItemCount,
+  isUserLoggedIn,
+  goToLogin
+} = useCartUtils();
 
 onMounted(() => {
-  // 从URL参数获取userId
-  const searchParams = new URLSearchParams((window as any).location.search);
-  const urlUserId = searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId);
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
 });
 
@@ -30,6 +55,23 @@ const headerSpaceStyle = computed(() => ({
 const CourseInstructorStyle = () => ({});
 const CourseTitleStyle = () => ({});
 const CourseIncartStyle = () => ({});
+
+// 清空购物车
+const clearing = ref(false);
+const handleClearCart = async () => {
+  if (clearing.value) return;
+  if (isCartEmpty(cart.value)) return;
+  if (!confirm('确定要清空购物车吗？')) return;
+  clearing.value = true;
+  try {
+    await clearCart();
+    alert('购物车已清空');
+  } catch (error) {
+    alert('清空购物车失败，请重试');
+  } finally {
+    clearing.value = false;
+  }
+};
 
 // 加入心愿单
 const addToWishlist = async (courseId: number) => {
@@ -82,7 +124,6 @@ const removeFromCart = async (courseId: number) => {
     <!-- 错误状态 -->
     <div v-else-if="error" class="error">
       <p>{{ error }}</p>
-      <button @click="() => (window as any).location.reload()">重试</button>
     </div>
 
     <!-- 空购物车状态 -->
@@ -90,12 +131,11 @@ const removeFromCart = async (courseId: number) => {
       <div class="empty-icon">🛒</div>
       <h2>购物车为空</h2>
       <p>您还没有添加任何课程到购物车</p>
-      <button class="browse-btn" @click="() => (window as any).location.href = '/course.html'">浏览课程</button>
     </div>
 
     <!-- 购物车内容 -->
     <div v-else class="content">
-    <div class="title">Shopping Cart</div>
+      <div class="title">Shopping Cart</div>
       <div class="course-list">
         <h1>{{ cart.cartItemList.length }} Courses in Cart</h1>
         <div class="course-items-container">
@@ -103,13 +143,13 @@ const removeFromCart = async (courseId: number) => {
             <!-- 图片区域 -->
             <div class="course-image-section">
               <img :src="course.courseImage" alt="" class="course-image">
-              </div>
+            </div>
 
             <!-- 内容区域 -->
             <div class="course-content-section">
               <h2 class="course-title">{{ course.courseName }}</h2>
-              <div class="course-price">${{ course.currentPrice }}</div>
-              </div>
+              <div class="course-price">¥{{ course.currentPrice }}</div>
+            </div>
 
             <!-- 按钮区域 -->
             <div class="course-actions-section">
@@ -120,22 +160,35 @@ const removeFromCart = async (courseId: number) => {
                 </svg>
               </button>
               <button class="remove-btn" @click="() => removeFromCart(course.courseId)">删除</button>
-              </div>
-              </div>
-              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 清空购物车按钮 -->
+        <button class="clearcart-btn" @click="handleClearCart" :disabled="clearing || loading"
+          v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
+          {{ clearing ? '清空中...' : '清空购物车' }}
+        </button>
       </div>
 
       <div class="checkout-section">
         <div class="checkout-summary">
-          <div class="total-label">Total:</div>
-          <div id="totalPrice"> ${{ totalPrice }}</div>
-          <button @click="goToCheckout">Proceed to checkout →</button>
-          <hr>
-          <div class="promotion-label">Promotions</div>
-          <div class="coupon-section">
-            <input type="text" name="couponId" id="coupon">
-            <button class="coupon-btn">Apply</button>
+          <div class="summary-item">
+            <span>课程数量:</span>
+            <span>{{ cart.cartItemList.length }} 门课程</span>
           </div>
+          <div class="summary-item" v-if="savedAmount > 0">
+            <span>原价:</span>
+            <span class="original-price">¥{{ totalOriginalPrice.toFixed(2) }}</span>
+          </div>
+          <div class="summary-item" v-if="savedAmount > 0">
+            <span>节省:</span>
+            <span class="saved-amount">-¥{{ savedAmount.toFixed(2) }}</span>
+          </div>
+          <div class="summary-item total-row">
+            <span>总计:</span>
+            <span class="total-price">¥{{ totalPrice.toFixed(2) }}</span>
+          </div>
+          <button class="checkout-btn" @click="goToCheckout">去结算</button>
         </div>
       </div>
     </div>
@@ -237,7 +290,6 @@ const removeFromCart = async (courseId: number) => {
   }
 }
 
-/* 错误状态样式 */
 .error {
   text-align: center;
   padding: 40px;
@@ -258,7 +310,6 @@ const removeFromCart = async (courseId: number) => {
   background: #c82333;
 }
 
-/* 空购物车样式 */
 .empty-cart {
   text-align: center;
   padding: 80px 20px;
@@ -284,31 +335,10 @@ const removeFromCart = async (courseId: number) => {
   font-size: 16px;
 }
 
-.browse-btn {
-  background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
-}
-
-.browse-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
-  background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
-}
-
-/* 课程项目容器 */
 .course-items-container {
   padding: 0 20px;
 }
 
-/* 课程项目布局 */
 .course-item {
   display: flex;
   align-items: flex-start;
@@ -320,7 +350,6 @@ const removeFromCart = async (courseId: number) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 图片区域 */
 .course-image-section {
   flex: 0 0 120px;
   margin-right: 15px;
@@ -334,7 +363,6 @@ const removeFromCart = async (courseId: number) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 内容区域 */
 .course-content-section {
   flex: 1;
   min-width: 0;
@@ -427,6 +455,24 @@ const removeFromCart = async (courseId: number) => {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
 }
+
+.clearcart-btn {
+  margin-bottom: 10px;
+  margin-left: calc(100vw - 120px);
+  width: fit-content;
+  white-space: nowrap;
+  padding: 8px 18px;
+  background: #fff;
+  color: #dc3545;
+  border: none;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
 
 /* 响应式设计 */
 @media (max-width: 480px) {

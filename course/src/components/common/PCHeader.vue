@@ -2,12 +2,15 @@
   <IconSprite />
   <div class="header">
     <div :style="headerSpaceStyle"></div>
-    <div id="logo" :style="headerButtonStyle" @click="goToIndex()">Course</div>
+    <div id="logo" :style="headerButtonStyle" @click="goToIndex()">
+      <img src="/src/images/itie_logo.png" alt="">
+    </div>
     <div :style="headerSpaceStyle"></div>
     <div class="explore">
-      <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">Explore</button>
+      <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">探索</button>
 
-      <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handlePopupEnter" @mouseleave="handlePopupLeave">
+      <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handleExplorePopupEnter"
+        @mouseleave="handleExplorePopupLeave">
         <div class="explore-popup-content">
           <div class="categories-list">
             <div v-for="category in categoryList" :key="category.categoryId" class="category-item"
@@ -23,7 +26,6 @@
                     @click="goToCategory(category.categoryId!, tag.tagId)">
                     {{ tag.name }}
                   </span>
-
                 </div>
               </div>
             </div>
@@ -42,35 +44,68 @@
       </div>
     </button>
 
-    <button v-if="userId" :style="headerButtonStyle" @click="goToLearning">
+    <button v-if="userId" :style="headerButtonStyle" @mouseenter="handleMyLearnEnter" @mouseleave="handleMyLearnLeave">
       我的学习
+      <div v-if="myLearnHoverFlag" class="mylearn-popup" @mouseenter="handleMyLearnPopupEnter"
+        @mouseleave="handleMyLearnPopupLeave">
+        <div class="mylearn-popup-content">
+          <!-- <div v-for="course in myLearnList" :key="course.id" class="mylearn-course-item">
+            <img :src="course.cover" class="mylearn-course-cover" />
+            <div class="mylearn-course-info">
+              <div class="mylearn-course-title">{{ course.title }}</div>
+              <div class="mylearn-progress-bar">
+                <div class="mylearn-progress-inner" :style="{ width: course.progress + '%' }"></div>
+              </div>
+            </div>
+          </div>
+          <button class="mylearn-btn" @click="goToMyLearn">转到我的学习</button> -->
+        </div>
+      </div>
+
     </button>
     <button v-if="userId" @click="goToWishlist">
-
-      <div class="icon">
+      <div class="icon" @mouseenter="handleWishlistEnter" @mouseleave="handleWishlistLeave">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
           <use href="#line-md--heart-filled" />
         </svg>
+        <div v-if="wishlistHoverFlag" class="wishlist-popup" @mouseenter="handleWishlistPopupEnter"
+          @mouseleave="handleWishlistPopupLeave">
+          <div class="wishlist-popup-content">
+            <!-- 这里放心愿单相关内容 -->
+
+          </div>
+        </div>
       </div>
-
-
     </button>
-    <div :style="headerSpaceStyle" v-if="!userId"></div>
-    <button @click="goToCart()">
+    <div :style="headerSpaceStyle2" v-if="!userId"></div>
+    <button @click="goToCart()" @mouseenter="handleCartEnter" @mouseleave="handleCartLeave">
       <div class="icon">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
           <use href="#mdi--cart-outline" />
         </svg>
       </div>
+      <div v-if="cartHoverFlag" class="cart-popup" @mouseenter="handleCartPopupEnter"
+        @mouseleave="handleCartPopupLeave">
+        <div class="cart-popup-content">
+          <!-- 这里放购物车相关内容 -->
+
+        </div>
+      </div>
     </button>
 
 
-    <button v-if="!userId" :style="headerButtonStyle2" @click="goToLogin">Login</button>
+    <button v-if="!userId" :style="headerButtonStyle2" @click="goToLogin">登录</button>
 
-    <div v-if="userId" :style="headerButtonStyle">
+    <div v-if="userId" :style="headerButtonStyle" @mouseenter="handleMyInfoEnter" @mouseleave="handleMyInfoLeave">
       <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
     </div>
+    <div v-if="myInfoHoverFlag" class="myinfo-popup" @mouseenter="handleMyInfoPopupEnter"
+      @mouseleave="handleMyInfoPopupLeave">
+      <div class="myinfo-popup-content">
+        <!-- 这里放myInfo相关内容 -->
 
+      </div>
+    </div>
   </div>
 
 </template>
@@ -78,11 +113,18 @@
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import IconSprite from '../Icon/IconSprite.vue';
+import IconSprite from '../Icon/IconSprite.vue'
 import './header.css'
-import { searchQuery, Search, goToCart, goToIndex, goToMyInfo, goToLogin, goToLearning, goToCourse } from './header.ts';
+import {
+  goToLogin, goToMyInfo, goToLearning, goToWishlist,
+  categoryList, expandedCategory, toggleCategory,
+  goToCategory, fetchCategories, goToIndex, goToCart, Search, searchQuery
+} from './header.ts';
 import type { CategoryList } from '@/api/course.ts';
-import { categoryApi } from '@/api/course.ts';
+import { categoryApi } from '@/api/course'
+import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { useCartLogic } from '@/pages/cart/components/content';
+const { cart, fetchCart } = useCartLogic();
 
 const exploreHoverFlag = ref(false)
 const hoveredCategory = ref<any>(null)
@@ -91,19 +133,24 @@ let exploreHideTimer: number | null = null
 let categoryHideTimer: number | null = null
 let tagsHideTimer: number | null = null
 
+const myInfoHoverFlag = ref(false)
+let myInfoHideTimer: number | null = null
 
-const categoryList = ref<CategoryList[]>([]);
+const cartHoverFlag = ref(false)
+let cartHideTimer: number | null = null
+
+const wishlistHoverFlag = ref(false)
+let wishlistHideTimer: number | null = null
+
+const myLearnHoverFlag = ref(false)
+let myLearnHideTimer: number | null = null
+
 onMounted(async () => {
-  const categoriesResponse = await categoryApi.getAllCategories();
-  categoryList.value = categoriesResponse.data;
-  console.log(categoryList);
-  categoryList.value.map(async category => {
-    const TagResponse = await categoryApi.getTagListByCategoryId(category.categoryId!);
-    category.tags = TagResponse.data;
-  });
+  await fetchCategories();
+  await fetchWishlist();
+  await fetchCart();
 });
 
-// 清理定时器
 onUnmounted(() => {
   if (exploreHideTimer) {
     clearTimeout(exploreHideTimer)
@@ -114,49 +161,27 @@ onUnmounted(() => {
   if (tagsHideTimer) {
     clearTimeout(tagsHideTimer)
   }
+  if (myInfoHideTimer) {
+    clearTimeout(myInfoHideTimer)
+  }
+  if (cartHideTimer) {
+    clearTimeout(cartHideTimer)
+  }
+  if (wishlistHideTimer) {
+    clearTimeout(wishlistHideTimer)
+  }
+  if (myLearnHideTimer) {
+    clearTimeout(myLearnHideTimer)
+  }
 });
 
-// 处理分类hover
-const handleCategoryHover = (category: any) => {
-  if (categoryHideTimer) {
-    clearTimeout(categoryHideTimer)
-    categoryHideTimer = null
-  }
-  hoveredCategory.value = category
-}
+const userId = ref<string | null>(null);
+const token = getValidToken();
+if (token) {
+  userId.value = getCurrentUserId();
+} else {
 
-// 处理分类离开
-const handleCategoryLeave = () => {
-  if (!tagsHoverFlag.value) {
-    categoryHideTimer = setTimeout(() => {
-      hoveredCategory.value = null
-    }, 200) // 200ms延迟
-  }
 }
-
-// 处理tags浮窗hover
-const handleTagsHover = () => {
-  if (tagsHideTimer) {
-    clearTimeout(tagsHideTimer)
-    tagsHideTimer = null
-  }
-  tagsHoverFlag.value = true
-}
-
-// 处理tags浮窗离开
-const handleTagsLeave = () => {
-  tagsHideTimer = setTimeout(() => {
-    tagsHoverFlag.value = false
-    hoveredCategory.value = null
-  }, 300) // 300ms延迟
-}
-
-// 跳转到分类页面
-const goToCategory = (categoryId: number, tagId?: number) => {
-  const params = tagId ? `?category=${categoryId}&tag=${tagId}` : `?category=${categoryId}`
-  window.location.href = `/course.html${params}`
-}
-
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 200) / 2800));
 const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 300));
@@ -167,6 +192,12 @@ const headerButtonPadding = computed(() => {
 const headerSpaceStyle = computed(() => ({
   width: `calc(3vw * ${headerSpaceWidth.value})`,
   transition: 'none'
+}));
+
+const headerSpaceStyle2 = computed(() => ({
+  width: `calc(8vw *( ${headerSpaceWidth.value}))`,
+  transition: 'none',
+  minWidth: '40px'
 }));
 
 const headerSearchInputStyle = computed(() => ({
@@ -185,16 +216,7 @@ const headerButtonStyle2 = computed(() => ({
 }));
 
 
-const goToWishlist = () => {
-  window.location.href = "/learning.html#/learning/wishlist";
-};
 
-defineProps<{
-  userId: string | null
-}>()
-
-
-// 处理explore按钮hover
 const handleExploreEnter = () => {
   if (exploreHideTimer) {
     clearTimeout(exploreHideTimer)
@@ -208,23 +230,163 @@ const handleExploreLeave = () => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 300) // 增加到300ms延迟
+  }, 300)
 }
 
-// 处理浮窗hover
-const handlePopupEnter = () => {
+const handleExplorePopupEnter = () => {
   if (exploreHideTimer) {
     clearTimeout(exploreHideTimer)
     exploreHideTimer = null
   }
 }
 
-const handlePopupLeave = () => {
+const handleExplorePopupLeave = () => {
   exploreHideTimer = setTimeout(() => {
     exploreHoverFlag.value = false
     hoveredCategory.value = null
     tagsHoverFlag.value = false
-  }, 500) // 增加到500ms延迟，给用户更多时间移动到子菜单
+  }, 300)
+}
+
+const handleCategoryHover = (category: any) => {
+  if (categoryHideTimer) {
+    clearTimeout(categoryHideTimer)
+    categoryHideTimer = null
+  }
+  hoveredCategory.value = category
+}
+
+const handleCategoryLeave = () => {
+  if (!tagsHoverFlag.value) {
+    categoryHideTimer = setTimeout(() => {
+      hoveredCategory.value = null
+    }, 300)
+  }
+}
+
+const handleTagsHover = () => {
+  if (tagsHideTimer) {
+    clearTimeout(tagsHideTimer)
+    tagsHideTimer = null
+  }
+  tagsHoverFlag.value = true
+}
+
+const handleTagsLeave = () => {
+  tagsHideTimer = setTimeout(() => {
+    tagsHoverFlag.value = false
+    hoveredCategory.value = null
+  }, 300)
+}
+
+// MyInfo
+const handleMyInfoEnter = () => {
+  if (myInfoHideTimer) {
+    clearTimeout(myInfoHideTimer)
+    myInfoHideTimer = null
+  }
+  myInfoHoverFlag.value = true
+}
+
+const handleMyInfoLeave = () => {
+  myInfoHideTimer = setTimeout(() => {
+    myInfoHoverFlag.value = false
+  }, 300)
+}
+
+const handleMyInfoPopupEnter = () => {
+  if (myInfoHideTimer) {
+    clearTimeout(myInfoHideTimer)
+    myInfoHideTimer = null
+  }
+}
+
+const handleMyInfoPopupLeave = () => {
+  myInfoHideTimer = setTimeout(() => {
+    myInfoHoverFlag.value = false
+  }, 300)
+}
+
+// Cart
+const handleCartEnter = () => {
+  if (cartHideTimer) {
+    clearTimeout(cartHideTimer)
+    cartHideTimer = null
+  }
+  cartHoverFlag.value = true
+}
+
+const handleCartLeave = () => {
+  cartHideTimer = setTimeout(() => {
+    cartHoverFlag.value = false
+  }, 300)
+}
+
+const handleCartPopupEnter = () => {
+  if (cartHideTimer) {
+    clearTimeout(cartHideTimer)
+    cartHideTimer = null
+  }
+}
+
+const handleCartPopupLeave = () => {
+  cartHideTimer = setTimeout(() => {
+    cartHoverFlag.value = false
+  }, 300)
+}
+
+const handleWishlistEnter = () => {
+  if (wishlistHideTimer) {
+    clearTimeout(wishlistHideTimer)
+    wishlistHideTimer = null
+  }
+  wishlistHoverFlag.value = true
+}
+
+const handleWishlistLeave = () => {
+  wishlistHideTimer = setTimeout(() => {
+    wishlistHoverFlag.value = false
+  }, 300)
+}
+
+const handleWishlistPopupEnter = () => {
+  if (wishlistHideTimer) {
+    clearTimeout(wishlistHideTimer)
+    wishlistHideTimer = null
+  }
+}
+
+const handleWishlistPopupLeave = () => {
+  wishlistHideTimer = setTimeout(() => {
+    wishlistHoverFlag.value = false
+  }, 300)
+}
+
+const handleMyLearnEnter = () => {
+  if (myLearnHideTimer) {
+    clearTimeout(myLearnHideTimer)
+    myLearnHideTimer = null
+  }
+  myLearnHoverFlag.value = true
+}
+
+const handleMyLearnLeave = () => {
+  myLearnHideTimer = setTimeout(() => {
+    myLearnHoverFlag.value = false
+  }, 300)
+}
+
+const handleMyLearnPopupEnter = () => {
+  if (myLearnHideTimer) {
+    clearTimeout(myLearnHideTimer)
+    myLearnHideTimer = null
+  }
+}
+
+const handleMyLearnPopupLeave = () => {
+  myLearnHideTimer = setTimeout(() => {
+    myLearnHoverFlag.value = false
+  }, 300)
 }
 
 </script>
@@ -292,7 +454,10 @@ img {
   cursor: pointer;
 }
 
-.explore-popup {
+.explore-popup,
+.mylearn-popup,
+.cart-popup,
+.myinfo-popup {
   position: absolute;
   top: 100%;
   left: 0;
@@ -304,11 +469,12 @@ img {
   z-index: 1000;
   margin-top: 8px;
   animation: fadeIn 0.3s ease-out;
-  backdrop-filter: blur(10px);
 }
 
-
-.explore-popup-content {
+.explore-popup-content,
+.mylearn-popup-content,
+.cart-popup-content,
+.myinfo-popup-content {
   padding: 16px 0;
   background: white;
   border-radius: 8px;
@@ -340,25 +506,23 @@ img {
   position: relative;
 }
 
-.category-item {
+.category-item,
+.tag-item {
   position: relative;
   padding: 14px 20px;
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 2px 0px;
-  border: 1px solid transparent;
 }
 
-.category-item:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+.category-item:hover,
+.tag-item:hover {
+  background: linear-gradient(105deg, white 70%, rgba(22, 92, 145, 0.2) 100%);
   color: #495057;
-  transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
 }
 
 .category-item:hover .category-name {
@@ -375,7 +539,7 @@ img {
 .category-icon {
   font-size: 16px;
   opacity: 0.7;
-  transition: all 0.3s ease;
+  transition: all 0.3s;
 }
 
 .category-item:hover .category-icon {
@@ -386,14 +550,13 @@ img {
 .category-arrow {
   font-size: 16px;
   color: #999;
-  transition: all 0.3s ease;
+  transition: all 0.3s;
   opacity: 0.6;
 }
 
 .category-item:hover .category-arrow {
   color: #6c757d;
   opacity: 1;
-  transform: translateX(4px);
 }
 
 .category-name {
@@ -403,14 +566,12 @@ img {
   transition: color 0.3s ease;
 }
 
-/* Tags浮窗样式 */
 .tags-popup {
   position: absolute;
   left: 100%;
   top: 0;
   width: 280px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border-radius: 0 12px 12px 0;
+  background: white;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-left: none;
@@ -437,33 +598,7 @@ img {
   gap: 4px;
 }
 
-.tag-item {
-  position: relative;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: transparent;
-  border: 1px solid transparent;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  user-select: none;
-  margin: 2px 0;
-}
-
-.tag-item:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #495057;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #dee2e6;
-}
-
-/* 响应式设计 - 修复重叠问题 */
+/* 
 @media (max-width: 1200px) {
   .header {
     min-width: 900px;
@@ -528,5 +663,5 @@ img {
     width: 70px;
     font-size: 12px;
   }
-}
+} */
 </style>

@@ -9,16 +9,16 @@
     </button>
     <div id="header-space"></div>
 
-      <div id="logo" @click="goToIndex()">Course</div>
-    
-    <button @click="searchFlag= !searchFlag">
+    <div id="logo" @click="goToIndex()"><img src="/src/images/itie_logo.png" alt=""></div>
+
+    <button @click="searchFlag = !searchFlag">
       <div class="icon">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="#35495e">
           <use href="#material-symbols--search" />
         </svg>
       </div>
     </button>
-    <button @click="goToCart(userId)">
+    <button @click="goToCart()">
       <div class="icon">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="#35495e">
           <use href="#mdi--cart-outline" />
@@ -44,21 +44,21 @@
   </div>
 
   <!-- 侧边栏 -->
-  <SideBar v-model:isOpen="showSidebar" position="left" :width="260">
+  <SideBar v-model:isOpen="showSidebar" position="left" :width="260" :userId="userId || undefined">
   </SideBar>
 </template>
 
 <script setup lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import './header.css'
-import { searchQuery, Search, goToCart, goToIndex,  goToLogin } from './header.ts';
+import { searchQuery, Search, goToCart, goToIndex, goToLogin } from './header.ts';
 import SideBar from '@/components/common/SideBar.vue'
 import { ref, computed } from 'vue'
 
 const showSidebar = ref(false)
 const { width, height } = useWindowSize()
 
-let searchFlag=ref(false)
+let searchFlag = ref(false)
 
 const headerStyle = computed(() => ({
   padding: width.value < 300 ? '5px' : '10px',
@@ -66,7 +66,7 @@ const headerStyle = computed(() => ({
 }))
 
 const headerSearchStyle = () => ({
-  top: (searchFlag.value) ? '-27px' :'-77px'
+  top: (searchFlag.value) ? '-27px' : '-77px'
 })
 
 defineProps<{
@@ -85,7 +85,7 @@ defineProps<{
   z-index: 100;
 }
 
-#header-search{
+#header-search {
   z-index: 50;
   display: flex;
   margin: 0 auto;
@@ -98,13 +98,13 @@ defineProps<{
   transition: all 0.5s ease;
 }
 
-#header-search input{
-    height: 36px;
-    width: 60%;
-    margin-left: 10%;
+#header-search input {
+  height: 36px;
+  width: 60%;
+  margin-left: 10%;
 }
 
-#header-search button{
+#header-search button {
   background-color: transparent;
   padding: 0px 0px;
   border: none;
@@ -132,7 +132,8 @@ button {
   width: 20%;
 }
 
-#logo, #header-space {
+#logo,
+#header-space {
   flex: 1;
   text-align: center;
 }
@@ -161,5 +162,4 @@ button {
 .menu-section li:hover {
   color: rgb(22, 92, 145);
 }
-
 </style>
