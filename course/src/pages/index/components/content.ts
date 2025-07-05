@@ -188,6 +188,7 @@ const changeCategory = async (i: NavigationButton) => {
     tagTitles.value = tags.value.map(tag => new NavigationButton(tag.name, tag.tagId));
     tagTitles.value[0].activeFlag = true;
     console.log("第一个标签已选中:", tagTitles.value[0]);
+    selectedCategoryTitle.value = i.title;
     changeTag(tagTitles.value[0]);
   } catch (error) {
     console.error("获取标签列表失败:", error);
@@ -241,7 +242,7 @@ const getTagListByCategoryId = async (categoryId: number) => {
 };
 
 export {
-  userId,
+  userId, selectedCategoryTitle,
   courseQuickViews, communityVoices,
   fetchCategories, changeCategory,
   changeTag, categoryTitles, tagTitles

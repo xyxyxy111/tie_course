@@ -1,4 +1,3 @@
-// src/api-call-examples.ts
 import {
   authApi,
   userApi,
@@ -12,130 +11,113 @@ import type {
 } from '@/api/user';
 import { ref, reactive } from 'vue';
 import { getValidToken } from '@/utils/request';
-
-// 1. 发送验证码
-const handleSendCaptcha = async () => {
-  try {
-    const response = await authApi.sendCaptcha('13800138000');
-    console.log('验证码发送成功', response.data);
-  } catch (error) {
-    console.error('发送验证码失败:', error);
-  }
-};
-
-// 2. 手机号+验证码登录
-const handleLoginByCaptcha = async () => {
-  const params: LoginByCaptchaParams = {
-    phone: '13800138000',
-    captcha: '123456'
-  };
-
-  try {
-    const response = await authApi.loginByCaptcha(params);
-    const token = response.data;
-    localStorage.setItem('token', token);
-    console.log('登录成功，token已保存');
-  } catch (error) {
-    console.error('登录失败:', error);
-  }
-};
-
-// 3. 手机号+密码登录
-const handleLoginByPassword = async () => {
-  const params: LoginByPasswordParams = {
-    phone: '13800138000',
-    password: 'yourPassword123'
-  };
-
-  try {
-    const response = await authApi.loginByPassword(params);
-    const token = response.data;
-    localStorage.setItem('token', token);
-    console.log('登录成功，token已保存');
-  } catch (error) {
-    console.error('登录失败:', error);
-  }
-};
-
-// 4. 手机号注册
-const handleRegister = async () => {
-  const params: RegisterParams = {
-    phone: '13800138000',
-    captcha: '123456'
-  };
-
-  try {
-    const response = await authApi.register(params);
-    const token = response.data;
-    localStorage.setItem('token', token);
-    console.log('注册成功，token已保存');
-  } catch (error) {
-    console.error('注册失败:', error);
-  }
-};
-
-// 5. 检查手机号是否注册
-const checkPhoneAvailability = async () => {
-  try {
-    const response = await authApi.checkPhoneAvailable('13800138000');
-    console.log(response.data.exist ? '手机号已注册' : '手机号可用');
-  } catch (error) {
-    console.error('检查失败:', error);
-  }
-};
-
+import { successCodes } from '@/utils/request';
 const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
-
 const loginForm = reactive({
+  phone: '',
   email: '',
   password: '',
+  captcha: '',
   rememberMe: false
 });
 
-const registerForm = reactive({
-  email: '',
-  password: '',
-  confirmPassword: '',
-  username: '',
-  agreeToTerms: false
+const loginStatus = ref<{
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+}>({
+  loading: false,
+  error: null,
+  success: false
 });
 
-// 微信登录相关状态
+const captchaBtn = ref({
+  text: '发送验证码',
+  disabled: false,
+  countdown: 60
+});
+
+
+const loginMethod = ref("captcha");
 const showWechatLogin = ref(false);
 const wechatQrCode = ref<string>('');
 const wechatLoginStatus = ref<'waiting' | 'scanning' | 'success' | 'expired'>('waiting');
 const wechatPollingInterval = ref<number | null>(null);
 
-export const useLoginData = () => {
-  // 密码登录
-  const handlePasswordLogin = async () => {
-    if (!loginForm.email || !loginForm.password) {
-      error.value = '请填写邮箱和密码';
+const useLoginData = () => {
+  const handleLogin = async () => {
+
+    if (loginMethod.value === 'captcha') {
+      await handleCaptchaLogin();
+    } else if (loginMethod.value === 'password') {
+      console.log("password")
+      await handlePasswordLogin();
+    } else if (loginMethod.value === 'email') {
+
+    } else if (loginMethod.value === 'wechat') {
+
+      await handleWechatLogin();
+    }
+  };
+  //验证码登录
+  const handleCaptchaLogin = async () => {
+    if (!loginForm.phone || !loginForm.captcha) {
+      error.value = '请填写电话号码和验证码';
       return;
     }
-
     loading.value = true;
     error.value = null;
     success.value = null;
-
     try {
-      const response = await authApi.loginByPassword({
-        phone: loginForm.email,
-        password: loginForm.password
+      const response = await authApi.loginByCaptcha({
+        phone: loginForm.phone,
+        captcha: loginForm.captcha
       });
-
       if (response.data) {
-        // 保存token
         localStorage.setItem('token', response.data);
         if (loginForm.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         }
-
         success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } else {
+        error.value = response.message || '登录失败';
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '登录失败，请检查网络连接';
+      console.error('登录失败:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
 
-        // 跳转到首页或之前的页面
+  // 密码登录
+  const handlePasswordLogin = async () => {
+    console.log(loginForm.phone, loginForm.password)
+    if (!loginForm.phone || !loginForm.password) {
+      error.value = '请填写电话号码和密码';
+      return;
+    }
+    loading.value = true;
+    error.value = null;
+    success.value = null;
+    try {
+      const response = await authApi.loginByPassword({
+        phone: loginForm.phone,
+        password: loginForm.password
+      });
+      console.log(response)
+      if (response.data) {
+        localStorage.setItem('token', response.data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
         const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
         setTimeout(() => {
           window.location.href = redirectUrl;
@@ -192,20 +174,49 @@ export const useLoginData = () => {
     error,
     success,
     loginForm,
-    registerForm,
     showWechatLogin,
     wechatQrCode,
     wechatLoginStatus,
+    handleLogin,
+    handleCaptchaLogin,
     handlePasswordLogin,
-    handleRegister,
     handleWechatLogin,
     isLoggedIn,
     redirectIfLoggedIn
   };
 };
+const sendCaptcha = async () => {
+  if (!loginForm.phone) {
+    alert('请输入手机号');
+    return;
+  }
+  try {
+    captchaBtn.value.disabled = true;
+    const response = await authApi.sendCaptcha(loginForm.phone);
+    if (successCodes.includes(response.status)) {
+      const timer = setInterval(() => {
+        captchaBtn.value.countdown--;
+        captchaBtn.value.text = `${captchaBtn.value.countdown}s后重新获取`;
+        if (captchaBtn.value.countdown <= 0) {
+          clearInterval(timer);
+          captchaBtn.value = {
+            text: '发送验证码',
+            disabled: false,
+            countdown: 60
+          };
+        }
+      }, 1000);
+    } else {
+      alert(response.message || '发送验证码失败');
+      captchaBtn.value.disabled = false;
+    }
+  } catch (error: any) {
+    captchaBtn.value.disabled = false;
+    alert(error.message || '发送验证码失败，请重试');
+  }
+};
 
-// 表单验证工具函数
-export const useFormValidation = () => {
+const useFormValidation = () => {
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -226,6 +237,29 @@ export const useFormValidation = () => {
   };
 };
 
+const switchLoginMethod = (i: number) => {
+  if (i === 0) {
+    loginMethod.value = 'captcha'
+  } else if (i === 1) {
+    loginMethod.value = 'password'
+  } else if (i === 2) {
+    loginMethod.value = 'email'
+  } else {
+    loginMethod.value = 'wechat'
+  }
+  loginForm.email = '';
+  loginForm.password = '';
+  loginForm.captcha = '';
+  captchaBtn.value = {
+    text: '发送验证码',
+    disabled: false,
+    countdown: 60
+  };
+};
+
 export {
-  authApi, userApi, profileApi
+  loginMethod, showWechatLogin, loginForm,
+  wechatLoginStatus, wechatQrCode, captchaBtn, loginStatus,
+  wechatPollingInterval, switchLoginMethod,
+  useFormValidation, useLoginData, sendCaptcha
 }

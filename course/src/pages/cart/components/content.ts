@@ -20,13 +20,11 @@ onMounted(() => {
   }
 })
 
-// 导出共享逻辑
 export function useCartLogic() {
   const cart = ref<Cart | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  // 获取购物车数据
   const fetchCart = async () => {
     loading.value = true;
     error.value = null;
@@ -42,7 +40,6 @@ export function useCartLogic() {
     }
   };
 
-  // 添加课程到购物车
   const addCourseToCart = async (courseId: number) => {
     loading.value = true;
     error.value = null;
@@ -72,7 +69,6 @@ export function useCartLogic() {
     }
   };
 
-  // 清空购物车
   const clearCart = async () => {
     loading.value = true;
     error.value = null;

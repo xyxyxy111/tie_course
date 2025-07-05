@@ -11,7 +11,7 @@ import { goToCart, goToCourse } from '@/components/common/header.ts';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import {
   communityVoices, changeTag,
-  categoryTitles,
+  categoryTitles, selectedCategoryTitle,
   tagTitles, changeCategory, useIndexData
 } from '../components/content.ts';
 import Footer from '@/components/common/Footer.vue';
@@ -93,7 +93,7 @@ const courseSliderStyle = computed(() => ({
         <h2>从关注技能到挑选技术主题，itie 为您的专业发展提供支持。</h2>
         <div class="navigator-btn-group">
           <div v-for="category in categoryTitles" :key="category.id" class="navigator-btn"
-            :class="{ active: category.id === selectedCategoryId }" @click="changeCategory(category)">
+            :class="{ active: category.id === selectedCategoryId }" @click="changeCategory(category); currentIndex = 0">
             {{ category.title }}
           </div>
         </div>
@@ -102,7 +102,7 @@ const courseSliderStyle = computed(() => ({
       <div class="category-section">
         <div class="category-tabs">
           <div v-for="tag in tagTitles" :key="tag.id" class="category-tab" :class="{ active: tag.id === selectedTagId }"
-            @click="changeTag(tag)">
+            @click="changeTag(tag); currentIndex = 0">
             <div class="category-tab-title">{{ tag.title }}</div>
             <div class="category-tab-desc">1k 以上的学习者</div>
           </div>
@@ -152,7 +152,7 @@ const courseSliderStyle = computed(() => ({
             </span>
           </button>
         </div>
-        <button class="show-all-btn">显示所有 {{}} 课程</button>
+        <button class="show-all-btn">显示所有 {{ selectedCategoryTitle }} 课程</button>
 
 
 

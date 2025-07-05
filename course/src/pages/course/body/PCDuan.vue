@@ -26,6 +26,7 @@ const { width, height } = useWindowSize()
 const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();
 const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
 
+// 获取userId
 const userId = ref<string | null>(null);
 
 // 展开章节的id集合
@@ -194,7 +195,7 @@ const handleAddToCart = async () => {
   <div id="course-detail">
     <div class="what-you-will-learn">
       <h1>您将会学到</h1>
-      <p>{{ courseVo?.whatYouWillLearn }}</p>
+      <p> <span class="checkmark">✔</span>{{ courseVo?.whatYouWillLearn }}</p>
     </div>
 
     <div class="other-theme">

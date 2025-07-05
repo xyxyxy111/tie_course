@@ -7,7 +7,7 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="courses.length === 0" class="empty-state">
+    <div v-else-if="wishlist.length === 0" class="empty-state">
       <div class="empty-icon">💝</div>
       <h3>心愿单为空</h3>
       <p>您还没有添加任何课程到心愿单</p>
@@ -19,13 +19,13 @@
       <div class="wishlist-header">
         <h2 style="display: flex; align-items: center; gap: 16px;">
           我的心愿单
-          <span class="course-count">{{ courses.length }} 门课程</span>
+          <span class="course-count">{{ wishlist.length }} 门课程</span>
         </h2>
         <button class="clear-btn" @click="clearWishlist">清空心愿单</button>
       </div>
 
-      <div class="courses-grid">
-        <div class="course-card" v-for="(course, index) in courses" :key="course.courseId || course.courseId || index">
+      <div class="wishlist-grid">
+        <div class="course-card" v-for="(course, index) in wishlist" :key="course.courseId || course.courseId || index">
           <div class="course-image">
             <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
           </div>
@@ -55,10 +55,12 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { wishlistApi } from '@/api/user';
 import type { WishListVO } from '@/api/user';
 
+
+
 export default defineComponent({
   name: 'Wishlist',
   setup() {
-    const courses = ref<WishListVO[]>([]);
+    const wishlist = ref<WishListVO[]>([]);
     const loading = ref(true);
 
     // 获取愿望单列表
@@ -68,23 +70,23 @@ export default defineComponent({
         const response = await wishlistApi.getWishlist();
         console.log('愿望单API响应:', response);
 
-        // 根据API返回的数据更新courses
+        // 根据API返回的数据更新wishlist
         if (response && response.data && Array.isArray(response.data)) {
           console.log('愿望单数据:', response.data);
-          courses.value = response.data as WishListVO[];
+          wishlist.value = response.data as WishListVO[];
 
           // 检查每个课程的ID字段
-          courses.value.forEach((course, index) => {
+          wishlist.value.forEach((course, index) => {
             console.log(`课程 ${index} 完整数据:`, course);
             console.log(`课程 ${index} 所有属性:`, Object.keys(course));
           });
         } else {
           console.log('愿望单数据为空或格式不正确');
-          courses.value = [];
+          wishlist.value = [];
         }
       } catch (error) {
         console.error('获取愿望单失败:', error);
-        courses.value = [];
+        wishlist.value = [];
       } finally {
         loading.value = false;
       }
@@ -148,7 +150,7 @@ export default defineComponent({
         await wishlistApi.clearWishlist();
         console.log('愿望单已清空');
         alert('愿望单已清空');
-        courses.value = [];
+        wishlist.value = [];
       } catch (error) {
         console.error('清空愿望单失败:', error);
         alert('清空失败，请重试');
@@ -178,7 +180,7 @@ export default defineComponent({
     });
 
     return {
-      courses,
+      wishlist,
       loading,
       removeFromWishlist,
       clearWishlist,
@@ -323,7 +325,7 @@ export default defineComponent({
   margin-left: 0;
 }
 
-.courses-grid {
+.wishlist-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
@@ -480,7 +482,7 @@ export default defineComponent({
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .courses-grid {
+  .wishlist-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 16px;
   }
@@ -497,7 +499,7 @@ export default defineComponent({
 }
 
 @media (max-width: 480px) {
-  .courses-grid {
+  .wishlist-grid {
     grid-template-columns: 1fr;
   }
 

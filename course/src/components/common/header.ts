@@ -4,7 +4,6 @@ import { categoryApi } from '@/api/course';
 import { getCurrentUserId } from '@/utils/request';
 
 export const searchQuery = ref('');
-// const router = useRouter();
 
 export function Search() {
   if (searchQuery.value.trim()) {
@@ -43,21 +42,16 @@ export const goToLearning = () => {
 
 export const goToMyInfo = () => {
   const url = new URL('/my-info.html', window.location.origin);
-  // 添加hash路由支持，重定向到profile页面
   url.hash = '#/my-info/profile';
   window.location.href = url.toString();
 };
 
-
 export const categoryList = ref<CategoryList[]>([]);
 export const expandedCategory = ref<number | null>(null);
-
 export const fetchCategories = async () => {
   try {
     const categoriesResponse = await categoryApi.getAllCategories();
     categoryList.value = categoriesResponse.data;
-
-    // 为每个category获取对应的tags
     for (const category of categoryList.value) {
       if (category.categoryId) {
         const tagsResponse = await categoryApi.getTagListByCategoryId(category.categoryId);
@@ -76,6 +70,7 @@ export const toggleCategory = (categoryId: number) => {
     expandedCategory.value = categoryId;
   }
 };
+
 export const goToCategory = (categoryId: number, tagId?: number) => {
   const params = new URLSearchParams();
   if (categoryId) {
@@ -87,6 +82,7 @@ export const goToCategory = (categoryId: number, tagId?: number) => {
   const url = `/search.html?${params.toString()}`;
   window.location.href = url;
 };
-export  const goToWishlist = () => {
+
+export const goToWishlist = () => {
   window.location.href = "/learning.html#/learning/wishlist";
 };

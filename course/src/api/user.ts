@@ -45,7 +45,23 @@ interface UploadAvatarResponse {
   avatarUrl: string;
 }
 
-//avatarUrl: string;
+export interface MyListVO {
+  id: number;
+  myCourseId: number;
+  userId: string;
+  courseId: number;
+  title: string;
+  coverImgUrl: string;
+  watchProgress: string;
+  lastViewedChapterId: number;
+  lastViewedLessonId: number;
+  lastViewedAt: number;
+  lastViewedTime: string;
+  createTime: string;
+  updateTime: string | null;
+  deleteTime: string | null;
+  unused: any;
+}
 
 export interface WishListVO {
   courseId: number;
@@ -293,4 +309,13 @@ export const logApi = {
       method: 'DELETE'
     })
   }
+}
+
+export const myListApi = {
+  getMyList: () => {
+    return request({
+      url: '/my-courses/',
+      method: 'GET'
+    })
+  },
 }

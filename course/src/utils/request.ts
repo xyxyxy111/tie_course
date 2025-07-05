@@ -64,7 +64,6 @@ export const isTokenExpired = (token: string): boolean => {
   }
 };
 
-// 清理过期的token
 export const clearExpiredToken = (): void => {
   const token = localStorage.getItem('token');
   if (token && isTokenExpired(token)) {
@@ -73,19 +72,15 @@ export const clearExpiredToken = (): void => {
   }
 };
 
-// 从token中解析用户信息
 export const getUserFromToken = (): { userId?: string; username?: string } | null => {
   const token = getValidToken();
   if (!token) return null;
 
   try {
-    // 如果token是JWT格式，尝试解析payload
     const parts = token.split('.');
     if (parts.length === 3) {
       const payload = JSON.parse(atob(parts[1]));
       console.log('Token payload:', payload);
-
-      // 检查token是否过期
       if (payload.exp) {
         const currentTime = Math.floor(Date.now() / 1000);
         if (currentTime > payload.exp) {
@@ -177,6 +172,7 @@ export const successCodes = [
   1112,   // 搜索课程成功
   1120,   // 获取章节信息成功
   1130,   // 获取课信息成功
+  1140,   // 获取我的课程成功
   1200,   // 获取订单信息成功
   1201,   // 获取订单列表信息成功
   1202,   // 订单创建成功
@@ -190,10 +186,10 @@ export const successCodes = [
 instance.interceptors.response.use(
   (response) => {
     if (!successCodes.includes(response.data.status)) {
-      console.log('完整response:', response);
-      console.log('response.data:', response.data);
       return Promise.reject(response.data.message);
     }
+    console.log('完整response:', response);
+    console.log('response.data:', response.data);
     return response.data;
   },
   (error) => {
