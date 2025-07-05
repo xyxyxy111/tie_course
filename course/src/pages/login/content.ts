@@ -142,7 +142,8 @@ const useLoginData = () => {
       // 获取微信登录二维码
       const response = await authApi.getWxLoginQrcode();
       if (response.data) {
-        // wechatQrCode.value = response.data.qrCodeUrl;
+        console.log(response.data)
+        // wechatQrCode.value = response.data;
         // startWechatPolling(response.data.qrCodeId);
       } else {
         error.value = '获取微信登录二维码失败';
