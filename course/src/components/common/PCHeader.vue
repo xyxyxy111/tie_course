@@ -145,12 +145,6 @@ let wishlistHideTimer: number | null = null
 const myLearnHoverFlag = ref(false)
 let myLearnHideTimer: number | null = null
 
-onMounted(async () => {
-  await fetchCategories();
-  await fetchWishlist();
-  await fetchCart();
-});
-
 onUnmounted(() => {
   if (exploreHideTimer) {
     clearTimeout(exploreHideTimer)
@@ -176,12 +170,23 @@ onUnmounted(() => {
 });
 
 const userId = ref<string | null>(null);
-const token = getValidToken();
-if (token) {
-  userId.value = getCurrentUserId();
-} else {
+// const token = getValidToken();
+// if (token) {
+//   userId.value = getCurrentUserId();
+// } else {
 
-}
+// }
+
+
+onMounted(async () => {
+  await fetchCategories();
+  // await fetchWishlist();
+  if (userId) {// await fetchCart(); 
+  }
+
+});
+
+
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 200) / 2800));
 const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 300));

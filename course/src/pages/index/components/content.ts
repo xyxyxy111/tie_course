@@ -93,8 +93,8 @@ export const useIndexData = () => {
     const token = getValidToken();
     if (token) {
       userId.value = getCurrentUserId();
+      await fetchProfile();
     }
-    await fetchProfile();
     await fetchCategories();
     selectedCategoryId.value = 1;
     await getTagListByCategoryId(1);

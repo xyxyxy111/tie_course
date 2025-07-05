@@ -48,7 +48,6 @@ const wxState = ref<string>('');
 const openWxLogin = async () => {
   wxLoginVisible.value = true;
   wxLoginStatus.value = 'waiting';
-
   try {
     const response = await authApi.getWxLoginQrcode();
     // 将arraybuffer转换为base64
@@ -181,7 +180,8 @@ onMounted(() => {
               <use href="#ic--outline-email" />
             </svg>
           </button>
-          <button v-if="loginMethod !== 'wechat'" class="login-icon-btn wx-icon-btn" @click="switchLoginMethod(3)">
+          <button v-if="loginMethod !== 'wechat'" class="login-icon-btn wx-icon-btn"
+            @click="switchLoginMethod(3); handleWechatLogin()">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="#27b148">
               <use href="#ic--baseline-wechat" />
             </svg>
