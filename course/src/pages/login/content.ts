@@ -39,9 +39,12 @@ const captchaBtn = ref({
   countdown: 60
 });
 
-
 const loginMethod = ref("captcha");
 
+interface wxQrCode {
+  state: string;
+  qrCodeUrl: string;
+}
 const qrCodeUrl = ref('')
 const state = ref('')
 
@@ -134,10 +137,17 @@ const useLoginData = () => {
 
   // 微信登录
   const handleWechatLogin = async () => {
-    const res = await fetch('/auth/wxLogin-qrcode')
-    const data = await res.json()
-    qrCodeUrl.value = data.data.qrCodeUrl
-    state.value = data.data.state
+    try {
+      const res = await authApi.getWxLoginQrcode();
+      const data = res.data as wxQrCode;
+      if (res.data) {
+        qrCodeUrl.value = data.qrCodeUrl;
+        state.value = data.state;
+      }
+    } catch (err) {
+      console.error('获取微信登录二维码失败:', err);
+      error.value = '获取微信登录二维码失败';
+    }
   };
 
   // 检查是否已登录
