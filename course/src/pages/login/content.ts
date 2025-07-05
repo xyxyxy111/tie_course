@@ -71,10 +71,11 @@ const useLoginData = () => {
     error.value = null;
     success.value = null;
     try {
-      const response = await authApi.loginByCaptcha({
-        phone: loginForm.phone,
-        captcha: loginForm.captcha
-      });
+      // const response = await authApi.loginByCaptcha({
+      //   phone: loginForm.phone,
+      //   captcha: loginForm.captcha
+      // });
+      const response = await authApi.loginTest();//后门登陆 数据库要有电话为17727096201的user
       if (response.data) {
         localStorage.setItem('token', response.data);
         if (loginForm.rememberMe) {
