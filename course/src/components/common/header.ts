@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import type { CategoryList } from '@/api/course';
 import { categoryApi } from '@/api/course';
 import { getCurrentUserId } from '@/utils/request';
+import { authApi } from '@/api/user';
 
 export const searchQuery = ref('');
 
@@ -85,4 +86,16 @@ export const goToCategory = (categoryId: number, tagId?: number) => {
 
 export const goToWishlist = () => {
   window.location.href = "/learning.html#/learning/wishlist";
+};
+
+
+export const handleLogout = async () => {
+  try {
+    await authApi.logout();
+    console.log('登出成功');
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  } catch (error) {
+    alert('登出失败，请重试');
+  }
 };

@@ -48,7 +48,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://2afa449a.r9.cpolar.cn', // 后端地址
+        target: 'http://localhost:8080',
+        // http://335af15e.r9.cpolar.top
+        // http://localhost:8080
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },

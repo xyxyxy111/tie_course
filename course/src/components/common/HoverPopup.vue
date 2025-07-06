@@ -170,29 +170,21 @@ export default defineComponent({
         alert('系统错误：缺少必要参数');
         return;
       }
-
       loading.value = true;
       try {
         const response = await cartApi.addCourseToCart(courseInfo.value.courseId);
-        console.log('添加课程到购物车成功:', response);
-
-        // 触发事件通知父组件
         emit('course-added', {
           courseId: courseInfo.value.courseId,
           courseName: courseInfo.value.title,
           userId: props.userId,
           success: true
         });
-
-        // 显示成功提示
         alert(`✅ 课程 "${courseInfo.value.title}" 已成功添加到购物车！`);
 
       } catch (err: any) {
         console.error('添加课程到购物车失败:', err);
-
         let errorMessage = '添加课程到购物车失败';
         let errorType = 'unknown';
-
         emit('course-added', {
           courseId: courseInfo.value.courseId,
           courseName: courseInfo.value.title,

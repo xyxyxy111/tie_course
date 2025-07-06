@@ -12,6 +12,7 @@ import type {
 import { ref, reactive } from 'vue';
 import { getValidToken } from '@/utils/request';
 import { successCodes } from '@/utils/request';
+import type { RefSymbol } from '@vue/reactivity';
 const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
@@ -50,17 +51,14 @@ const state = ref('')
 
 const useLoginData = () => {
   const handleLogin = async () => {
-
     if (loginMethod.value === 'captcha') {
       await handleCaptchaLogin();
     } else if (loginMethod.value === 'password') {
-      console.log("password")
       await handlePasswordLogin();
     } else if (loginMethod.value === 'email') {
 
     } else if (loginMethod.value === 'wechat') {
-
-      await handleWechatLogin();
+      await getWxLoginStatus();
     }
   };
   //验证码登录
@@ -113,7 +111,6 @@ const useLoginData = () => {
         phone: loginForm.phone,
         password: loginForm.password
       });
-      console.log(response)
       if (response.data) {
         localStorage.setItem('token', response.data);
         if (loginForm.rememberMe) {
@@ -139,16 +136,41 @@ const useLoginData = () => {
   const handleWechatLogin = async () => {
     try {
       const res = await authApi.getWxLoginQrcode();
+      console.log(res)
       const data = res.data as wxQrCode;
       if (res.data) {
         qrCodeUrl.value = data.qrCodeUrl;
         state.value = data.state;
       }
+      console.log(qrCodeUrl + "  " + state)
     } catch (err) {
       console.error('获取微信登录二维码失败:', err);
       error.value = '获取微信登录二维码失败';
     }
   };
+
+  const getWxLoginStatus = async () => {
+    try {
+      const res = await authApi.getWxLoginStatus(state.value);
+      console.log(res)
+      const data = res.data as string;
+      if (res.data) {
+        localStorage.setItem('token', data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      }
+      console.log(qrCodeUrl + "  " + state)
+    } catch (err) {
+      console.error('获取微信登录二维码失败:', err);
+      error.value = '获取微信登录二维码失败';
+    }
+  }
 
   // 检查是否已登录
   const isLoggedIn = () => {
@@ -173,6 +195,7 @@ const useLoginData = () => {
     handleCaptchaLogin,
     handlePasswordLogin,
     handleWechatLogin,
+    getWxLoginStatus,
     isLoggedIn,
     redirectIfLoggedIn
   };
