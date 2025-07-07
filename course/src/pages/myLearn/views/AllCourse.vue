@@ -1,22 +1,57 @@
 <template>
   <div class="learning-content">
-    <!-- 学习进度部分 -->
-    <div class="learning-progress">
-      <h3>开始每周坚持记录</h3>
-      <p>完成了一个环！现在，请观看您的课程。</p>
-
-      <div class="progress-stats">
-        <div class="stat-item">
-          <strong>0</strong> 周<br>
-          <span>当前坚持记录</span>
+    <div class="study-summary-card">
+      <div class="summary-left">
+        <div class="summary-title">开始每周坚持记录</div>
+        <div class="summary-desc">完成了一个环！现在，请观看您的课程。</div>
+        <div class="summary-week">
+          <svg width="24" height="24" fill="#fbbf24" style="vertical-align: middle;">
+            <use href="#flame-icon" />
+          </svg>
+          <span class="summary-week-num">3</span>
+          <span class="summary-week-label">周</span>
+          <span class="summary-week-desc">当前坚持记录</span>
         </div>
-        <div class="stat-item">
-          <strong>0/30</strong> 课程分钟数<br>
-          <span>4/1 次访问</span><br>
-          <span>6月1日 - 6月14日</span>
+      </div>
+      <div class="summary-right">
+        <div class="summary-progress">
+          <svg width="60" height="60" viewBox="0 0 60 60">
+            <!-- 灰色底环 -->
+            <circle cx="30" cy="30" r="26" stroke="#e5e7eb" stroke-width="6" fill="none" />
+            <!-- 黄色进度 -->
+            <circle cx="30" cy="30" r="26" stroke="#fbbf24" stroke-width="6" fill="none" stroke-dasharray="163.36"
+              stroke-dashoffset="54" />
+            <!-- 绿色进度 -->
+            <circle cx="30" cy="30" r="20" stroke="#22c55e" stroke-width="6" fill="none" stroke-dasharray="125.66"
+              stroke-dashoffset="25" />
+          </svg>
+          <div class="summary-progress-text">
+            <div><span class="yellow">18/30</span> 课程分钟数</div>
+            <div><span class="green">4/5</span> 次访问</div>
+            <div class="summary-date">2025年6月29日~2025年7月5日</div>
+          </div>
         </div>
       </div>
     </div>
+    <div class="study-plan-card-container">
+      <div class="study-plan-card">
+        <svg width="60" height="60" fill="#222" style="vertical-align: middle;">
+          <use href="#lets-icons--clock" />
+        </svg>
+        <div class="plan-header">
+          <div class="plan-title">安排学习时间</div>
+          <div class="plan-desc">
+            学习需要日积月累。研究表明，养成良好学习习惯的学生更有可能实现目标。请留出时间向学习计划提醒接收提醒。
+          </div>
+        </div>
+
+      </div>
+      <div class="plan-actions">
+        <button class="plan-btn">开始</button>
+        <button class="cancel-btn">取消</button>
+      </div>
+    </div>
+
 
     <div class="mycourses-container">
       <div class="course-card" v-for="(course, index) in mylist" :key="index" @mouseenter="hoverIndex = index"
@@ -30,8 +65,15 @@
           </div>
         </div>
         <h5>{{ course.title }}</h5>
+        <div class="iclass">
+          iClass
+        </div>
         <div class="progress-bar">
-          <div class="in-progressbar"></div>
+          <div class="in-progressbar" :style="{ width: (course.watchProgress * 100) + '%' }">
+          </div>
+        </div>
+        <div class="watchProgress">
+          完成 {{ course.watchProgress * 100 }} %
         </div>
       </div>
     </div>
@@ -91,72 +133,211 @@ export default defineComponent({
   margin-bottom: 20px;
 }
 
-h3 {
-  margin-top: 0;
-  color: #202124;
-}
-
-.progress-stats {
+.study-summary-card {
   display: flex;
-  gap: 40px;
-  margin-top: 20px;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #f3f4f6;
+  padding: 32px 36px 28px 36px;
+  margin-bottom: 24px;
+  min-height: 120px;
 }
 
-.stat-item {
-  line-height: 1.6;
+.summary-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.stat-item strong {
-  font-size: 1.2em;
-  color: #1a73e8;
+.summary-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 4px;
 }
 
-button {
-  position: relative;
-  left: 80%;
-  width: fit-content;
-  background-color: rgb(22, 92, 145);
-  color: white;
+.summary-desc {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.summary-week {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.summary-week-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fbbf24;
+  margin: 0 2px;
+}
+
+.summary-week-label {
+  font-size: 15px;
+  color: #222;
+  font-weight: 600;
+}
+
+.summary-week-desc {
+  font-size: 14px;
+  color: #888;
+  margin-left: 8px;
+}
+
+.summary-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.summary-progress {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.summary-progress-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  color: #222;
+}
+
+.summary-progress-text .yellow {
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.summary-progress-text .green {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.summary-date {
+  font-size: 13px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.study-plan-card-container {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #f3f4f6;
+  padding: 28px 36px 24px 36px;
+  margin-bottom: 24px;
+  min-height: 80px;
+}
+
+.study-plan-card {
+  display: flex;
+}
+
+.plan-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 36px;
+  margin-bottom: 8px;
+}
+
+.plan-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.plan-desc {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 18px;
+
+}
+
+.plan-actions {
+  display: flex;
+  gap: 16px;
+  margin-left: 36px;
+}
+
+.plan-btn,
+.cancel-btn {
+  padding: 8px 40px;
+  border-radius: 6px;
   border: none;
-  margin: 5px 20px;
-  padding: 2px 15px;
-  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  height: 30px;
-  font-size: 12px;
   transition: all 0.3s;
-  border: 1px rgb(22, 92, 145) solid;
+  border: 1px solid rgb(22, 92, 145);
 }
 
-button:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+.plan-btn {
+  background: rgb(22, 92, 145);
+  color: #fff;
 }
 
+.plan-btn:hover {
+  background: #fff;
+  color: rgb(22, 92, 145);
+}
+
+.cancel-btn {
+  background: #fff;
+  color: rgb(22, 92, 145);
+}
+
+.cancel-btn:hover {
+  background-color: rgba(22, 92, 145, 0.1);
+}
 
 .mycourses-container {
-  width: 1260px;
-  display: grid;
-  grid-template-columns: repeat(4, 320px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 24px 0;
 }
 
 .course-card {
-  width: 300px;
-  height: 308px;
-  display: inline-block;
-  margin: 0 20px 30px 0;
-  vertical-align: top;
+  width: 260px;
   background: #fff;
-  box-sizing: border-box;
-  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 18px 18px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+  background-color: rgba(22, 92, 145, 0.02);
+  box-shadow: 0 6px 24px rgba(22, 92, 145, 0.13);
 }
 
 .img-wrapper {
-  position: relative;
   width: 100%;
-  height: 176px;
+  height: 120px;
+  border-radius: 8px;
   overflow: hidden;
+  position: relative;
   background: #f5f5f5;
-  transition: all 0.2s;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .img-wrapper img {
@@ -167,20 +348,57 @@ button:hover {
 }
 
 .img-wrapper .overlay {
-  display: none;
   position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2;
-  justify-content: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
   align-items: center;
-  transition: all 0.3s;
+  justify-content: center;
+  border-radius: 8px;
+  opacity: 1;
+  transition: opacity 0.2s;
 }
 
-.img-wrapper.hovered .overlay {
-  transition: all 0.3s;
-  display: flex;
-  color: #eee;
+.img-wrapper:not(.hovered) .overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.course-card h5 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 8px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-card .iclass {
+  color: #888;
+  font-weight: 500;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 7px;
+  background: #e5e7eb;
+  margin: 10px 0 0 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.in-progressbar {
+  height: 100%;
+  background: rgb(22, 92, 145);
+  transition: width 0.3s;
+}
+
+.course-card .watchProgress {
+  font-weight: 700;
 }
 
 .play-btn {

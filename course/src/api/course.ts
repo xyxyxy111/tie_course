@@ -131,6 +131,24 @@ export const courseApi = {
       url: `/courses/${courseId}/lessons/${sortOrder}`
     });
   },
+
+  getHottestCourse: () => {
+    return request<CourseListVO[]>({
+      method: 'GET',
+      url: 'courses/hottest'
+    })
+  },
+
+  getCourseTogetherBuy: (tagId: string, courseId: string) => {
+    return request<CourseListVO>({
+      method: 'GET',
+      url: '/courses/togetherBuy',
+      params: {
+        tagId: tagId,
+        courseId: courseId
+      }
+    })
+  }
 };
 
 export const categoryApi = {

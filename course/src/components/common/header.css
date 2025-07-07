@@ -302,14 +302,12 @@ button:hover {
   width: 100%;
   height: 8px;
   background: #e5e7eb;
-  border-radius: 4px;
   overflow: hidden;
 }
 
 .mylearn-progress-inner {
   height: 100%;
   background: rgb(22, 92, 145);
-  border-radius: 4px;
   transition: width 0.3s;
 }
 
@@ -403,7 +401,7 @@ button:hover {
   background: #fafbfc;
 }
 
-.myinfo-avatar {
+.myinfo .myinfo-header .myinfo-avatar {
   width: 56px;
   height: 56px;
   border-radius: 50%;

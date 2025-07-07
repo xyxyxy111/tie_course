@@ -3,6 +3,7 @@ import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { categoryApi, courseApi } from '@/api/course';
 import type { CategoryList, Tag, CourseListVO } from '@/api/course';
 import { profileApi } from '@/api';
+import { myListApi, type MyListVO } from '@/api/user';
 const userInfo = reactive({
   username: '',
   firstName: '',
@@ -95,6 +96,8 @@ export const useIndexData = () => {
       userId.value = getCurrentUserId();
       await fetchProfile();
     }
+    await fetchHottestCourse();
+    console.log(hottestCourseList.value?.length)
     await fetchCategories();
     selectedCategoryId.value = 1;
     await getTagListByCategoryId(1);
@@ -118,6 +121,9 @@ export const useIndexData = () => {
         course.whatYouWillLearn
       );
     });
+    if (userId.value) {
+      fetchMylist();
+    }
   };
   return {
     categories,
@@ -139,6 +145,39 @@ const communityVoices = ref<CommunityVoice[]>([
   )
 ])
 
+
+const mylist = ref<MyListVO[]>();
+const fetchMylist = async () => {
+  try {
+    const response = await myListApi.getMyList();
+    if (response && response.data && Array.isArray(response.data)) {
+      mylist.value = response.data as MyListVO[];
+    } else {
+      console.log('数据为空或格式不正确');
+      mylist.value = [];
+    }
+  } catch (error) {
+    console.error('获取失败:', error);
+    mylist.value = [];
+  }
+};
+
+const hottestCourseList = ref<CourseListVO[]>([]);
+const fetchHottestCourse = async () => {
+  try {
+    const response = await courseApi.getHottestCourse();
+    if (response && response.data && Array.isArray(response.data)) {
+      hottestCourseList.value = response.data as CourseListVO[];
+      console.log("!!!!!!!!" + hottestCourseList.value)
+    } else {
+      console.log('数据为空或格式不正确');
+      mylist.value = [];
+    }
+  } catch (error) {
+    console.error('获取失败:', error);
+    mylist.value = [];
+  }
+}
 
 interface Product {
   id: number;
@@ -215,7 +254,6 @@ const changeTag = async (i: NavigationButton) => {
       course.whatYouWillLearn
     );
   });
-  console.log("courseQuickViews:" + courseQuickViews.value.map(course => course.title));
 };
 
 const getCourseListByTagId = async (tagId: number) => {
@@ -242,6 +280,7 @@ const getTagListByCategoryId = async (categoryId: number) => {
 };
 
 export {
+  mylist, hottestCourseList,
   userId, selectedCategoryTitle,
   courseQuickViews, communityVoices,
   fetchCategories, changeCategory,

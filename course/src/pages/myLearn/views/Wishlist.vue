@@ -286,7 +286,6 @@ export default defineComponent({
 }
 
 .browse-btn:active {
-  transform: translateY(0);
   box-shadow: 0 2px 8px rgba(22, 92, 145, 0.3);
 }
 

@@ -169,6 +169,8 @@ export const successCodes = [
   1110,   // 获取课程列表信息成功
   1111,   // 获取单个课程详情成功
   1112,   // 搜索课程成功
+  1114,   //获取热门课程列表成功
+  1115,   // 获取搭配课程列表成功
   1120,   // 获取章节信息成功
   1130,   // 获取课信息成功
   1140,   // 获取我的课程成功
@@ -187,8 +189,6 @@ instance.interceptors.response.use(
     if (!successCodes.includes(response.data.status)) {
       return Promise.reject(response.data.message);
     }
-    console.log('完整response:', response);
-    console.log('response.data:', response.data);
     return response.data;
   },
   (error) => {
