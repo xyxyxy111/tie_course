@@ -128,15 +128,14 @@ export const getCurrentUsername = (): string | null => {
 };
 
 const instance = axios.create({
-  baseURL: '/api',
-  //  baseURL: 'http://2afa449a.r9.cpolar.cn',
+  baseURL: 'http://2afa449a.r9.cpolar.cn',
 
-  //生产环境使用
-  //baseURL: import.meta.env.VITE_APP_API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
+  //baseURL: 'http://localhost:5173/api',
+
 });
 
 instance.interceptors.request.use((config) => {

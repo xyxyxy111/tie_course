@@ -53,24 +53,16 @@ export default defineComponent({
       try {
         loading.value = true;
         const response = await myListApi.getMyList();
-        console.log('愿望单API响应:', response);
-
-        // 根据API返回的数据更新Mylist
+        console.log('我的课程API响应:', response);
         if (response && response.data && Array.isArray(response.data)) {
-          console.log('愿望单数据:', response.data);
           mylist.value = response.data as MyListVO[];
-
-          // 检查每个课程的ID字段
           mylist.value.forEach((course, index) => {
-            console.log(`课程 ${index} 完整数据:`, course);
-            console.log(`课程 ${index} 所有属性:`, Object.keys(course));
           });
         } else {
-          console.log('愿望单数据为空或格式不正确');
           mylist.value = [];
         }
       } catch (error) {
-        console.error('获取愿望单失败:', error);
+        console.error('获取我的课程失败:', error);
         mylist.value = [];
       } finally {
         loading.value = false;

@@ -52,7 +52,7 @@ export interface MyListVO {
   courseId: number;
   title: string;
   coverImgUrl: string;
-  watchProgress: string;
+  watchProgress: number;
   lastViewedChapterId: number;
   lastViewedLessonId: number;
   lastViewedAt: number;
@@ -131,15 +131,6 @@ export const authApi = {
     });
   },
 
-  // 手机号注册
-  register: (data: RegisterParams) => {
-    return request<string>({
-      method: 'POST',
-      url: '/auth/registrations',
-      data
-    });
-  },
-
   // 检查手机号是否注册
   checkPhoneAvailable: (phone: string) => {
     return request<{ exist: boolean }>({
@@ -163,8 +154,7 @@ export const authApi = {
   getWxLoginQrcode: () => {
     return request({
       method: 'GET',
-      url: '/auth/wxLogin-qrcode',
-      responseType: 'arraybuffer'
+      url: '/auth/wxLogin-qrcode'
     });
   },
 
@@ -173,7 +163,6 @@ export const authApi = {
     return request({
       method: 'GET',
       url: '/auth/sessions/by-wx',
-      params: { state }
     });
   }
 };
@@ -233,7 +222,7 @@ export const userApi = {
 export const profileApi = {
   // 获取个人资料
   getProfile: () => {
-    return request({
+    return request<UserProfile>({
       method: 'GET',
       url: '/account/profile'
     });

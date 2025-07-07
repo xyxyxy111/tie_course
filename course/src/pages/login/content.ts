@@ -12,6 +12,7 @@ import type {
 import { ref, reactive } from 'vue';
 import { getValidToken } from '@/utils/request';
 import { successCodes } from '@/utils/request';
+import type { RefSymbol } from '@vue/reactivity';
 const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
@@ -39,26 +40,25 @@ const captchaBtn = ref({
   countdown: 60
 });
 
-
 const loginMethod = ref("captcha");
-const showWechatLogin = ref(false);
-const wechatQrCode = ref<string>('');
-const wechatLoginStatus = ref<'waiting' | 'scanning' | 'success' | 'expired'>('waiting');
-const wechatPollingInterval = ref<number | null>(null);
+
+interface wxQrCode {
+  state: string;
+  qrCodeUrl: string;
+}
+const qrCodeUrl = ref('')
+const state = ref('')
 
 const useLoginData = () => {
   const handleLogin = async () => {
-
     if (loginMethod.value === 'captcha') {
       await handleCaptchaLogin();
     } else if (loginMethod.value === 'password') {
-      console.log("password")
       await handlePasswordLogin();
     } else if (loginMethod.value === 'email') {
 
     } else if (loginMethod.value === 'wechat') {
-
-      await handleWechatLogin();
+      await getWxLoginStatus();
     }
   };
   //验证码登录
@@ -112,7 +112,6 @@ const useLoginData = () => {
         phone: loginForm.phone,
         password: loginForm.password
       });
-      console.log(response)
       if (response.data) {
         localStorage.setItem('token', response.data);
         if (loginForm.rememberMe) {
@@ -136,25 +135,43 @@ const useLoginData = () => {
 
   // 微信登录
   const handleWechatLogin = async () => {
-    showWechatLogin.value = true;
-    wechatLoginStatus.value = 'waiting';
-
     try {
-      // 获取微信登录二维码
-      const response = await authApi.getWxLoginQrcode();
-      if (response.data) {
-        // wechatQrCode.value = response.data.qrCodeUrl;
-        // startWechatPolling(response.data.qrCodeId);
-      } else {
-        error.value = '获取微信登录二维码失败';
-        showWechatLogin.value = false;
+      const res = await authApi.getWxLoginQrcode();
+      console.log(res)
+      const data = res.data as wxQrCode;
+      if (res.data) {
+        qrCodeUrl.value = data.qrCodeUrl;
+        state.value = data.state;
       }
-    } catch (err: any) {
+      console.log(qrCodeUrl + "  " + state)
+    } catch (err) {
+      console.error('获取微信登录二维码失败:', err);
       error.value = '获取微信登录二维码失败';
-      showWechatLogin.value = false;
-      console.error('获取微信二维码失败:', err);
     }
   };
+
+  const getWxLoginStatus = async () => {
+    try {
+      const res = await authApi.getWxLoginStatus(state.value);
+      console.log(res)
+      const data = res.data as string;
+      if (res.data) {
+        localStorage.setItem('token', data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      }
+      console.log(qrCodeUrl + "  " + state)
+    } catch (err) {
+      console.error('获取微信登录二维码失败:', err);
+      error.value = '获取微信登录二维码失败';
+    }
+  }
 
   // 检查是否已登录
   const isLoggedIn = () => {
@@ -175,13 +192,11 @@ const useLoginData = () => {
     error,
     success,
     loginForm,
-    showWechatLogin,
-    wechatQrCode,
-    wechatLoginStatus,
     handleLogin,
     handleCaptchaLogin,
     handlePasswordLogin,
     handleWechatLogin,
+    getWxLoginStatus,
     isLoggedIn,
     redirectIfLoggedIn
   };
@@ -259,8 +274,8 @@ const switchLoginMethod = (i: number) => {
 };
 
 export {
-  loginMethod, showWechatLogin, loginForm,
-  wechatLoginStatus, wechatQrCode, captchaBtn, loginStatus,
-  wechatPollingInterval, switchLoginMethod,
+  loginMethod, loginForm,
+  captchaBtn, loginStatus,
+  switchLoginMethod, qrCodeUrl, state,
   useFormValidation, useLoginData, sendCaptcha
 }
