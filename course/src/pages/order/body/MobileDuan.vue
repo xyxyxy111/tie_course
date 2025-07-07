@@ -140,6 +140,7 @@ onMounted(() => {
 <!-- html -->
 <template>
   <IconSprite />
+  <MobileHeader :userId="userId"/>
   <div class="payment-container">
     <!-- 付款方式部分 -->
     <div class="section">

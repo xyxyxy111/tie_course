@@ -111,6 +111,7 @@ const handleAddToCart = async () => {
       alert('课程ID无效');
       return;
     }
+    console.log("调用添加api")
 
     // 调用购物车API
     const { cartApi } = await import('@/api/cart');
@@ -118,17 +119,31 @@ const handleAddToCart = async () => {
 
     if (response.status === 1302) {
       alert('添加至购物车成功！');
+      // Element
       showCart.value = true;
-    } else if (response.status === 2301) {
-      alert('该课程已在购物车中');
     } else {
       alert('添加至购物车失败，请重试');
     }
-  } catch (error) {
-    console.error('添加至购物车失败:', error);
-    alert('添加至购物车失败，请重试');
+  } catch (error:any) {
+    console.log("添加错误")
+    alert('该课程已在购物车中');
+    // if(error === "商品已在购物车中") {
+    //   alert('该课程已在购物车中');
+    // }else{
+    //   console.error('添加至购物车失败:', error);
+    //   alert('添加至购物车失败，请重试'); 
+    // }
   }
 };
+
+const handleBuyNow = async() =>{
+    try {
+      goToCheckout(courseVo.value?.coverImgUrl!,courseVo.value?.currentPrice!);
+  } catch (error:any) {
+      console.error('购买失败:', error);
+      alert('购买失败，请重试'); 
+  }
+}
 
 </script>
 
@@ -136,7 +151,11 @@ const handleAddToCart = async () => {
   <IconSprite />
   <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
   <PCHeader :userId="userId" />
-  <FloatingBox @addToCart="handleAddToCart" />
+  <FloatingBox 
+    @addToCart="handleAddToCart" 
+    @buyNow="handleBuyNow"
+  />
+
   <div id="top-container">
     <div class="content">
       <div class="course-theme">

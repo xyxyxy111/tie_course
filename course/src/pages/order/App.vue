@@ -20,7 +20,7 @@ const headerSpaceStyle = computed(() => ({
 
   <IconSprite />
 
-  <div class="header">
+  <!-- <div class="header">
     <div class=""></div>
     <div :style="headerSpaceStyle"></div>
     <div id="logo" @click="goToIndex">Course</div>
@@ -32,7 +32,7 @@ const headerSpaceStyle = computed(() => ({
         </svg>
       </div>
     </button>
-  </div>
+  </div> -->
 
   <div class="app">
     <PCDuan v-if="width > 800" />
