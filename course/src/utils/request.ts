@@ -145,7 +145,6 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-// 这里维护所有"成功"code
 export const successCodes = [
   1,      // 通用成功
   1000,   // 操作成功

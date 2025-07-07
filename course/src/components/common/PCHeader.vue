@@ -3,7 +3,7 @@
   <div class="header">
     <div :style="headerSpaceStyle"></div>
     <div id="logo" :style="headerButtonStyle" @click="goToIndex()">
-      <img src="/src/images/itie_logo.png" alt="">
+      <img src="/src/images/iclass.png" alt="">
     </div>
     <div :style="headerSpaceStyle"></div>
     <div class="explore">
@@ -44,8 +44,9 @@
     </button>
 
 
-    <div class="mylearn" :style="headerButtonStyle">
-      <button v-if="userId" @mouseenter="handleMyLearnEnter" @mouseleave="handleMyLearnLeave" class="mylearn-button">
+    <div v-if="userId" class="mylearn" :style="headerButtonStyle" @click="goToLearning">
+      <button v-if="userId" @click="goToLearning" @mouseenter="handleMyLearnEnter" @mouseleave="handleMyLearnLeave"
+        class="mylearn-button">
         我的学习 </button>
       <div v-if="myLearnHoverFlag" class="mylearn-popup" @mouseenter="handleMyLearnPopupEnter"
         @mouseleave="handleMyLearnPopupLeave">
@@ -56,6 +57,7 @@
               <div class="mylearn-course-title">
                 {{ course.title }}
               </div>
+              <div class="mylearn-course-author">iClass</div>
               <div class="mylearn-progress-bar">
                 <div class="mylearn-progress-inner" :style="{ width: (course.watchProgress * 100) + '%' }">
                 </div>
@@ -67,9 +69,9 @@
       </div>
     </div>
 
-    <div class="wishlist" :style="headerButtonStyle">
+    <div v-if="userId" class="wishlist" :style="headerButtonStyle">
       <button v-if="userId" @click="goToWishlist" :style="headerButtonStyle" @mouseenter="handleWishlistEnter"
-        @mouseleave="handleWishlistLeave" class="wishlist-btn">
+        @mouseleave="handleWishlistLeave" class="wishlist-button">
         <div class="header-icon">
           <svg width="36" height="36" viewBox="0 2 16 16" fill="#35495e">
             <use href="#line-md--heart-filled" />
@@ -80,26 +82,28 @@
         @mouseleave="handleWishlistPopupLeave">
         <div class="wishlist-popup-content">
           <div v-for="item in wishlist" :key="item.courseId" class="wishlist-card">
-            <img :src="item.coverImgUrl" class="wishlist-card-cover" />
-            <div class="wishlist-card-info">
-              <div class="wishlist-card-title">{{ item.title }}</div>
-              <div class="wishlist-card-meta">iClass</div>
-              <div class="wishlist-card-price">￥{{ item.currentPrice }}</div>
-              <!-- @click="addToCart(item)" -->
-              <button class="wishlist-card-btn">添加到购物车</button>
+            <div class="wishlist-card-item">
+              <div class="wishlist-card-cover"> <img :src="item.coverImgUrl" class="wishlist-card-cover" />
+              </div>
+              <div class="wishlist-card-info">
+                <div class="wishlist-card-title">{{ item.title }}</div>
+                <div class="wishlist-card-meta">iClass</div>
+                <div class="wishlist-card-price">￥{{ item.currentPrice }}</div>
+              </div>
+
             </div>
+            <!-- @click="addToCart(item)" -->
+            <button class="wishlist-card-btn">添加到购物车</button>
+
           </div>
           <button class="wishlist-popup-btn" @click="goToWishlist">转至心愿单</button>
         </div>
-
       </div>
     </div>
 
-    <div :style="headerSpaceStyle2" v-if="!userId"></div>
-
     <div class="cart" :style="headerButtonStyle">
       <button @click="goToCart()" @mouseenter="handleCartEnter" @mouseleave="handleCartLeave" class="cart-button">
-        <div class="icon">
+        <div class="header-icon">
           <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
             <use href="#mdi--cart-outline" />
           </svg>
@@ -121,7 +125,7 @@
           <div v-else class="cart-empty">购物车为空</div>
           <div class="cart-popup-footer">
             <div class="cart-total">
-              总计：<span class="cart-total-price">￥{{ totalPrice }}</span>
+              总计：￥{{ totalPrice }}
             </div>
             <button class="cart-popup-btn" @click="goToCart">前往购物车</button>
           </div>
@@ -136,7 +140,7 @@
     <div v-if="userId" :style="headerButtonStyle" @mouseenter="handleMyInfoEnter" @mouseleave="handleMyInfoLeave"
       class="myinfo">
       <div class="myinfo-button">
-        <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
+        <img :src="profile?.avatarUrl" alt="" @click="goToMyInfo()">
       </div>
       <div v-if="myInfoHoverFlag" class="myinfo-popup" @mouseenter="handleMyInfoPopupEnter"
         @mouseleave="handleMyInfoPopupLeave">
@@ -315,19 +319,18 @@ const totalPrice = computed(() => {
 });
 onMounted(async () => {
   await fetchCategories();
-  if (userId) {
+  if (userId.value) {
     await fetchMylist();
     await fetchWishlist();
     await fetchCart();
     await fetchProfile();
   }
-
 });
 
 
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 200) / 2800));
-const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 300));
+const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 800) / 300));
 const headerButtonPadding = computed(() => {
   const calculatedValue = (width.value - 1500) / 3000;
   return Math.min(3, Math.max(1, calculatedValue));
@@ -337,14 +340,8 @@ const headerSpaceStyle = computed(() => ({
   transition: 'none'
 }));
 
-const headerSpaceStyle2 = computed(() => ({
-  width: `calc(8vw *( ${headerSpaceWidth.value}))`,
-  transition: 'none',
-  minWidth: '40px'
-}));
-
 const headerSearchInputStyle = computed(() => ({
-  width: `clamp(30vw, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 65vw)`,
+  width: `clamp(30vw, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 70vw)`,
   transition: 'none'
 }));
 
@@ -354,7 +351,8 @@ const headerButtonStyle = computed(() => ({
 }));
 
 const headerButtonStyle2 = computed(() => ({
-  marginInline: `calc(1vw * ${headerButtonPadding.value})`,
+  marginInline: `calc(1vw * ${headerButtonPadding.value} + 10px)`,
+  paddingInline: `calc(1vw * ${headerButtonPadding.value} + 20px)`,
   transition: 'none'
 }));
 
@@ -422,7 +420,6 @@ const handleTagsLeave = () => {
   }, 300)
 }
 
-// MyInfo
 const handleMyInfoEnter = () => {
   if (myInfoHideTimer) {
     clearTimeout(myInfoHideTimer)
@@ -450,7 +447,6 @@ const handleMyInfoPopupLeave = () => {
   }, 300)
 }
 
-// Cart
 const handleCartEnter = () => {
   if (cartHideTimer) {
     clearTimeout(cartHideTimer)
@@ -540,7 +536,6 @@ const handleMyLearnPopupLeave = () => {
   overflow: visible;
   margin-bottom: 30px;
   height: 80px;
-  min-width: 1000px;
 }
 
 #logo {
@@ -595,8 +590,14 @@ button .header-icon {
   min-width: 320px;
 }
 
-img {
-  height: 50px;
+.header img {
+  height: 40px;
+}
+
+.myinfo-button img {
+  margin-top: 5px;
+  width: 40px;
+  border-radius: 50%;
   cursor: pointer;
 }
 </style>
