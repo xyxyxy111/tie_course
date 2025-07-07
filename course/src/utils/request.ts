@@ -128,11 +128,7 @@ export const getCurrentUsername = (): string | null => {
 };
 
 const instance = axios.create({
-  baseURL: '/api',
-  //  baseURL: 'http://2afa449a.r9.cpolar.cn',
-
-  //生产环境使用
-  //baseURL: import.meta.env.VITE_APP_API_BASE_URL,
+  baseURL: 'http://localhost:5173/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -149,7 +145,6 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-// 这里维护所有"成功"code
 export const successCodes = [
   1,      // 通用成功
   1000,   // 操作成功

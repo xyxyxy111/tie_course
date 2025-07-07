@@ -3,12 +3,11 @@
   <div class="header">
     <div :style="headerSpaceStyle"></div>
     <div id="logo" :style="headerButtonStyle" @click="goToIndex()">
-      <img src="/src/images/itie_logo.png" alt="">
+      <img src="/src/images/iclass.png" alt="">
     </div>
     <div :style="headerSpaceStyle"></div>
     <div class="explore">
       <button @mouseenter="handleExploreEnter" @mouseleave="handleExploreLeave" class="explore-button">探索</button>
-
       <div v-if="exploreHoverFlag" class="explore-popup" @mouseenter="handleExplorePopupEnter"
         @mouseleave="handleExplorePopupLeave">
         <div class="explore-popup-content">
@@ -36,7 +35,7 @@
 
     <input v-model="searchQuery" type="text" placeholder="Find your course by skill,topic,or instructor"
       :style="headerSearchInputStyle" @keyup.enter="Search">
-    <button style="margin-inline: 0;">
+    <button>
       <div class="icon" @click="Search">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
           <use href="#material-symbols--search" />
@@ -44,70 +43,152 @@
       </div>
     </button>
 
-    <button v-if="userId" :style="headerButtonStyle" @mouseenter="handleMyLearnEnter" @mouseleave="handleMyLearnLeave">
-      我的学习
+
+    <div v-if="userId" class="mylearn" :style="headerButtonStyle" @click="goToLearning">
+      <button v-if="userId" @click="goToLearning" @mouseenter="handleMyLearnEnter" @mouseleave="handleMyLearnLeave"
+        class="mylearn-button">
+        我的学习 </button>
       <div v-if="myLearnHoverFlag" class="mylearn-popup" @mouseenter="handleMyLearnPopupEnter"
         @mouseleave="handleMyLearnPopupLeave">
         <div class="mylearn-popup-content">
-          <!-- <div v-for="course in myLearnList" :key="course.id" class="mylearn-course-item">
-            <img :src="course.cover" class="mylearn-course-cover" />
+          <div v-for="course in mylist" :key="course.courseId" class="mylearn-course-item">
+            <img :src="course.coverImgUrl" class="mylearn-course-cover" />
             <div class="mylearn-course-info">
-              <div class="mylearn-course-title">{{ course.title }}</div>
+              <div class="mylearn-course-title">
+                {{ course.title }}
+              </div>
+              <div class="mylearn-course-author">iClass</div>
               <div class="mylearn-progress-bar">
-                <div class="mylearn-progress-inner" :style="{ width: course.progress + '%' }"></div>
+                <div class="mylearn-progress-inner" :style="{ width: (course.watchProgress * 100) + '%' }">
+                </div>
               </div>
             </div>
           </div>
-          <button class="mylearn-btn" @click="goToMyLearn">转到我的学习</button> -->
+          <button class="mylearn-btn" @click="goToLearning">转到我的学习</button>
         </div>
       </div>
+    </div>
 
-    </button>
-    <button v-if="userId" @click="goToWishlist">
-      <div class="icon" @mouseenter="handleWishlistEnter" @mouseleave="handleWishlistLeave">
-        <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
-          <use href="#line-md--heart-filled" />
-        </svg>
-        <div v-if="wishlistHoverFlag" class="wishlist-popup" @mouseenter="handleWishlistPopupEnter"
-          @mouseleave="handleWishlistPopupLeave">
-          <div class="wishlist-popup-content">
-            <!-- 这里放心愿单相关内容 -->
+    <div v-if="userId" class="wishlist" :style="headerButtonStyle">
+      <button v-if="userId" @click="goToWishlist" :style="headerButtonStyle" @mouseenter="handleWishlistEnter"
+        @mouseleave="handleWishlistLeave" class="wishlist-button">
+        <div class="header-icon">
+          <svg width="36" height="36" viewBox="0 2 16 16" fill="#35495e">
+            <use href="#line-md--heart-filled" />
+          </svg>
+        </div>
+      </button>
+      <div v-if="wishlistHoverFlag" class="wishlist-popup" @mouseenter="handleWishlistPopupEnter"
+        @mouseleave="handleWishlistPopupLeave">
+        <div class="wishlist-popup-content">
+          <div v-for="item in wishlist" :key="item.courseId" class="wishlist-card">
+            <div class="wishlist-card-item">
+              <div class="wishlist-card-cover"> <img :src="item.coverImgUrl" class="wishlist-card-cover" />
+              </div>
+              <div class="wishlist-card-info">
+                <div class="wishlist-card-title">{{ item.title }}</div>
+                <div class="wishlist-card-meta">iClass</div>
+                <div class="wishlist-card-price">￥{{ item.currentPrice }}</div>
+              </div>
 
+            </div>
+            <!-- @click="addToCart(item)" -->
+            <button class="wishlist-card-btn">添加到购物车</button>
+
+          </div>
+          <button class="wishlist-popup-btn" @click="goToWishlist">转至心愿单</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart" :style="headerButtonStyle">
+      <button @click="goToCart()" @mouseenter="handleCartEnter" @mouseleave="handleCartLeave" class="cart-button">
+        <div class="header-icon">
+          <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
+            <use href="#mdi--cart-outline" />
+          </svg>
+        </div>
+      </button>
+      <div v-if="cartHoverFlag && userId" class="cart-popup" @mouseenter="handleCartPopupEnter"
+        @mouseleave="handleCartPopupLeave">
+        <div class="cart-popup-content">
+          <div class="cart-list" v-if="cart?.cartItemList.length">
+            <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
+              <img :src="item.courseImage" class="cart-item-cover" />
+              <div class="cart-item-info">
+                <div class="cart-item-title">{{ item.courseName }}</div>
+                <div class="cart-item-meta">iClass</div>
+                <div class="cart-item-price">￥{{ item.currentPrice }}</div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="cart-empty">购物车为空</div>
+          <div class="cart-popup-footer">
+            <div class="cart-total">
+              总计：￥{{ totalPrice }}
+            </div>
+            <button class="cart-popup-btn" @click="goToCart">前往购物车</button>
           </div>
         </div>
       </div>
-    </button>
-    <div :style="headerSpaceStyle2" v-if="!userId"></div>
-    <button @click="goToCart()" @mouseenter="handleCartEnter" @mouseleave="handleCartLeave">
-      <div class="icon">
-        <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
-          <use href="#mdi--cart-outline" />
-        </svg>
-      </div>
-      <div v-if="cartHoverFlag" class="cart-popup" @mouseenter="handleCartPopupEnter"
-        @mouseleave="handleCartPopupLeave">
-        <div class="cart-popup-content">
-          <!-- 这里放购物车相关内容 -->
-
-        </div>
-      </div>
-    </button>
+    </div>
 
 
     <button v-if="!userId" :style="headerButtonStyle2" @click="goToLogin">登录</button>
 
-    <div v-if="userId" :style="headerButtonStyle" @mouseenter="handleMyInfoEnter" @mouseleave="handleMyInfoLeave">
-      <img src="/src/images/userPic.png" alt="" @click="goToMyInfo()">
-    </div>
-    <div v-if="myInfoHoverFlag" class="myinfo-popup" @mouseenter="handleMyInfoPopupEnter"
-      @mouseleave="handleMyInfoPopupLeave">
-      <div class="myinfo-popup-content">
-        <!-- 这里放myInfo相关内容 -->
 
+    <div v-if="userId" :style="headerButtonStyle" @mouseenter="handleMyInfoEnter" @mouseleave="handleMyInfoLeave"
+      class="myinfo">
+      <div class="myinfo-button">
+        <img :src="profile?.avatarUrl" alt="" @click="goToMyInfo()">
+      </div>
+      <div v-if="myInfoHoverFlag" class="myinfo-popup" @mouseenter="handleMyInfoPopupEnter"
+        @mouseleave="handleMyInfoPopupLeave">
+        <div class="myinfo-popup-content">
+          <div class="myinfo-header">
+            <img :src="profile?.avatarUrl" class="myinfo-avatar" />
+            <div class="myinfo-userinfo">
+              <div class="myinfo-username">{{ profile?.firstName }}</div>
+              <!-- <div class="myinfo-email">{{ profile?.email }}</div> -->
+            </div>
+          </div>
+          <div class="myinfo-menu">
+            <div class="myinfo-menu-group">
+              <div class="myinfo-menu-item" @click="goToLearning">我的学习</div>
+              <div class="myinfo-menu-item" @click="goToCart">
+                我的购物车
+                <span v-if="cart && cart.cartItemList && cart?.cartItemList.length > 0" class="myinfo-cart-badge">
+                  {{ cart?.cartItemList.length > 99 ? '99+' : cart?.cartItemList.length }}</span>
+              </div>
+              <div class="myinfo-menu-item" @click="goToWishlist">心愿单</div>
+            </div>
+            <!-- <div class="myinfo-menu-group">
+            <div class="myinfo-menu-item" @click="goTo('notice')">通知</div>
+            <div class="myinfo-menu-item" @click="goTo('message')">消息</div>
+          </div> -->
+            <div class="myinfo-menu-group">
+              <div class="myinfo-menu-item">账户设置</div>
+              <div class="myinfo-menu-item">付款方式</div>
+              <div class="myinfo-menu-item">订阅</div>
+              <div class="myinfo-menu-item">iClass 积分</div>
+              <div class="myinfo-menu-item">购买记录</div>
+            </div>
+            <div class="myinfo-menu-group">
+              <div class="myinfo-menu-item lang">
+                语言
+                <span class="myinfo-lang">中文(简体) <i class="lang-icon"></i></span>
+              </div>
+            </div>
+            <div class="myinfo-menu-group">
+              <div class="myinfo-menu-item" @click="goToMyInfo">编辑个人资料</div>
+              <div class="myinfo-menu-item" @click="handleLogout">退出</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -117,14 +198,16 @@ import IconSprite from '../Icon/IconSprite.vue'
 import './header.css'
 import {
   goToLogin, goToMyInfo, goToLearning, goToWishlist,
-  categoryList, expandedCategory, toggleCategory,
+  categoryList, expandedCategory, toggleCategory, handleLogout,
   goToCategory, fetchCategories, goToIndex, goToCart, Search, searchQuery
 } from './header.ts';
 import type { CategoryList } from '@/api/course.ts';
 import { categoryApi } from '@/api/course'
 import { getCurrentUserId, getValidToken } from '@/utils/request';
-import { useCartLogic } from '@/pages/cart/components/content';
-const { cart, fetchCart } = useCartLogic();
+import { cartApi, type Cart } from '@/api/cart.ts';
+import { myListApi, profileApi, wishlistApi, type MyListVO, type UserProfile, type WishListVO } from '@/api/user.ts';
+// import { useCartLogic } from '@/pages/cart/components/content';
+// const { cart, fetchCart } = useCartLogic();
 
 const exploreHoverFlag = ref(false)
 const hoveredCategory = ref<any>(null)
@@ -132,16 +215,12 @@ const tagsHoverFlag = ref(false)
 let exploreHideTimer: number | null = null
 let categoryHideTimer: number | null = null
 let tagsHideTimer: number | null = null
-
 const myInfoHoverFlag = ref(false)
 let myInfoHideTimer: number | null = null
-
 const cartHoverFlag = ref(false)
 let cartHideTimer: number | null = null
-
 const wishlistHoverFlag = ref(false)
 let wishlistHideTimer: number | null = null
-
 const myLearnHoverFlag = ref(false)
 let myLearnHideTimer: number | null = null
 
@@ -170,28 +249,90 @@ onUnmounted(() => {
 });
 
 const userId = ref<string | null>(null);
-// const token = getValidToken();
-// if (token) {
-//   userId.value = getCurrentUserId();
-// } else {
+const token = getValidToken();
+if (token) {
+  userId.value = getCurrentUserId();
+} else {
 
-// }
+}
+const mylist = ref<MyListVO[]>();
+const wishlist = ref<WishListVO[]>();
+const cart = ref<Cart | null>(null);
+const profile = ref<UserProfile | null>(null);
+const error = ref<string | null>(null);
 
+const fetchMylist = async () => {
+  try {
+    const response = await myListApi.getMyList();
+    if (response && response.data && Array.isArray(response.data)) {
+      mylist.value = response.data as MyListVO[];
+      console.log("!!!!!!!!" + mylist.value)
+    } else {
+      console.log('数据为空或格式不正确');
+      mylist.value = [];
+    }
+  } catch (error) {
+    console.error('获取失败:', error);
+    mylist.value = [];
+  }
+};
+const fetchWishlist = async () => {
+  try {
+    const response = await wishlistApi.getWishlist();
+    if (response && response.data && Array.isArray(response.data)) {
+      wishlist.value = response.data as WishListVO[];
+    } else {
+      console.log('愿望单数据为空或格式不正确');
+      wishlist.value = [];
+    }
+  } catch (error) {
+    console.error('获取愿望单失败:', error);
+    wishlist.value = [];
+  }
+};
+const fetchCart = async () => {
+  error.value = null;
+  try {
+    const response = await cartApi.getMyCart();
+    cart.value = response.data;
+    console.log(cart.value);
+  } catch (err) {
+    error.value = '获取购物车数据失败';
+    console.error('获取购物车失败:', err);
+  }
+};
+const fetchProfile = async () => {
+  error.value = null;
+  try {
+    const response = await profileApi.getProfile();
+    profile.value = response.data;
+  } catch (err) {
+    error.value = '获取个人信息数据失败';
+    console.error('获取个人信息失败:', err);
+  }
+}
 
+const totalPrice = computed(() => {
+  if (!cart.value?.cartItemList) return 0;
+  const sum = cart.value.cartItemList.reduce((sum, course) => sum + course.currentPrice, 0);
+  return Number(sum.toFixed(2));
+});
 onMounted(async () => {
   await fetchCategories();
-  // await fetchWishlist();
-  if (userId) {// await fetchCart(); 
+  if (userId.value) {
+    await fetchMylist();
+    await fetchWishlist();
+    await fetchCart();
+    await fetchProfile();
   }
-
 });
 
 
 const { width, height } = useWindowSize()
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 200) / 2800));
-const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 1200) / 300));
+const headerSearchInputWidth = computed(() => Math.max(0, (width.value - 800) / 300));
 const headerButtonPadding = computed(() => {
-  const calculatedValue = (width.value - 800) / 1700;
+  const calculatedValue = (width.value - 1500) / 3000;
   return Math.min(3, Math.max(1, calculatedValue));
 });
 const headerSpaceStyle = computed(() => ({
@@ -199,24 +340,19 @@ const headerSpaceStyle = computed(() => ({
   transition: 'none'
 }));
 
-const headerSpaceStyle2 = computed(() => ({
-  width: `calc(8vw *( ${headerSpaceWidth.value}))`,
-  transition: 'none',
-  minWidth: '40px'
-}));
-
 const headerSearchInputStyle = computed(() => ({
-  width: `clamp(30vw, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 50vw)`,
+  width: `clamp(30vw, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 70vw)`,
   transition: 'none'
 }));
 
 const headerButtonStyle = computed(() => ({
-  paddingInline: `calc(2vw * ${headerButtonPadding.value})`,
+  marginInline: `calc(0.5vw * ${headerButtonPadding.value})`,
   transition: 'none'
 }));
 
 const headerButtonStyle2 = computed(() => ({
-  paddingInline: `calc(5vw * ${headerButtonPadding.value})`,
+  marginInline: `calc(1vw * ${headerButtonPadding.value} + 10px)`,
+  paddingInline: `calc(1vw * ${headerButtonPadding.value} + 20px)`,
   transition: 'none'
 }));
 
@@ -284,7 +420,6 @@ const handleTagsLeave = () => {
   }, 300)
 }
 
-// MyInfo
 const handleMyInfoEnter = () => {
   if (myInfoHideTimer) {
     clearTimeout(myInfoHideTimer)
@@ -312,7 +447,6 @@ const handleMyInfoPopupLeave = () => {
   }, 300)
 }
 
-// Cart
 const handleCartEnter = () => {
   if (cartHideTimer) {
     clearTimeout(cartHideTimer)
@@ -402,7 +536,6 @@ const handleMyLearnPopupLeave = () => {
   overflow: visible;
   margin-bottom: 30px;
   height: 80px;
-  min-width: 1000px;
 }
 
 #logo {
@@ -423,14 +556,7 @@ input {
   margin-left: 1%;
 }
 
-button {
-  height: 50px;
-  font-size: 16px;
-  width: 4%;
-  font-weight: 600;
-}
-
-button .icon {
+button .header-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -438,235 +564,40 @@ button .icon {
   height: 100%;
 }
 
-.explore {
+
+.explore-button,
+.mylearn-button,
+.wishlist-button,
+.cart-button,
+.myinfo-button {
+  margin: 0 auto;
   position: relative;
-  height: 50px;
   display: block;
-  justify-items: center;
-  width: 155px;
-  line-height: 0px;
+  width: 100%;
 }
 
-.explore-button {
+.myinfo {
   position: relative;
-  top: 0%;
-  display: block;
-  width: 105px;
+  z-index: 10;
+  display: inline-block;
 }
 
-img {
-  height: 50px;
-  cursor: pointer;
-}
-
-.explore-popup,
-.mylearn-popup,
-.cart-popup,
 .myinfo-popup {
   position: absolute;
-  top: 100%;
-  left: 0;
-  width: 270px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  z-index: 1000;
-  margin-top: 8px;
-  animation: fadeIn 0.3s ease-out;
+  top: 58px;
+  right: 0px;
+  z-index: 20;
+  min-width: 320px;
 }
 
-.explore-popup-content,
-.mylearn-popup-content,
-.cart-popup-content,
-.myinfo-popup-content {
-  padding: 16px 0;
-  background: white;
-  border-radius: 8px;
-  position: relative;
-  overflow: visible;
+.header img {
+  height: 40px;
 }
 
-.explore-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 16px;
-  padding: 0 20px 16px 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.explore-title h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  text-align: center;
-}
-
-.categories-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-}
-
-.category-item,
-.tag-item {
-  position: relative;
-  padding: 14px 20px;
+.myinfo-button img {
+  margin-top: 5px;
+  width: 40px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 2px 0px;
 }
-
-.category-item:hover,
-.tag-item:hover {
-  background: linear-gradient(105deg, white 70%, rgba(22, 92, 145, 0.2) 100%);
-  color: #495057;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.category-item:hover .category-name {
-  color: #495057;
-}
-
-.category-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.category-icon {
-  font-size: 16px;
-  opacity: 0.7;
-  transition: all 0.3s;
-}
-
-.category-item:hover .category-icon {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.category-arrow {
-  font-size: 16px;
-  color: #999;
-  transition: all 0.3s;
-  opacity: 0.6;
-}
-
-.category-item:hover .category-arrow {
-  color: #6c757d;
-  opacity: 1;
-}
-
-.category-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  transition: color 0.3s ease;
-}
-
-.tags-popup {
-  position: absolute;
-  left: 100%;
-  top: 0;
-  width: 280px;
-  background: white;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-left: none;
-  z-index: 1000;
-  padding: 0px;
-}
-
-.tags-header {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-}
-
-.tags-header h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
-  text-align: center;
-}
-
-.tags-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* 
-@media (max-width: 1200px) {
-  .header {
-    min-width: 900px;
-    padding: 0 20px;
-  }
-
-  #logo {
-    width: 80px;
-    font-size: 28px;
-    padding: 0 8px;
-  }
-
-  .explore {
-    width: 120px;
-  }
-
-  .explore-button {
-    width: 90px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 1000px) {
-  .header {
-    min-width: 800px;
-    padding: 0 15px;
-  }
-
-  #logo {
-    width: 70px;
-    font-size: 24px;
-    padding: 0 6px;
-  }
-
-  .explore {
-    width: 100px;
-  }
-
-  .explore-button {
-    width: 80px;
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 900px) {
-  .header {
-    min-width: 700px;
-    padding: 0 10px;
-  }
-
-  #logo {
-    width: 60px;
-    font-size: 20px;
-    padding: 0 5px;
-  }
-
-  .explore {
-    width: 90px;
-  }
-
-  .explore-button {
-    width: 70px;
-    font-size: 12px;
-  }
-} */
 </style>

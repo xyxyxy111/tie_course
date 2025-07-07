@@ -78,7 +78,7 @@ const courseSliderStyle = computed(() => ({
   <main>
     <CartPopup v-model="showCart" :userId="userId || undefined" :courseName="selectedCourse?.title || ''"
       :courseId="selectedCourse?.courseId || undefined" :style="`width:${width};height:${height}`" />
-    <PCHeader :userId="userId" />
+    <PCHeader />
 
     <div id="main-content">
       <div v-if="userId" class="user">
@@ -267,7 +267,6 @@ const courseSliderStyle = computed(() => ({
   padding: 32px 0 48px 0;
   margin: 0 auto;
   max-width: 1300px;
-  min-width: 1100px;
 }
 
 .category-tabs {
@@ -322,6 +321,7 @@ const courseSliderStyle = computed(() => ({
   margin: 0 auto;
   padding-left: 5px;
   width: 100%;
+  max-width: 100%;
   overflow: hidden;
 }
 

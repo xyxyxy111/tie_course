@@ -12,11 +12,10 @@ import { successCodes } from '@/utils/request';
 import { goToIndex } from '@/components/common/header.ts';
 
 import {
-  captchaBtn,
+  captchaBtn, qrCodeUrl,
   loginMethod,
   sendCaptcha,
-  switchLoginMethod,
-  wechatPollingInterval, useFormValidation, useLoginData, loginStatus
+  switchLoginMethod, useFormValidation, useLoginData, loginStatus
 } from '../content';
 
 const {
@@ -24,13 +23,11 @@ const {
   error,
   success,
   loginForm,
-  showWechatLogin,
-  wechatQrCode,
-  wechatLoginStatus,
   handleLogin,
   handleCaptchaLogin,
   handlePasswordLogin,
   handleWechatLogin,
+  getWxLoginStatus,
   isLoggedIn,
   redirectIfLoggedIn
 } = useLoginData();
@@ -127,8 +124,9 @@ onMounted(() => {
 
           <!-- 微信登录方式 -->
           <div v-if="loginMethod === 'wechat'" class="wechat-wrapper">
-            <div v-if="wxLoginStatus === 'waiting'" class="qr-code-container">
-              <img v-if="wxQrCode" :src="wxQrCode" alt="微信登录二维码" class="qr-code">
+            <div v-if="qrCodeUrl">
+              <img :src="qrCodeUrl" alt="微信登录二维码" />
+
             </div>
             <div v-else-if="wxLoginStatus === 'scanning'" class="status-message">
               <div class="loading-spinner"></div>
@@ -145,18 +143,19 @@ onMounted(() => {
             </div>
           </div>
 
-          <button type="submit" class="login-button" :disabled="loginStatus.loading">
+          <button v-if="loginMethod !== 'wechat'" type="submit" class="login-button" :disabled="loginStatus.loading">
             {{ loginStatus.loading ? '登录中...' : '登录' }}
           </button>
 
+          <button v-else type="submit" class="login-button" :disabled="loginStatus.loading">
+            {{ loginStatus.loading ? '登录中...' : '认证成功' }}
+          </button>
           <div v-if="loginStatus.error" class="error-message">
             {{ loginStatus.error }}
           </div>
           <div v-if="loginStatus.success" class="success-message">
             登录成功，正在跳转...
           </div>
-
-
         </form>
         <div class="login-divider">
           <span class="divider-line"></span>
@@ -193,4 +192,16 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.wechat-wrapper {
+  margin: 0 auto;
+  width: 420px;
+  height: fit-content;
+}
+
+.wechat-wrapper img {
+  margin: 0 auto;
+  width: 90%;
+  height: fit-content;
+}
+</style>

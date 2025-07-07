@@ -25,6 +25,7 @@ interface StsCredentials {
   AccessKeyId: string;
   AccessKeySecret: string;
   securityToken: string;
+  fileName: string;
 }
 
 export default defineComponent({
@@ -119,9 +120,17 @@ export default defineComponent({
           secure: true,
         });
 
-        // 3. 定义文件名并上传到OSS
+        // 3. 从后端获取文件名并上传到OSS
         statusMessage.value = '正在上传头像...';
-        const objectKey = `avatars/${Date.now()}-${selectedFile.value.name}`;
+
+        const fileName = selectedFile.value.name;
+        const lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex === -1 || lastDotIndex === fileName.length - 1) {
+          console.log('无效的文件，缺少后缀名');
+        }
+        const fileExt = fileName.substring(lastDotIndex + 1).toLowerCase();
+
+        const objectKey = `avatars/${creds.fileName}.${fileExt}`;
         const uploadResult = await client.put(objectKey, selectedFile.value);
 
         // 4. 上传成功后，使用返回的URL更新form
