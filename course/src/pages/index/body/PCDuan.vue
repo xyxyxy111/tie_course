@@ -133,7 +133,7 @@ const courseSliderStyle = computed(() => ({
                         iClass
                       </div>
                       <div class="course-rating">
-                        {{ courseQuickView.score }} ★★★★ (2,187)
+                        {{ courseQuickView.score }} ★★★★★ (2,187)
                       </div>
                       <div class="course-price">
                         ¥{{ courseQuickView.originalPrice }}

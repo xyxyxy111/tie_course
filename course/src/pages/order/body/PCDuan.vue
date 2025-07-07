@@ -8,6 +8,7 @@ import '../order.css'
 
 // 导入共享的数据和逻辑
 import { useOrderData, useOrderUtils, orderStatusOptions, timeRangeOptions } from '../content';
+import PCHeader from '@/components/common/PCHeader.vue'
 
 const { width, height } = useWindowSize()
 
@@ -141,6 +142,7 @@ onMounted(() => {
 <!-- html -->
 <template>
   <IconSprite />
+  <PCHeader :userId="userId" />
 
   <div class="payment-container">
 

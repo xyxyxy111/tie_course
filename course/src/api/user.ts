@@ -105,6 +105,14 @@ export const authApi = {
     });
   },
 
+    // 手机号+验证码登录
+  loginTest: () => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/loginTest',
+    });
+  },
+
   // 手机号+验证码登录
   loginByCaptcha: (data: LoginByCaptchaParams) => {
     return request<string>({

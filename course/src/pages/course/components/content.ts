@@ -1,5 +1,6 @@
 // src/composables/content.ts
 import { ref, computed } from 'vue';
+ 
 
 // 课程描述相关逻辑
 function useCourseDescription() {
@@ -37,16 +38,17 @@ function useCart() {
 
       if (response.status === 1302) {
         alert('添加至购物车成功！');
-        cartTitle.value = course;
         showCart.value = true;
-      } else if (response.status === 2301) {
-        alert('该课程已在购物车中');
       } else {
         alert('添加至购物车失败，请重试');
       }
-    } catch (error) {
-      console.error('添加至购物车失败:', error);
-      alert('添加至购物车失败，请重试');
+    } catch (error:any) {
+      if(error === "商品已在购物车中") {
+        alert('该课程已在购物车中');
+      }else{
+        console.error('添加至购物车失败:', error);
+        alert('添加至购物车失败，请重试'); 
+      }
     }
   };
 
