@@ -77,17 +77,19 @@ class CommunityVoice {
     public course: string) { }
 }
 
-const userId = ref<string | null>(null);
+const userId = ref<string | null>('');
 const categories = ref<CategoryList[]>([]);
 const selectedCategoryId = ref<number | null>(null);
 let selectedCategoryTitle = ref("");
 const tags = ref<Tag[]>([]);
 const selectedTagId = ref<number | null>(null);
 const courseListVos = ref<CourseListVO[]>([]);
+const hottestCourseList = ref<CourseListVO[]>([]);
 const categoryTitles = ref<NavigationButton[]>([]);
 const tagTitles = ref<NavigationButton[]>([]);
 const courseQuickViews = ref<CourseQuickView[]>([]);
-
+const hottestCourseQuickViews = ref<CourseQuickView[]>([]);
+const nextToLearnQuickViews = ref<CourseQuickView[]>([]);
 export const useIndexData = () => {
 
   const initializeData = async () => {
@@ -162,13 +164,26 @@ const fetchMylist = async () => {
   }
 };
 
-const hottestCourseList = ref<CourseListVO[]>([]);
 const fetchHottestCourse = async () => {
   try {
     const response = await courseApi.getHottestCourse();
     if (response && response.data && Array.isArray(response.data)) {
       hottestCourseList.value = response.data as CourseListVO[];
-      console.log("!!!!!!!!" + hottestCourseList.value)
+      hottestCourseQuickViews.value = hottestCourseList.value.map(
+        course => {
+          return new CourseQuickView(
+            course.courseId,
+            course.coverImgUrl,
+            course.title,
+            course.score,
+            course.originalPrice,
+            new Date(course.updateTime || new Date()),
+            course.totalMinutes,
+            course.description,
+            course.whatYouWillLearn
+          );
+        }
+      );
     } else {
       console.log('数据为空或格式不正确');
       mylist.value = [];
@@ -280,7 +295,7 @@ const getTagListByCategoryId = async (categoryId: number) => {
 };
 
 export {
-  mylist, hottestCourseList,
+  mylist, hottestCourseList, hottestCourseQuickViews,
   userId, selectedCategoryTitle,
   courseQuickViews, communityVoices,
   fetchCategories, changeCategory,

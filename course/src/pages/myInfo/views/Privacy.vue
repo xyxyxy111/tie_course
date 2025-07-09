@@ -191,8 +191,8 @@ export default defineComponent({
 }
 
 .privacy-option:hover {
-  border-color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.05);
+  border-color: #215486;
+  background-color: rgba(33, 84, 150, 0.05);
 }
 
 .option-text {
@@ -217,8 +217,8 @@ export default defineComponent({
 }
 
 .privacy-checkbox[type="checkbox"]:checked {
-  background-color: rgb(22, 92, 145);
-  border-color: rgb(22, 92, 145);
+  background-color: #215486;
+  border-color: #215486;
   position: relative;
 }
 
@@ -234,7 +234,7 @@ export default defineComponent({
 }
 
 .privacy-checkbox[type="checkbox"]:focus {
-  box-shadow: 0 0 0 2px rgba(22, 92, 145, 0.2);
+  box-shadow: 0 0 0 2px rgba(33, 84, 150, 0.2);
 }
 
 button {
@@ -242,7 +242,7 @@ button {
   width: 100%;
   max-width: 200px;
   margin: 0 auto;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -251,13 +251,13 @@ button {
   font-size: 16px;
   font-weight: 500;
   transition: all 0.3s ease;
-  border: 2px solid rgb(22, 92, 145);
+  border: 2px solid #215486;
 }
 
 button:hover:not(:disabled) {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 8px rgba(33, 84, 150, 0.3);
 }
 
 button:disabled {
@@ -270,6 +270,6 @@ button:disabled {
 
 button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 2px 4px rgba(33, 84, 150, 0.3);
 }
 </style>

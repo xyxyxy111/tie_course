@@ -4,7 +4,7 @@
   display: inline-flex;
   min-width: 32px;
   margin: 0 auto;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   font-weight: 400;
   border: none;
@@ -35,7 +35,7 @@
 .icon-demo {
   display: inline-block;
   color: white;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   border-radius: 25px;
 }
 

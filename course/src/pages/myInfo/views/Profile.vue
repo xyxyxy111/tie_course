@@ -61,7 +61,7 @@ const route = useRoute();
   padding: 20px 50px 5px;
   ;
   font-weight: bolder;
-  color: rgb(22, 92, 145);
-  border-bottom: 8px solid rgb(22, 92, 145);
+  color: #215486;
+  border-bottom: 8px solid #215486;
 }
 </style>

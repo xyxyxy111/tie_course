@@ -1,0 +1,430 @@
+<body>
+    <div class="container">
+     
+        
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="userId">用户ID:</label>
+                <input type="text" id="userId" value="123" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">支付金额 (元):</label>
+                <input type="number" id="amount" value="0.01" step="0.01" min="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="courseId">课程ID:</label>
+                <input type="number" id="courseId" value="1001" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="courseName">课程名称:</label>
+                <input type="text" id="courseName" value="测试课程" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="token">JWT Token (可选):</label>
+                <input type="text" id="token" placeholder="Bearer xxx...">
+                <small>如果不填写，将使用模拟token进行测试</small>
+            </div>
+        </form>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="orderInfo" class="order-info" style="display: none;">
+            <h3>📋 订单信息</h3>
+            <p><strong>订单号:</strong> <span id="generatedOrderId">-</span></p>
+            <p><strong>用户ID:</strong> <span id="orderUserId">-</span></p>
+            <p><strong>支付金额:</strong> ¥<span id="orderAmount">-</span></p>
+            <p><strong>课程信息:</strong> <span id="orderCourseInfo">-</span></p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button id="createPaymentBtn" class="button" onclick="createPayment()">
+                创建支付订单
+            </button>
+            <button id="testNotifyBtn" class="button" onclick="testNotify()" style="background: #52c41a;">
+                测试异步通知
+            </button>
+            <button id="testCancelBtn" class="button" onclick="testCancel()" style="background: #fa8c16;">
+                测试取消订单
+            </button>
+            <button id="testRefundBtn" class="button" onclick="testRefund()" style="background: #eb2f96;">
+                测试退款
+            </button>
+            <button id="queryOrderBtn" class="button" onclick="queryOrder()" style="background: #722ed1;">
+                查询订单状态
+            </button>
+        </div>
+        
+        <div id="paymentFormContainer" style="margin-top: 30px; display: none;">
+            <h3>支付表单:</h3>
+            <div id="paymentFormHtml"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentOrderId = null; // 存储当前创建的订单号
+        
+        // 创建支付订单
+        async function createPayment() {
+            const statusDiv = document.getElementById('status');
+            const createBtn = document.getElementById('createPaymentBtn');
+            const orderInfoDiv = document.getElementById('orderInfo');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status loading';
+                statusDiv.innerHTML = '<p>🔄 正在创建支付订单...</p>';
+                createBtn.disabled = true;
+                createBtn.textContent = '创建中...';
+                
+                // 获取表单数据（不包含订单号，由后端生成）
+                const orderData = {
+                    userId: document.getElementById('userId').value,
+                    paymentPrice: parseFloat(document.getElementById('amount').value),
+                    paymentType: "alipay",
+                    orderItemList: [
+                        {
+                            courseId: parseInt(document.getElementById('courseId').value),
+                            courseName: document.getElementById('courseName').value,
+                            currentPrice: parseFloat(document.getElementById('amount').value),
+                            courseOriginalPrice: parseFloat(document.getElementById('amount').value),
+                            courseDiscount: 1
+                        }
+                    ]
+                };
+                
+                console.log('创建支付订单，数据:', orderData);
+                
+                // 调用后端API创建支付订单
+                const response = await fetch('https://itie.sumixer.com/api/api/pay/alipay/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                console.log('响应状态:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('后端响应:', result);
+                
+                if (result.status === 1202 && result.data) {
+                    // 从返回的订单信息中获取生成的订单号
+                    if (result.data.orderId) {
+                        currentOrderId = result.data.orderId;
+                        
+                        // 显示订单信息
+                        document.getElementById('generatedOrderId').textContent = currentOrderId;
+                        document.getElementById('orderUserId').textContent = orderData.userId;
+                        document.getElementById('orderAmount').textContent = orderData.paymentPrice;
+                        document.getElementById('orderCourseInfo').textContent = `${orderData.orderItemList[0].courseName} (ID: ${orderData.orderItemList[0].courseId})`;
+                        orderInfoDiv.style.display = 'block';
+                    }
+                    
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '<p>✅ 支付订单创建成功！</p><p>订单已保存到数据库，可以继续测试其他功能</p>';
+                    createBtn.textContent = '创建成功';
+
+                    // 自动跳转到支付宝支付页面
+                    if (result.data.formHtml) {
+                        // 创建一个临时div插入formHtml
+                        const tempDiv = document.createElement('div');
+                        tempDiv.style.display = 'none';
+                        tempDiv.innerHTML = result.data.formHtml;
+                        document.body.appendChild(tempDiv);
+                        // 自动提交表单
+                        const form = tempDiv.querySelector('form');
+                        if (form) {
+                            form.submit();
+                        } else {
+                            alert('未获取到支付表单，无法跳转');
+                        }
+                    }
+                    // 不再显示支付表单，因为现在返回的是订单信息
+                    // 如果需要真实支付，可以调用支付宝的支付接口
+                    
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `<p>❌ 创建支付订单失败: ${result.message}</p>`;
+                    createBtn.textContent = '创建失败';
+                }
+                
+            } catch (error) {
+                console.error('创建支付订单失败:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<p>❌ 创建支付订单失败: ${error.message}</p>`;
+                createBtn.textContent = '创建失败';
+            } finally {
+                createBtn.disabled = false;
+            }
+        }
+        
+        // 测试异步通知
+        async function testNotify() {
+            const statusDiv = document.getElementById('status');
+            const notifyBtn = document.getElementById('testNotifyBtn');
+            
+            if (!currentOrderId) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '<p>❌ 请先创建支付订单</p>';
+                return;
+            }
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status loading';
+                statusDiv.innerHTML = '<p>🔄 正在测试异步通知...</p>';
+                notifyBtn.disabled = true;
+                notifyBtn.textContent = '测试中...';
+                
+                // 构造模拟的支付宝回调参数
+                const mockParams = `out_trade_no=${currentOrderId}&trade_no=2024122600000000&trade_status=TRADE_SUCCESS&total_amount=${document.getElementById('amount').value}&buyer_id=2088102122458832&app_id=9021000149688581&sign_type=RSA2&timestamp=2024-12-26+11:18:54&version=1.0&sign=test_real_sign`;
+                
+                console.log('测试异步通知，参数:', mockParams);
+                
+                // 调用后端通知接口
+                const response = await fetch('https://itie.sumixer.com/api/api/pay/alipay/notify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `params=${encodeURIComponent(mockParams)}`
+                });
+                
+                const result = await response.json();
+                console.log('异步通知测试结果:', result);
+                
+                if (result.status === 1) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '<p>✅ 异步通知测试成功！订单状态已更新，课程已添加到用户课程表</p>';
+                    notifyBtn.textContent = '测试成功';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `<p>❌ 异步通知测试失败: ${result.message}</p>`;
+                    notifyBtn.textContent = '测试失败';
+                }
+                
+            } catch (error) {
+                console.error('异步通知测试失败:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<p>❌ 异步通知测试失败: ${error.message}</p>`;
+                notifyBtn.textContent = '测试失败';
+            } finally {
+                notifyBtn.disabled = false;
+            }
+        }
+        
+        // 测试取消订单
+        async function testCancel() {
+            const statusDiv = document.getElementById('status');
+            const cancelBtn = document.getElementById('testCancelBtn');
+            
+            if (!currentOrderId) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '<p>❌ 请先创建支付订单</p>';
+                return;
+            }
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status loading';
+                statusDiv.innerHTML = '<p>🔄 正在测试取消订单...</p>';
+                cancelBtn.disabled = true;
+                cancelBtn.textContent = '测试中...';
+                
+                console.log('测试取消订单，订单ID:', currentOrderId);
+                
+                // 调用后端取消接口
+                const response = await fetch(`https://itie.sumixer.com/api/api/pay/alipay/cancel?orderId=${currentOrderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                console.log('取消订单测试结果:', result);
+                
+                if (result.status === 1) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '<p>✅ 取消订单测试成功！</p>';
+                    cancelBtn.textContent = '测试成功';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `<p>❌ 取消订单测试失败: ${result.message}</p>`;
+                    cancelBtn.textContent = '测试失败';
+                }
+                
+            } catch (error) {
+                console.error('取消订单测试失败:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<p>❌ 取消订单测试失败: ${error.message}</p>`;
+                cancelBtn.textContent = '测试失败';
+            } finally {
+                cancelBtn.disabled = false;
+            }
+        }
+        
+        // 测试退款
+        async function testRefund() {
+            const statusDiv = document.getElementById('status');
+            const refundBtn = document.getElementById('testRefundBtn');
+            
+            if (!currentOrderId) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '<p>❌ 请先创建支付订单</p>';
+                return;
+            }
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status loading';
+                statusDiv.innerHTML = '<p>🔄 正在测试退款...</p>';
+                refundBtn.disabled = true;
+                refundBtn.textContent = '测试中...';
+                
+                console.log('测试退款，订单ID:', currentOrderId);
+                
+                // 调用后端退款接口
+                const response = await fetch(`https://itie.sumixer.com/api/api/pay/alipay/refund?orderId=${currentOrderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                console.log('退款测试结果:', result);
+                
+                if (result.status === 1) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = `<p>✅ 退款测试成功！</p><p>${result.data}</p>`;
+                    refundBtn.textContent = '测试成功';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `<p>❌ 退款测试失败: ${result.message}</p>`;
+                    refundBtn.textContent = '测试失败';
+                }
+                
+            } catch (error) {
+                console.error('退款测试失败:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<p>❌ 退款测试失败: ${error.message}</p>`;
+                refundBtn.textContent = '测试失败';
+            } finally {
+                refundBtn.disabled = false;
+            }
+        }
+        
+        // 查询订单状态
+        async function queryOrder() {
+            const statusDiv = document.getElementById('status');
+            const queryBtn = document.getElementById('queryOrderBtn');
+            
+            if (!currentOrderId) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '<p>❌ 请先创建支付订单</p>';
+                return;
+            }
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status loading';
+                statusDiv.innerHTML = '<p>🔄 正在查询订单状态...</p>';
+                queryBtn.disabled = true;
+                queryBtn.textContent = '查询中...';
+                
+                console.log('查询订单状态，订单ID:', currentOrderId);
+                // 调用后端查询接口
+                //
+                const response = await fetch(`https://itie.sumixer.com/api/order/single/${currentOrderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                console.log('订单查询结果:', result);
+                
+                if (result.status === 1) {
+                    const order = result.data;
+                    const statusText = getStatusText(order.status);
+                    const paymentTime = order.paymentTime ? new Date(order.paymentTime).toLocaleString() : '未支付';
+                    const currentTime = new Date().toLocaleString();
+                    
+                    // 计算时间差
+                    let timeInfo = '';
+                    if (order.paymentTime) {
+                        const timeDiff = Date.now() - new Date(order.paymentTime).getTime();
+                        const hoursDiff = Math.floor(timeDiff / (60 * 60 * 1000));
+                        const minutesDiff = Math.floor((timeDiff % (60 * 60 * 1000)) / (60 * 1000));
+                        
+                        if (hoursDiff < 24) {
+                            timeInfo = `<p>✅ 距离支付时间: ${hoursDiff}小时${minutesDiff}分钟 (可退款)</p>`;
+                        } else {
+                            timeInfo = `<p>❌ 距离支付时间: ${hoursDiff}小时${minutesDiff}分钟 (超过24小时，不可退款)</p>`;
+                        }
+                    }
+                    
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = `
+                        <p>✅ 订单查询成功！</p>
+                        <p><strong>订单信息:</strong></p>
+                        <p>订单ID: ${order.orderId}</p>
+                        <p>订单状态: ${statusText}</p>
+                        <p>支付金额: ¥${order.paymentPrice || 0}</p>
+                        <p>支付时间: ${paymentTime}</p>
+                        <p>当前时间: ${currentTime}</p>
+                        ${timeInfo}
+                    `;
+                    queryBtn.textContent = '查询成功';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `<p>❌ 订单查询失败: ${result.message}</p>`;
+                    queryBtn.textContent = '查询失败';
+                }
+                
+            } catch (error) {
+                console.error('订单查询失败:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<p>❌ 订单查询失败: ${error.message}</p>`;
+                queryBtn.textContent = '查询失败';
+            } finally {
+                queryBtn.disabled = false;
+            }
+        }
+        
+        // 获取订单状态文本描述
+        function getStatusText(status) {
+            switch (status) {
+                case 1: return "已取消";
+                case 2: return "未支付";
+                case 3: return "已支付";
+                case 4: return "已退款";
+                default: return "未知状态";
+            }
+        }
+        
+        // 页面加载完成后的初始化
+        window.onload = function() {
+            console.log('支付测试页面加载完成');
+            console.log('后端API地址: http://localhost:8080');
+            console.log('支付宝网关: https://openapi.alipay.com/gateway.do');
+            console.log('订单号由后端自动生成');
+        };
+    </script>
+</body>
+</html> 

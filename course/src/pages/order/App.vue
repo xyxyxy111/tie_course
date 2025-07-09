@@ -20,10 +20,11 @@ const headerSpaceStyle = computed(() => ({
 
   <IconSprite />
 
-  <!-- <div class="header">
-    <div class=""></div>
-    <div :style="headerSpaceStyle"></div>
-    <div id="logo" @click="goToIndex">Course</div>
+  <div class="order-header">
+
+    <div id="logo" @click="goToIndex()">
+      <img src="/src/images/iclass.png" alt="">
+    </div>
     <div :style="headerSpaceStyle"></div>
     <button class="close-order-btn" @click="goToCart">
       <div class="icon">
@@ -32,7 +33,7 @@ const headerSpaceStyle = computed(() => ({
         </svg>
       </div>
     </button>
-  </div> -->
+  </div>
 
   <div class="app">
     <PCDuan v-if="width > 800" />
@@ -41,9 +42,9 @@ const headerSpaceStyle = computed(() => ({
 
 </template>
 
-<!-- css -->
+<!-- css -->order-
 <style scoped>
-.header {
+.order-header {
   overflow: hidden;
   margin-bottom: 30px;
   height: 80px;
@@ -60,20 +61,25 @@ const headerSpaceStyle = computed(() => ({
 #logo {
   font-size: 28px;
   font-weight: 700;
-  color: rgb(22, 92, 145);
+  color: #215486;
   cursor: pointer;
   font-family: 'Times New Roman', Times, serif;
   margin-inline: 20px;
   align-items: center;
 }
 
+#logo img {
+  height: 50px;
+  width: fit-content;
+}
+
 .icon {
-  color: rgb(22, 92, 145);
+  color: #215486;
   background-color: transparent;
   border-radius: 25px;
 }
 
-.close-order-btn{
+.close-order-btn {
   border: none;
   margin-left: auto;
   background-color: white;
@@ -82,8 +88,7 @@ const headerSpaceStyle = computed(() => ({
   border-radius: 8px;
 }
 
-.close-order-btn:hover{
-  background-color: rgb(22, 92, 145,0.1);
+.close-order-btn:hover {
+  background-color: rgb(22, 92, 145, 0.1);
 }
-
 </style>

@@ -12,7 +12,7 @@
 
 #logo {
   font-weight: 700;
-  color: rgb(22, 92, 145);
+  color: #215486;
   cursor: pointer;
   font-family: 'Times New Roman', Times, serif;
   margin-inline: 1%;
@@ -31,7 +31,7 @@
 
 input:hover,
 input:focus {
-  border: 1.5px rgb(22, 92, 145) solid;
+  border: 1.5px #215486 solid;
   background-color: aliceblue;
   color: black;
   outline: none;
@@ -56,8 +56,8 @@ input:focus {
 }
 
 button:hover {
-  color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  color: #215486;
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .explore,
@@ -163,7 +163,7 @@ button:hover {
 
 .category-item:hover,
 .tag-item:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: rgba(33, 84, 150, 0.1);
   color: #495057;
 }
 
@@ -307,7 +307,7 @@ button:hover {
 
 .mylearn-progress-inner {
   height: 100%;
-  background: rgb(22, 92, 145);
+  background: #215486;
   transition: width 0.3s;
 }
 
@@ -318,7 +318,7 @@ button:hover {
   width: 100%;
   margin-top: 12px;
   padding: 12px 0;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: #fff;
   font-size: 17px;
   font-weight: 700;
@@ -338,7 +338,7 @@ button:hover {
 .wishlist-card-price,
 .cart-item-info .cart-item-price {
   font-size: 17px;
-  color: rgb(22, 92, 145);
+  color: #215486;
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -346,8 +346,8 @@ button:hover {
 .wishlist-popup .wishlist-popup-content .wishlist-card-btn {
   margin-top: 0px;
   background-color: #fff;
-  color: rgb(22, 92, 145);
-  box-shadow: 0 0 0 0.5px rgb(22, 92, 145);
+  color: #215486;
+  box-shadow: 0 0 0 0.5px #215486;
   border: none;
   margin-bottom: 10px;
 }

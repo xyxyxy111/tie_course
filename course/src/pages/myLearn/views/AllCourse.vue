@@ -22,8 +22,11 @@
             <circle cx="30" cy="30" r="26" stroke="#fbbf24" stroke-width="6" fill="none" stroke-dasharray="163.36"
               stroke-dashoffset="54" />
             <!-- 绿色进度 -->
-            <circle cx="30" cy="30" r="20" stroke="#22c55e" stroke-width="6" fill="none" stroke-dasharray="125.66"
-              stroke-dashoffset="25" />
+            <!-- 灰色底环 -->
+            <circle cx="30" cy="30" r="20" stroke="#f6f8fc" stroke-width="6" fill="none" />
+
+            <circle cx="30" cy="30" r="20" stroke="#22c55e" stroke-width="6" fill="none" stroke-dasharray="75.66"
+              stroke-dashoffset="55" />
           </svg>
           <div class="summary-progress-text">
             <div><span class="yellow">18/30</span> 课程分钟数</div>
@@ -279,26 +282,26 @@ export default defineComponent({
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  border: 1px solid rgb(22, 92, 145);
+  border: 1px solid #215486;
 }
 
 .plan-btn {
-  background: rgb(22, 92, 145);
+  background: #215486;
   color: #fff;
 }
 
 .plan-btn:hover {
   background: #fff;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .cancel-btn {
   background: #fff;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .cancel-btn:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .mycourses-container {
@@ -323,8 +326,8 @@ export default defineComponent({
 
 .course-card:hover {
   transform: translateY(-3px);
-  background-color: rgba(22, 92, 145, 0.02);
-  box-shadow: 0 6px 24px rgba(22, 92, 145, 0.13);
+  background-color: rgba(33, 84, 150, 0.02);
+  box-shadow: 0 6px 24px rgba(33, 84, 150, 0.13);
 }
 
 .img-wrapper {
@@ -393,7 +396,7 @@ export default defineComponent({
 
 .in-progressbar {
   height: 100%;
-  background: rgb(22, 92, 145);
+  background: #215486;
   transition: width 0.3s;
 }
 

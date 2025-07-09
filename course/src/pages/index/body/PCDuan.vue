@@ -10,7 +10,7 @@ import CartPopup from '@/components/common/CartPopup.vue';
 import { goToCart, goToCourse } from '@/components/common/header.ts';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import {
-  mylist, hottestCourseList,
+  mylist, hottestCourseQuickViews, hottestCourseList,
   communityVoices, changeTag,
   categoryTitles, selectedCategoryTitle,
   tagTitles, changeCategory, useIndexData
@@ -89,7 +89,8 @@ const courseSliderStyle = computed(() => ({
         </span>
       </div>
       <Swiper />
-      <div class="navigator">
+      <!-- 未登录 -->
+      <div v-if="!userId" class="navigator">
         <h1>将您需要的所有技能集中在一个地方</h1>
         <h2>从关注技能到挑选技术主题，itie 为您的专业发展提供支持。</h2>
         <div class="navigator-btn-group">
@@ -99,8 +100,7 @@ const courseSliderStyle = computed(() => ({
           </div>
         </div>
       </div>
-
-      <div class="category-section">
+      <div v-if="!userId" class="category-section">
         <div class="category-tabs">
           <div v-for="tag in tagTitles" :key="tag.id" class="category-tab" :class="{ active: tag.id === selectedTagId }"
             @click="changeTag(tag); currentIndex = 0">
@@ -158,7 +158,7 @@ const courseSliderStyle = computed(() => ({
 
 
       </div>
-
+      <!-- 已登录 -->
       <div v-if="userId" class="start-section">
         <div class="start-header">
           <h1>开始学习吧</h1>
@@ -238,33 +238,44 @@ const courseSliderStyle = computed(() => ({
           </div>
         </div>
       </div>
+
       <div class="watching-section">
         <h2 class="watching-title">学习者正在看</h2>
         <div class="watching-cards-row">
-          <div class="watching-card" v-for="(course, index) in hottestCourseList?.slice(1)" :key="index">
+          <div class="watching-card" v-for="(course, index) in hottestCourseQuickViews?.slice(1)" :key="index"
+            @mouseenter="course.mouseEnter()" @mouseleave="course.mouseLeave()">
+            <HoverPopup v-model="course.hoverFlag" transition="slide" width="300px" height="360px" :index="index"
+              :show-delay="200" :hide-delay="200" :userId="userId || undefined" :courseName="course.title"
+              :courseId="course.courseId" @course-added="handleCourseAdded">
+              <template #trigger>
+                <div>
+                  <div @click="goToCourse(course.courseId)">
+                    <div class="watching-card-cover">
+                      <img :src="course.coverImgUrl" alt="课程封面" />
+                    </div>
 
-
-            <div class="watching-card-cover">
-              <img :src="course.coverImgUrl" alt="课程封面" />
-            </div>
-
-            <div class="watching-card-title">{{ course.title }}</div>
-            <div class="watching-card-author">iClass</div>
-            <div class="watching-card-rating">
-              <span class="watching-card-score">4.9</span>
-              <span class="watching-card-stars">
-                <span v-for="i in 5" :key="i" class="star filled">★</span>
-              </span>
-              <span class="watching-card-count">(1,025)</span>
-            </div>
-            <div class="watching-card-price">￥19.99</div>
-            <div class="cart-tag">热门课程</div>
+                    <div class="watching-card-title">{{ course.title }}</div>
+                    <div class="watching-card-author">iClass</div>
+                    <div class="watching-card-rating">
+                      <span class="watching-card-score">4.9</span>
+                      <span class="watching-card-stars">
+                        <span v-for="i in 5" :key="i" class="star filled">★</span>
+                      </span>
+                      <span class="watching-card-count">(1,025)</span>
+                    </div>
+                    <div class="watching-card-price">￥19.99</div>
+                    <div class="cart-tag">热门课程</div>
+                  </div>
+                </div>
+              </template>
+            </HoverPopup>
           </div>
-
-          <!-- 右侧箭头按钮 -->
-          <button class="watching-arrow-btn right"><span>›</span></button>
         </div>
+
+        <!-- 右侧箭头按钮 -->
+        <button class="watching-arrow-btn right"><span>›</span></button>
       </div>
+
     </div>
     <Footer />
   </main>
@@ -565,9 +576,9 @@ const courseSliderStyle = computed(() => ({
 .start-section,
 .watching-section,
 .recommend-section {
-  margin: 24px 32px;
+  margin: 24px 30px;
   max-width: 1300px;
-  padding: 12px 32px;
+  padding: 12px 30px;
 }
 
 .start-section .start-header {
@@ -588,7 +599,6 @@ const courseSliderStyle = computed(() => ({
   font-size: 16px;
   font-weight: 700;
   color: rgb(22, 92, 125);
-  margin: 0 24px 0 0;
   cursor: pointer;
   transition: color 0.2s;
   text-decoration: underline;
@@ -653,7 +663,7 @@ const courseSliderStyle = computed(() => ({
 .start-section .mylearn-progress-bar {
   position: absolute;
   left: 122px;
-  bottom: 1px;
+  bottom: 2px;
   box-shadow: 0px 2px 2px #e5e7eb;
   width: 218px;
   height: 8px;
@@ -701,7 +711,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .next-card:hover {
-  box-shadow: 0 6px 24px rgba(22, 92, 145, 0.13);
+  box-shadow: 0 6px 24px rgba(33, 84, 150, 0.13);
 }
 
 .next-card-cover {
@@ -893,7 +903,7 @@ const courseSliderStyle = computed(() => ({
 
 .recommend-card-meta-link {
   height: 24px;
-  color: rgb(22, 92, 145);
+  color: #215486;
   font-weight: 600;
   margin-right: 10px;
 }
@@ -936,7 +946,7 @@ const courseSliderStyle = computed(() => ({
 .recommend-card-tag {
   display: inline-block;
   background: #e5e7eb;
-  color: rgb(22, 92, 145);
+  color: #215486;
   font-size: 13px;
   font-weight: 600;
   border-radius: 6px;
@@ -985,7 +995,7 @@ const courseSliderStyle = computed(() => ({
 } */
 /* 
 .watching-card:hover {
-  box-shadow: 0 6px 24px rgba(22, 92, 145, 0.13);
+  box-shadow: 0 6px 24px rgba(33,84,150, 0.13);
 } */
 /* 
 .watching-card-cover {
@@ -1070,7 +1080,7 @@ const courseSliderStyle = computed(() => ({
 
 .cart-tag {
   display: inline-block;
-  background-color: rgba(22, 92, 145, 0.13);
+  background-color: rgba(33, 84, 150, 0.13);
   color: rgb(22, 92, 125);
   font-size: 13px;
   font-weight: 600;
@@ -1090,7 +1100,7 @@ const courseSliderStyle = computed(() => ({
   width: 36px;
   height: 36px;
   font-size: 22px;
-  color: rgb(22, 92, 145);
+  color: #215486;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -1101,7 +1111,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .watching-arrow-btn:hover {
-  background: rgb(22, 92, 145);
+  background: #215486;
   color: #fff;
 }
 </style>

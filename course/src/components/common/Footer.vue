@@ -60,7 +60,7 @@ const { width, height } = useWindowSize()
 
 .footer-left #i {
   font-size: 40px;
-  color: rgb(22, 92, 145);
+  color: #215486;
   font-family: 'HarmonyOS_Sans_Condensed-black';
   margin-right: 4px;
 }

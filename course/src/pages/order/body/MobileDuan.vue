@@ -5,7 +5,6 @@ import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import '../order.css'
-import MobileHeader from '@/components/common/MoblieHeader.vue';
 
 // 导入共享的数据和逻辑
 import { useOrderData, useOrderUtils, orderStatusOptions, timeRangeOptions } from '../content';
@@ -140,7 +139,6 @@ onMounted(() => {
 <!-- html -->
 <template>
   <IconSprite />
-  <MobileHeader :userId="userId"/>
   <div class="payment-container">
     <!-- 付款方式部分 -->
     <div class="section">
@@ -240,13 +238,13 @@ h3 {
 }
 
 .payment-method.active {
-  border-color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  border-color: #215486;
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .payment-method:hover {
-  border-color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.05);
+  border-color: #215486;
+  background-color: rgba(33, 84, 150, 0.05);
 }
 
 .payment-method input[type="radio"] {
@@ -295,7 +293,7 @@ h3 {
 
 .course-item .price {
   font-weight: bold;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .coupon-section {
@@ -333,7 +331,7 @@ h3 {
 }
 
 .apply-coupon-btn {
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -346,7 +344,7 @@ h3 {
 }
 
 .apply-coupon-btn:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 
 .price-breakdown {
@@ -402,7 +400,7 @@ h3 {
 }
 
 .pay-button {
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -415,6 +413,6 @@ h3 {
 }
 
 .pay-button:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 </style>

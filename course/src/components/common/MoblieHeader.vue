@@ -112,12 +112,12 @@ defineProps<{
 }
 
 #header-search button:hover {
-  color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  color: #215486;
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .icon {
-  color: rgb(22, 92, 145);
+  color: #215486;
   background-color: transparent;
   border-radius: 25px;
 }
@@ -160,6 +160,6 @@ button {
 }
 
 .menu-section li:hover {
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 </style>

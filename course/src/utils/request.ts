@@ -9,23 +9,17 @@ export interface ApiResponse<T = any> {
   token: string;
 }
 
-// 检查token是否有效
 export const isValidToken = (token: string | null): boolean => {
   return token !== null && token !== undefined && token !== 'undefined' && token.trim() !== '';
 };
 
-// 获取有效的token
 export const getValidToken = (): string | null => {
   const token = localStorage.getItem('token');
   if (!isValidToken(token)) return null;
-
-  // 对于JWT token，进行额外的过期检查
   try {
     const parts = token!.split('.');
     if (parts.length === 3) {
       const payload = JSON.parse(atob(parts[1]));
-
-      // 检查token是否过期
       if (payload.exp) {
         const currentTime = Math.floor(Date.now() / 1000);
         if (currentTime > payload.exp) {
@@ -37,15 +31,12 @@ export const getValidToken = (): string | null => {
     }
   } catch (error) {
     console.error('检查token过期时出错:', error);
-    // 如果检查失败，清除可能损坏的token
     localStorage.removeItem('token');
     return null;
   }
 
   return token;
 };
-
-// 检查token是否过期
 export const isTokenExpired = (token: string): boolean => {
   try {
     const parts = token.split('.');
@@ -57,10 +48,10 @@ export const isTokenExpired = (token: string): boolean => {
         return currentTime > payload.exp;
       }
     }
-    return false; // 如果不是JWT格式或没有过期时间，认为未过期
+    return false;
   } catch (error) {
     console.error('检查token过期时出错:', error);
-    return true; // 解析失败认为已过期
+    return true;
   }
 };
 
@@ -75,7 +66,6 @@ export const clearExpiredToken = (): void => {
 export const getUserFromToken = (): { userId?: string; username?: string } | null => {
   const token = getValidToken();
   if (!token) return null;
-
   try {
     const parts = token.split('.');
     if (parts.length === 3) {
@@ -95,9 +85,6 @@ export const getUserFromToken = (): { userId?: string; username?: string } | nul
         username: payload.username || payload.name
       };
     }
-
-    // 如果不是JWT格式，尝试解析为简单格式
-    // 假设token格式为: userId:username 或其他格式
     if (token.includes(':')) {
       const [userId, username] = token.split(':');
       return { userId, username };
@@ -195,20 +182,15 @@ instance.interceptors.response.use(
     // 处理token相关错误
     if (error.response) {
       const { status, data } = error.response;
-
-      // 401 未授权，可能是token过期或无效
       if (status === 401) {
         console.log('Token无效或已过期，清除本地token');
         localStorage.removeItem('token');
-
-        // 如果不是登录页面，则重定向到登录页面
         if (!window.location.pathname.includes('login.html')) {
           console.log('重定向到登录页面');
           window.location.href = '/login.html';
         }
       }
 
-      // 403 禁止访问
       if (status === 403) {
         console.log('访问被禁止，可能需要重新登录');
         localStorage.removeItem('token');
@@ -226,25 +208,21 @@ export const request = <T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> 
   return instance(config);
 };
 
-// Token管理工具类
 export class TokenManager {
   private static checkInterval: number | null = null;
-  private static readonly CHECK_INTERVAL = 5 * 60 * 1000; // 每5分钟检查一次
+  private static readonly CHECK_INTERVAL = 7 * 24 * 60 * 60 * 1000; // 每7天检查一次
 
-  // 启动定期检查
   static startPeriodicCheck(): void {
     if (this.checkInterval) {
-      return; // 已经在运行
+      return;
     }
 
     this.checkInterval = window.setInterval(() => {
       clearExpiredToken();
     }, this.CHECK_INTERVAL);
-
-    console.log('Token定期检查已启动，每5分钟检查一次');
+    console.log('Token定期检查已启动，每7天检查一次');
   }
 
-  // 停止定期检查
   static stopPeriodicCheck(): void {
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
@@ -253,12 +231,10 @@ export class TokenManager {
     }
   }
 
-  // 立即检查并清理过期token
   static checkAndClear(): void {
     clearExpiredToken();
   }
 
-  // 获取token剩余有效时间（秒）
   static getTokenRemainingTime(): number | null {
     const token = localStorage.getItem('token');
     if (!token) return null;
@@ -277,15 +253,12 @@ export class TokenManager {
     } catch (error) {
       console.error('获取token剩余时间时出错:', error);
     }
-
     return null;
   }
 
-  // 检查token是否即将过期（默认5分钟内）
-  static isTokenExpiringSoon(warningMinutes: number = 5): boolean {
-    const remainingTime = this.getTokenRemainingTime();
-    if (remainingTime === null) return false;
-
-    return remainingTime <= warningMinutes * 60;
-  }
+  // static isTokenExpiringSoon(warningMinutes: number = 7 * 24 * 60): boolean {
+  //   const remainingTime = this.getTokenRemainingTime();
+  //   if (remainingTime === null) return false;
+  //   return remainingTime <= warningMinutes * 60;
+  // }
 }

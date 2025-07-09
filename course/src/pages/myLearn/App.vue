@@ -29,9 +29,10 @@ onMounted(() => {
 <template>
   <IconSprite />
   <main>
-    <PCHeader :userId="userId" v-if="width > 800" />
-    <MobileHeader :userId="userId" v-else />
+    <div></div>
+    <PCHeader :userId="userId" />
     <div class="container">
+
       <div class="my-learning-container">
         <!-- 导航栏 -->
         <h1>我的学习</h1>
@@ -41,7 +42,7 @@ onMounted(() => {
             所有课程
           </router-link>
           <router-link to="/learning/my-list" class="nav-link" :class="{ active: route.path.includes('my-list') }">
-            我的列表
+            我的订单
           </router-link>
           <router-link to="/learning/wishlist" class="nav-link" :class="{ active: route.path.includes('wishlist') }">
             心愿单
@@ -67,6 +68,7 @@ onMounted(() => {
   width: 100%;
   padding-top: 20px;
   background-color: rgb(4, 35, 58);
+  min-width: 1000px;
 
 }
 

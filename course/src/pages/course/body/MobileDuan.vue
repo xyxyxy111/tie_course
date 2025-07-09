@@ -147,9 +147,9 @@ const handleGift = () => {
           <img :src="courseVo?.coverImgUrl || '/src/images/image1.png'" alt="">
         </div>
         <span class="current-price">{{ courseVo?.currentPrice ? '¥' + courseVo.currentPrice : '¥13.99'
-          }}</span>
+        }}</span>
         <span class="original-price">{{ courseVo?.originalPrice ? '¥' + courseVo.originalPrice : '¥94.99'
-          }}</span>
+        }}</span>
         <span class="discount">85% 折扣</span>
         <div class="time-left">此优惠价格仅剩1天！</div>
         <div class="action-buttons">
@@ -208,7 +208,7 @@ const handleGift = () => {
       </div>
       <button @click="CourseDescriptionFlag = !CourseDescriptionFlag;" class="course-descrpitionbtn">{{
         CourseDescription
-        }}</button>
+      }}</button>
       <h1>评论</h1>
       <div class="comment-container .container-scroll-x">
         <div class="comment">
@@ -233,7 +233,7 @@ const handleGift = () => {
 }
 
 
-.video-picture img{
+.video-picture img {
   width: 100%;
   height: 200px;
 }
@@ -284,12 +284,12 @@ const handleGift = () => {
 .add-to-cart:hover,
 .buy-now:hover {
   background-color: white;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .add-to-cart,
 .buy-now {
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
 }
 
@@ -359,6 +359,4 @@ h1 {
 .slide-lesson-leave-from {
   max-height: 500px;
 }
-
-
 </style>

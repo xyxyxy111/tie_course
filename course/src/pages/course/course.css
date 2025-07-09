@@ -23,8 +23,8 @@
 }
 
 .other-theme button:hover {
-  border: 1px rgb(22, 92, 145) solid;
-  color: rgb(22, 92, 145);
+  border: 1px #215486 solid;
+  color: #215486;
 }
 
 .course-content ul {
@@ -45,7 +45,7 @@
 }
 
 .course-content ul li:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .course-content .curriculum-title {
@@ -71,14 +71,14 @@
 .course-descrpition button {
   border: none;
   padding: 10px;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .course-descrpitionbtn {
   width: fit-content;
   border: none;
   background-color: white;
-  color: rgb(22, 92, 145);
+  color: #215486;
   font-weight: 700;
   padding: 10px 20px;
   margin: 10px 20px;

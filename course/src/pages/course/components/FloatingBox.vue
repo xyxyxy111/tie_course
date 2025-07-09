@@ -174,21 +174,21 @@ const floatingBoxStyle = () => ({
 
 .add-to-cart {
   background-color: #fff;
-  color: rgb(22, 92, 145);
-  border: 1px solid rgb(22, 92, 145);
+  color: #215486;
+  border: 1px solid #215486;
 }
 
 .add-to-cart:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .buy-now {
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
 }
 
 .buy-now:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 
 }
 
@@ -226,7 +226,7 @@ const floatingBoxStyle = () => ({
 }
 
 .action-links a {
-  color: rgb(22, 92, 145);
+  color: #215486;
   text-decoration: underline;
   font-size: 14px;
   cursor: pointer;

@@ -110,11 +110,11 @@ const handleLogout = async () => {
 }
 
 .sidebar-icon:hover {
-  background: rgba(22, 92, 145, 0.6);
+  background: rgba(33, 84, 150, 0.6);
 }
 
 .sidebar-icon.active {
-  background: rgb(22, 92, 145);
+  background: #215486;
 }
 
 .sidebar-icon img {
