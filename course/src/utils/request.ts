@@ -115,11 +115,20 @@ export const getCurrentUsername = (): string | null => {
 };
 
 const instance = axios.create({
+<<<<<<< HEAD
+  baseURL: '/api',
+
+
+  
+=======
   baseURL: 'http://localhost:5173/api',
+>>>>>>> bfe3d0cb00b21c68babb0ec21713b7f2767b27fe
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
+  //baseURL: 'http://localhost:5173/api',
+
 });
 
 instance.interceptors.request.use((config) => {
