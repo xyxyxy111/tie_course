@@ -163,14 +163,14 @@ export default defineComponent({
 .privacy-container h1 {
   margin-bottom: 10px;
   color: #333;
-  font-size: 24px;
+  font-size: 2.2rem;
   text-align: center;
 }
 
 .privacy-note {
   text-align: center;
   color: #666;
-  font-size: 14px;
+  font-size: 1.4rem;
   margin-bottom: 30px;
   font-style: italic;
 }
@@ -191,13 +191,13 @@ export default defineComponent({
 }
 
 .privacy-option:hover {
-  border-color: #215486;
+  border-color: #215496;
   background-color: rgba(33, 84, 150, 0.05);
 }
 
 .option-text {
   margin-left: 10px;
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #333;
   flex: 1;
 }
@@ -217,8 +217,8 @@ export default defineComponent({
 }
 
 .privacy-checkbox[type="checkbox"]:checked {
-  background-color: #215486;
-  border-color: #215486;
+  background-color: #215496;
+  border-color: #215496;
   position: relative;
 }
 
@@ -229,7 +229,7 @@ export default defineComponent({
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: bold;
 }
 
@@ -242,16 +242,16 @@ button {
   width: 100%;
   max-width: 200px;
   margin: 0 auto;
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   padding: 12px 20px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  border: 2px solid #215486;
+  border: 2px solid #215496;
 }
 
 button:hover:not(:disabled) {

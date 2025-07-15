@@ -59,9 +59,9 @@ const headerSpaceStyle = computed(() => ({
 }
 
 #logo {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 700;
-  color: #215486;
+  color: #215496;
   cursor: pointer;
   font-family: 'Times New Roman', Times, serif;
   margin-inline: 20px;
@@ -74,7 +74,7 @@ const headerSpaceStyle = computed(() => ({
 }
 
 .icon {
-  color: #215486;
+  color: #215496;
   background-color: transparent;
   border-radius: 25px;
 }

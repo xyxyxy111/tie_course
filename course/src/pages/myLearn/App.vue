@@ -63,18 +63,28 @@ onMounted(() => {
 </template>
 
 <!-- css -->
-<style scoped>
+<style>
+.header {
+  min-width: 1200px;
+}
+
+.header input {
+  min-width: 600px;
+}
+
 .container {
   width: 100%;
   padding-top: 20px;
   background-color: rgb(4, 35, 58);
-  min-width: 1000px;
-
+  min-width: 1200px;
 }
 
+@media(max-width:2000px) {}
+
 .my-learning-container {
-  max-width: 1200px;
+  width: 120rem;
   min-width: 1000px;
+  max-width: 1400px;
   position: relative;
   margin: 0 auto;
   font-family: '宋体';
@@ -84,7 +94,7 @@ onMounted(() => {
   color: white;
   padding: 30px 40px;
   font-weight: bolder;
-  font-size: 40px;
+  font-size: 4rem;
 }
 
 .learning-nav {
@@ -114,8 +124,9 @@ onMounted(() => {
 }
 
 .learning-content {
-  max-width: 1200px;
+  width: 120rem;
   min-width: 1000px;
-  margin: 0 auto;
+  max-width: 1400px;
+  margin: 1rem auto;
 }
 </style>

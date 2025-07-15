@@ -50,13 +50,51 @@ const qrCodeUrl = ref('')
 const state = ref('')
 
 const useLoginData = () => {
+  const validatePhone = (phone: string) => /^1[3-9]\d{9}$/.test(phone);
+  const validateCaptcha = (captcha: string) => /^\d{6}$/.test(captcha);
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password: string) => password.length >= 6;
+
   const handleLogin = async () => {
+    loginStatus.value.error = null;
+    loginStatus.value.success = false;
+    // 前端校验
+    if (loginMethod.value === 'captcha') {
+      if (!validatePhone(loginForm.phone)) {
+        loginStatus.value.error = '请输入正确的手机号！';
+        return;
+      }
+      if (!validateCaptcha(loginForm.captcha)) {
+        loginStatus.value.error = '请输入正确的验证码！';
+        return;
+      }
+    } else if (loginMethod.value === 'password') {
+      if (!validatePhone(loginForm.phone)) {
+        loginStatus.value.error = '请输入正确的手机号！';
+        return;
+      }
+      if (!validatePassword(loginForm.password)) {
+        loginStatus.value.error = '请输入正确的密码！';
+        return;
+      }
+    } else if (loginMethod.value === 'email') {
+      if (!validateEmail(loginForm.phone)) {
+        loginStatus.value.error = '请输入正确的电子邮箱！';
+        return;
+      }
+      if (!validatePassword(loginForm.email)) {
+        loginStatus.value.error = '请输入正确的密码！';
+        return;
+      }
+    }
+    // 校验通过，开始登录
+    loginStatus.value.loading = true;
     if (loginMethod.value === 'captcha') {
       await handleCaptchaLogin();
     } else if (loginMethod.value === 'password') {
       await handlePasswordLogin();
     } else if (loginMethod.value === 'email') {
-
+      // 邮箱登录逻辑（如有）
     } else if (loginMethod.value === 'wechat') {
       await getWxLoginStatus();
     }
@@ -92,8 +130,10 @@ const useLoginData = () => {
     } catch (err: any) {
       error.value = err.response?.data?.message || '登录失败，请检查网络连接';
       console.error('登录失败:', err);
+      loginStatus.value.loading = false;
     } finally {
       loading.value = false;
+      loginStatus.value.loading = false;
     }
   };
 
@@ -128,6 +168,7 @@ const useLoginData = () => {
     } catch (err: any) {
       error.value = err.response?.data?.message || '登录失败，请检查网络连接';
       console.error('登录失败:', err);
+      loginStatus.value.loading = false;
     } finally {
       loading.value = false;
     }
@@ -137,13 +178,11 @@ const useLoginData = () => {
   const handleWechatLogin = async () => {
     try {
       const res = await authApi.getWxLoginQrcode();
-      console.log(res)
       const data = res.data as wxQrCode;
       if (res.data) {
         qrCodeUrl.value = data.qrCodeUrl;
         state.value = data.state;
       }
-      console.log(qrCodeUrl + "  " + state)
     } catch (err) {
       console.error('获取微信登录二维码失败:', err);
       error.value = '获取微信登录二维码失败';
@@ -153,7 +192,7 @@ const useLoginData = () => {
   const getWxLoginStatus = async () => {
     try {
       const res = await authApi.getWxLoginStatus(state.value);
-      console.log(res)
+
       const data = res.data as string;
       if (res.data) {
         localStorage.setItem('token', data);
@@ -166,7 +205,6 @@ const useLoginData = () => {
           window.location.href = redirectUrl;
         }, 1000);
       }
-      console.log(qrCodeUrl + "  " + state)
     } catch (err) {
       console.error('获取微信登录二维码失败:', err);
       error.value = '获取微信登录二维码失败';

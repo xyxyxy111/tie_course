@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { RouterView, RouterLink } from 'vue-router';
-import { toRef, ref, onMounted } from 'vue';
+import { toRef, ref, onMounted, computed } from 'vue';
 import { authApi, userApi } from '@/api/user';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
@@ -15,7 +15,7 @@ import {
   captchaBtn, qrCodeUrl,
   loginMethod,
   sendCaptcha,
-  switchLoginMethod, useFormValidation, useLoginData, loginStatus
+  switchLoginMethod, useLoginData, loginStatus
 } from '../content';
 
 const {
@@ -32,8 +32,6 @@ const {
   redirectIfLoggedIn
 } = useLoginData();
 
-const { validateEmail, validatePassword, validateUsername } = useFormValidation();
-
 const { width, height } = useWindowSize()
 // 微信登录相关状态
 const wxLoginVisible = ref(false);
@@ -41,13 +39,59 @@ const wxQrCode = ref<string>('');
 const wxLoginStatus = ref<'waiting' | 'scanning' | 'success' | 'error'>('waiting');
 const wxState = ref<string>('');
 
+// 错误状态
+const phoneError = ref("");
+const captchaError = ref("");
+const emailError = ref("");
+const passwordError = ref("");
+
+let iconWidth = ref(26 + (width.value - 1920) / 100)
+iconWidth.value = (iconWidth.value > 26) ? iconWidth.value : 26;
+
+
+function validatePhone() {
+  if (!loginForm.phone) {
+    phoneError.value = "请输入手机号";
+  } else if (!/^1[3-9]\d{9}$/.test(loginForm.phone)) {
+    phoneError.value = "请输入正确的手机号！";
+  } else {
+    phoneError.value = "";
+  }
+}
+function validateCaptcha() {
+  if (!loginForm.captcha) {
+    captchaError.value = "请输入验证码";
+  } else if (!/^\d{6}$/.test(loginForm.captcha)) {
+    captchaError.value = "请输入正确的验证码！";
+  } else {
+    captchaError.value = "";
+  }
+}
+function validateEmail() {
+  if (!loginForm.phone) {
+    emailError.value = "请输入电子邮箱";
+  } else if (!/^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(loginForm.phone)) {
+    emailError.value = "请输入正确的电子邮箱！";
+  } else {
+    emailError.value = "";
+  }
+}
+function validatePassword() {
+  if (!loginForm.password) {
+    passwordError.value = "请输入用户密码";
+  } else if (loginForm.password.length < 6) {
+    passwordError.value = "请输入正确的密码！";
+  } else {
+    passwordError.value = "";
+  }
+}
+
 
 const openWxLogin = async () => {
   wxLoginVisible.value = true;
   wxLoginStatus.value = 'waiting';
   try {
     const response = await authApi.getWxLoginQrcode();
-    // 将arraybuffer转换为base64
     const arrayBuffer = response.data as ArrayBuffer;
     const uint8Array = new Uint8Array(arrayBuffer);
     const base64 = btoa(String.fromCharCode(...uint8Array));
@@ -57,11 +101,6 @@ const openWxLogin = async () => {
     wxLoginStatus.value = 'error';
   }
 };
-
-
-
-
-
 
 const LImgStyle = () => ({
   width: width.value < 1150 ? '40%' : '50%'
@@ -100,25 +139,54 @@ onMounted(() => {
 
             <!-- 验证码登录方式 -->
             <div v-if="loginMethod === 'captcha'" class="captcha-wrapper">
-              <input v-model="loginForm.phone" placeholder="手机号" class="phone">
-              <div class="captcha-input-group">
-                <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha">
-                <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
-                  {{ captchaBtn.text }}
-                </button>
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('手机号') }]">
+                <input v-model="loginForm.phone" placeholder="手机号" class="phone" />
+                <div v-if="loginStatus.error && loginStatus.error.includes('手机号')" class="error-message">{{
+                  loginStatus.error }}</div>
+              </div>
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('验证码') }]">
+
+                <div class="captcha-input-group">
+                  <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
+                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+                    {{ captchaBtn.text }}
+                  </button>
+                </div>
+                <div v-if="loginStatus.error && loginStatus.error.includes('验证码')" class="error-message">{{
+                  loginStatus.error }}</div>
               </div>
             </div>
 
             <!-- 密码登录方式 -->
             <div v-if="loginMethod === 'password'" class="password-wrapper">
-              <input v-model="loginForm.phone" placeholder="手机号" class="phone">
-              <input v-model="loginForm.password" type="password" placeholder="密码" class="password">
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('手机号') }]">
+
+                <input v-model="loginForm.phone" placeholder="手机号" class="phone" />
+                <div v-if="loginStatus.error && loginStatus.error.includes('手机号')" class="error-message">{{
+                  loginStatus.error }}</div>
+              </div>
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('密码') }]">
+
+                <input v-model="loginForm.password" type="password" placeholder="密码" class="password" />
+                <div v-if="loginStatus.error && loginStatus.error.includes('密码')" class="error-message">{{
+                  loginStatus.error }}</div>
+              </div>
             </div>
 
             <!-- 邮箱登录方式 -->
             <div v-if="loginMethod === 'email'" class="email-wrapper">
-              <input v-model="loginForm.phone" placeholder="邮箱" class="email">
-              <input v-model="loginForm.email" type="email" placeholder="密码" class="password">
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('邮箱') }]">
+
+                <input v-model="loginForm.phone" placeholder="邮箱" class="email" />
+                <div v-if="loginStatus.error && loginStatus.error.includes('邮箱')" class="error-message">{{
+                  loginStatus.error }}</div>
+              </div>
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('密码') }]">
+
+                <input v-model="loginForm.email" type="email" placeholder="密码" class="password" />
+                <div v-if="loginStatus.error && loginStatus.error.includes('密码')" class="error-message">{{
+                  loginStatus.error }}</div>
+              </div>
             </div>
           </div>
 
@@ -143,16 +211,10 @@ onMounted(() => {
             </div>
           </div>
 
-          <button v-if="loginMethod !== 'wechat'" type="submit" class="login-button" :disabled="loginStatus.loading">
+          <button type="submit" class="login-button" :disabled="loginStatus.loading">
             {{ loginStatus.loading ? '登录中...' : '登录' }}
           </button>
 
-          <button v-else type="submit" class="login-button" :disabled="loginStatus.loading">
-            {{ loginStatus.loading ? '登录中...' : '认证成功' }}
-          </button>
-          <div v-if="loginStatus.error" class="error-message">
-            {{ loginStatus.error }}
-          </div>
           <div v-if="loginStatus.success" class="success-message">
             登录成功，正在跳转...
           </div>
@@ -165,23 +227,23 @@ onMounted(() => {
 
         <div class="login-icons">
           <button v-if="loginMethod !== 'captcha'" class="login-icon-btn" @click="switchLoginMethod(0)">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#gridicons--phone" />
             </svg>
           </button>
           <button v-if="loginMethod !== 'password'" class=" login-icon-btn" @click="switchLoginMethod(1)">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#solar--key-bold" />
             </svg>
           </button>
           <button v-if="loginMethod !== 'email'" class="login-icon-btn" @click="switchLoginMethod(2)">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#ic--outline-email" />
             </svg>
           </button>
           <button v-if="loginMethod !== 'wechat'" class="login-icon-btn wx-icon-btn"
             @click="switchLoginMethod(3); handleWechatLogin()">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="#27b148">
+            <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="#27b148">
               <use href="#ic--baseline-wechat" />
             </svg>
           </button>
@@ -193,6 +255,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .wechat-wrapper {
   margin: 0 auto;
   width: 420px;

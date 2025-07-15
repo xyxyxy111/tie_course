@@ -204,14 +204,14 @@ img {
 }
 
 .upload-btn:hover {
-  border-color: #215486;
+  border-color: #215496;
 }
 
 button {
   position: relative;
   left: 80%;
   width: fit-content;
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   margin: 5px 20px;
@@ -219,9 +219,9 @@ button {
   border-radius: 4px;
   cursor: pointer;
   height: 30px;
-  font-size: 12px;
+  font-size: 1.2rem;
   transition: all 0.3s;
-  border: 1px #215486 solid;
+  border: 1px #215496 solid;
 }
 
 button:hover:not(:disabled) {

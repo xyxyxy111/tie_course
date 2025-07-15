@@ -147,9 +147,9 @@ const handleGift = () => {
           <img :src="courseVo?.coverImgUrl || '/src/images/image1.png'" alt="">
         </div>
         <span class="current-price">{{ courseVo?.currentPrice ? '¥' + courseVo.currentPrice : '¥13.99'
-        }}</span>
+          }}</span>
         <span class="original-price">{{ courseVo?.originalPrice ? '¥' + courseVo.originalPrice : '¥94.99'
-        }}</span>
+          }}</span>
         <span class="discount">85% 折扣</span>
         <div class="time-left">此优惠价格仅剩1天！</div>
         <div class="action-buttons">
@@ -208,7 +208,7 @@ const handleGift = () => {
       </div>
       <button @click="CourseDescriptionFlag = !CourseDescriptionFlag;" class="course-descrpitionbtn">{{
         CourseDescription
-      }}</button>
+        }}</button>
       <h1>评论</h1>
       <div class="comment-container .container-scroll-x">
         <div class="comment">
@@ -227,6 +227,8 @@ const handleGift = () => {
 </template>
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .price-section {
   margin: 15px;
   padding: 10px;
@@ -239,27 +241,27 @@ const handleGift = () => {
 }
 
 .current-price {
-  font-size: 24px;
+  font-size: 2.2rem;
   font-weight: bold;
   color: white;
   margin-right: 10px;
 }
 
 .original-price {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #999;
   text-decoration: line-through;
   margin-right: 10px;
 }
 
 .discount {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #d83b3b;
   font-weight: bold;
 }
 
 .time-left {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #d83b3b;
   margin-top: 5px;
 }
@@ -284,12 +286,12 @@ const handleGift = () => {
 .add-to-cart:hover,
 .buy-now:hover {
   background-color: white;
-  color: #215486;
+  color: #215496;
 }
 
 .add-to-cart,
 .buy-now {
-  background-color: #215486;
+  background-color: #215496;
   color: white;
 }
 
@@ -306,7 +308,7 @@ const handleGift = () => {
   width: 100%;
   min-width: 400px;
   padding: 0px 0px 20px 10px;
-  font-size: 16px;
+  font-size: 1.6rem;
   height: 400px;
   overflow: hidden;
 }

@@ -277,7 +277,7 @@ export default defineComponent({
   right: 10px;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 2.2rem;
   cursor: pointer;
   color: #666;
   transition: color 0.2s;
@@ -310,21 +310,21 @@ export default defineComponent({
 .shopping-cart-container button,
 .topic-tag {
   width: fit-content;
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   padding: 2px 5px;
   border-radius: 4px;
   cursor: pointer;
   height: 30px;
-  font-size: 12px;
+  font-size: 1.2rem;
   transition: all 0.3s;
 }
 
 .shopping-cart-container button:hover,
 .topic-tag:hover {
   background-color: white;
-  color: #215486;
+  color: #215496;
 }
 
 .recommendations {
@@ -343,7 +343,7 @@ export default defineComponent({
 }
 
 .shopping-cart-container h2 {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
@@ -355,7 +355,7 @@ export default defineComponent({
 
 .product-info {
   width: 45%;
-  font-size: 12px;
+  font-size: 1.2rem;
   text-align: left;
   margin: 5px;
 }
@@ -375,7 +375,7 @@ export default defineComponent({
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   height: 45px;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .rating {
@@ -388,7 +388,7 @@ export default defineComponent({
 
 .price {
   font-weight: bold;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: #dc3545;
 }
 
@@ -399,7 +399,7 @@ export default defineComponent({
 
 .total-price {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .add-all-btn {

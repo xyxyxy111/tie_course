@@ -178,6 +178,8 @@ export default {
 </script>
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .course-page {
   display: flex;
   height: 100vh;

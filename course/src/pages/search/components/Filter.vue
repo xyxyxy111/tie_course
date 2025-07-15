@@ -110,7 +110,7 @@ onMounted(async () => {
 .sidebar-header div {
   margin: 0 auto;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 2rem;
 }
 
 .sidebar-content {
@@ -122,7 +122,7 @@ onMounted(async () => {
 
 .sidebar-title {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.8rem;
   padding: 15px 0 0px 20px;
   color: var(--text-primary);
 }
@@ -163,7 +163,7 @@ onMounted(async () => {
 .tag-list button {
   width: 100%;
   margin: 0px 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   padding: 6px 10px;
   color: var(--text-primary);
   border: none;

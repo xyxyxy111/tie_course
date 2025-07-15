@@ -156,14 +156,14 @@ export default defineComponent({
 }
 
 .summary-title {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 4px;
 }
 
 .summary-desc {
-  font-size: 15px;
+  font-size: 1.5rem;
   color: #666;
   margin-bottom: 8px;
 }
@@ -176,20 +176,20 @@ export default defineComponent({
 }
 
 .summary-week-num {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #fbbf24;
   margin: 0 2px;
 }
 
 .summary-week-label {
-  font-size: 15px;
+  font-size: 1.5rem;
   color: #222;
   font-weight: 600;
 }
 
 .summary-week-desc {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #888;
   margin-left: 8px;
 }
@@ -210,7 +210,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 15px;
+  font-size: 1.5rem;
   color: #222;
 }
 
@@ -225,7 +225,7 @@ export default defineComponent({
 }
 
 .summary-date {
-  font-size: 13px;
+  font-size: 1.3rem;
   color: #888;
   margin-top: 2px;
 }
@@ -255,13 +255,13 @@ export default defineComponent({
 }
 
 .plan-title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #222;
 }
 
 .plan-desc {
-  font-size: 15px;
+  font-size: 1.5rem;
   color: #666;
   margin-bottom: 18px;
 
@@ -278,26 +278,26 @@ export default defineComponent({
   padding: 8px 40px;
   border-radius: 6px;
   border: none;
-  font-size: 15px;
+  font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  border: 1px solid #215486;
+  border: 1px solid #215496;
 }
 
 .plan-btn {
-  background: #215486;
+  background: #215496;
   color: #fff;
 }
 
 .plan-btn:hover {
   background: #fff;
-  color: #215486;
+  color: #215496;
 }
 
 .cancel-btn {
   background: #fff;
-  color: #215486;
+  color: #215496;
 }
 
 .cancel-btn:hover {
@@ -309,25 +309,6 @@ export default defineComponent({
   flex-wrap: wrap;
   gap: 24px;
   margin: 24px 0;
-}
-
-.course-card {
-  width: 260px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  padding: 18px 18px 16px 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  transition: all 0.2s;
-  position: relative;
-}
-
-.course-card:hover {
-  transform: translateY(-3px);
-  background-color: rgba(33, 84, 150, 0.02);
-  box-shadow: 0 6px 24px rgba(33, 84, 150, 0.13);
 }
 
 .img-wrapper {
@@ -370,21 +351,6 @@ export default defineComponent({
   pointer-events: none;
 }
 
-.course-card h5 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #222;
-  margin: 0 0 8px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.course-card .iclass {
-  color: #888;
-  font-weight: 500;
-}
-
 .progress-bar {
   width: 100%;
   height: 7px;
@@ -396,13 +362,10 @@ export default defineComponent({
 
 .in-progressbar {
   height: 100%;
-  background: #215486;
+  background: #215496;
   transition: width 0.3s;
 }
 
-.course-card .watchProgress {
-  font-weight: 700;
-}
 
 .play-btn {
   font-size: 48px;

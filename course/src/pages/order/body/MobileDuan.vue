@@ -205,6 +205,8 @@ onMounted(() => {
 
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .payment-container {
   max-width: 800px;
   margin: 0 auto;
@@ -218,13 +220,13 @@ onMounted(() => {
 
 h2 {
   margin-bottom: 15px;
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: bold;
 }
 
 h3 {
   margin-bottom: 15px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
@@ -238,12 +240,12 @@ h3 {
 }
 
 .payment-method.active {
-  border-color: #215486;
+  border-color: #215496;
   background-color: rgba(33, 84, 150, 0.1);
 }
 
 .payment-method:hover {
-  border-color: #215486;
+  border-color: #215496;
   background-color: rgba(33, 84, 150, 0.05);
 }
 
@@ -287,13 +289,13 @@ h3 {
 
 .course-item .title {
   flex: 1;
-  font-size: 14px;
+  font-size: 1.4rem;
   margin: 0 10px;
 }
 
 .course-item .price {
   font-weight: bold;
-  color: #215486;
+  color: #215496;
 }
 
 .coupon-section {
@@ -305,7 +307,7 @@ h3 {
 
 .coupon-section h3 {
   margin-bottom: 15px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #333;
   text-align: left;
@@ -322,7 +324,7 @@ h3 {
   padding: 10px;
   border: 1px solid #d1d7dc;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .coupon-code-input:focus {
@@ -331,13 +333,13 @@ h3 {
 }
 
 .apply-coupon-btn {
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
   transition: background-color 0.3s;
   white-space: nowrap;
   min-width: fit-content;
@@ -357,7 +359,7 @@ h3 {
 
 .price-breakdown h3 {
   margin-bottom: 15px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #333;
   border-bottom: 1px solid #eee;
@@ -369,7 +371,7 @@ h3 {
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .price-item.total {
@@ -377,7 +379,7 @@ h3 {
   padding-top: 10px;
   margin-top: 10px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .price-item .discount {
@@ -400,12 +402,12 @@ h3 {
 }
 
 .pay-button {
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   padding: 12px 24px;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   cursor: pointer;
   width: 100%;

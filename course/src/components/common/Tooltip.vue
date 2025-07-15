@@ -112,7 +112,7 @@ export default defineComponent({
   background: #333;
   color: white;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 1.4rem;
   white-space: nowrap;
 }
 

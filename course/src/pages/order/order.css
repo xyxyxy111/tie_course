@@ -1,3 +1,6 @@
+@import "/src/assets/rem.css";
+;
+
 .course-item img {
   width: 200px;
   height: 120px;
