@@ -15,7 +15,7 @@ export enum PaymentType {
 }
 
 // 订单项接口
-export interface OrderItem {
+export interface OrderVO {
   id?: number;
   orderId: number;
   userId: number;
@@ -48,7 +48,7 @@ export interface Order {
   updateTime?: string;
   deleteTime?: string | null;
   unused?: string;
-  orderItemList: OrderItem[];
+  orderItemList: OrderVO[];
 }
 
 // 创建订单请求参数
@@ -67,7 +67,7 @@ export interface CreateOrderParams {
   updateTime?: string;
   deleteTime?: string | null;
   unused?: string;
-  orderItemList: OrderItem[];
+  orderItemList: OrderVO[];
 }
 
 // 更新订单状态请求参数

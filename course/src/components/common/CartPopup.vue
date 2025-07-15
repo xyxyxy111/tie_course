@@ -310,7 +310,7 @@ export default defineComponent({
 .shopping-cart-container button,
 .topic-tag {
   width: fit-content;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   padding: 2px 5px;
@@ -324,7 +324,7 @@ export default defineComponent({
 .shopping-cart-container button:hover,
 .topic-tag:hover {
   background-color: white;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .recommendations {

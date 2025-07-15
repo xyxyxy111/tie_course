@@ -5,144 +5,50 @@ import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import { useWindowSize } from '@/useWindowSize'
 import '../order.css'
-
 // 导入共享的数据和逻辑
-import { useOrderData, useOrderUtils, orderStatusOptions, timeRangeOptions } from '../content';
+import {
+  cartCourses,
+  cartTotal,
+  cartOriginalTotal,
+  cartSaved,
+  selectedPayment,
+  couponCode,
+  applyCoupon,
+  discountAmount,
+  finalPrice,
+  payAmount,
+  payLoading,
+  payStatusMsg,
+  payStatusType,
+  payOrderInfo,
+  currentOrderId,
+  useOrderData,
+  useOrderUtils,
+  orderStatusOptions,
+  timeRangeOptions,
+  initializeData,
+  handlePayment,
+  handlePaymentChange,
+  testNotify,
+  testCancel,
+  testRefund,
+  queryOrder,
+  getStatusText
+} from '../content';
 import PCHeader from '@/components/common/PCHeader.vue'
 
 const { width, height } = useWindowSize()
 
-// 使用共享的数据和逻辑
-const {
-  orders,
-  loading,
-  error,
-  userId,
-  currentPage,
-  pageSize,
-  totalPages,
-  totalOrders,
-  selectedStatus,
-  selectedTimeRange,
-  initializeData,
-  fetchOrders,
-  handlePageChange,
-  handleStatusFilter,
-  handleTimeRangeFilter,
-  cancelOrder,
-  confirmReceipt,
-  applyRefund
-} = useOrderData();
-
-const {
-  formatOrderStatus,
-  getOrderStatusColor,
-  formatPrice,
-  formatTime,
-  formatOrderNumber,
-  calculateOrderTotal,
-  calculateOrderOriginalTotal,
-  canCancelOrder,
-  canConfirmReceipt,
-  canApplyRefund
-} = useOrderUtils();
-
-onMounted(async () => {
-  await initializeData();
-});
-
-// 购物车数据
-const cartData = ref<any>(null);
-const cartCourses = ref<any[]>([]);
-const cartTotal = ref(0);
-const cartOriginalTotal = ref(0);
-const cartSaved = ref(0);
-
-// 响应式数据
-const selectedPayment = ref('alipay'); // 默认选择支付宝
-const couponCode = ref(''); // 优惠券码
-const discountAmount = ref(0); // 优惠金额
-const finalPrice = ref(0); // 最终价格
-
-// 从localStorage读取购物车数据
-const loadCartData = () => {
-  try {
-    const storedData = localStorage.getItem('tempCartData');
-    if (storedData) {
-      cartData.value = JSON.parse(storedData);
-      cartCourses.value = cartData.value.courses || [];
-      cartTotal.value = cartData.value.total || 0;
-      cartOriginalTotal.value = cartData.value.originalTotal || 0;
-      cartSaved.value = cartData.value.saved || 0;
-
-      // 初始化最终价格
-      finalPrice.value = cartTotal.value;
-
-      console.log('购物车数据加载成功:', cartData.value);
-    } else {
-      console.log('没有找到购物车数据');
-      // 如果没有购物车数据，可以重定向回购物车页面
-      // window.location.href = '/cart.html';
-    }
-  } catch (error) {
-    console.error('读取购物车数据失败:', error);
-  }
-};
-
-// 计算最终价格
-const calculateFinalPrice = () => {
-  finalPrice.value = cartTotal.value - discountAmount.value;
-};
-
-// 处理付款方式选择
-const handlePaymentChange = (paymentMethod: string) => {
-  selectedPayment.value = paymentMethod;
-};
-
-// 应用优惠券
-const applyCoupon = () => {
-  if (!couponCode.value.trim()) {
-    alert('请输入优惠券码');
-    return;
-  }
-
-  // 这里可以添加实际的优惠券验证逻辑
-  // 示例：简单的优惠券逻辑
-  if (couponCode.value.toLowerCase() === 'discount10') {
-    discountAmount.value = cartTotal.value * 0.1; // 10%折扣
-    calculateFinalPrice();
-    alert('优惠券应用成功！获得10%折扣');
-  } else if (couponCode.value.toLowerCase() === 'save5') {
-    discountAmount.value = 5; // 固定5美元折扣
-    calculateFinalPrice();
-    alert('优惠券应用成功！获得5美元折扣');
-  } else {
-    alert('无效的优惠券码');
-  }
-};
-
-// 处理支付
-const handlePayment = () => {
-  if (!selectedPayment.value) {
-    alert('请选择付款方式');
-    return;
-  }
-
-  console.log(`使用${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付 ¥${finalPrice.value.toFixed(2)}`);
-  // 这里可以添加实际的支付逻辑
-  alert('支付功能开发中...');
-};
 
 // 组件挂载时加载购物车数据
 onMounted(() => {
-  loadCartData();
+  initializeData();
 });
 </script>
 
 <!-- html -->
 <template>
   <IconSprite />
-  <PCHeader :userId="userId" />
 
   <div class="payment-container">
 
@@ -254,8 +160,8 @@ label {
 }
 
 .payment-method.active {
-  border-color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  border-color: #215486;
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .order-summary {
@@ -389,7 +295,7 @@ label {
 }
 
 .pay-button {
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -403,7 +309,7 @@ label {
 }
 
 .pay-button:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 
 .refund-policy {

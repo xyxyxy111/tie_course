@@ -9,7 +9,7 @@
   margin-top: 10px;
   padding: 10px;
   border: none;
-  color: rgb(22, 92, 145);
+  color: #215486;
   font-weight: 600;
   border-radius: 5px;
   background-color: white;
@@ -20,11 +20,11 @@
 }
 
 .shopping-cart-container .course-item button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .shopping-cart-container .checkout-summary button:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 
 .shopping-cart-container .cart-buttons {
@@ -189,7 +189,7 @@ hr {
   margin-left: calc(100% - 180px);
   white-space: nowrap;
   padding: 8px 0px;
-  background: rgb(22, 92, 145);
+  background: #215486;
 }
 
 .original-price {
@@ -319,12 +319,12 @@ hr {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 84, 150, 0.3);
 }
 
 .browse-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
+  box-shadow: 0 6px 20px rgba(33, 84, 150, 0.4);
   background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
 }
 

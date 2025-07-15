@@ -282,7 +282,7 @@ const handleClearCart = async () => {
 
 .wishlist-btn {
   background-color: none;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .shopping-cart-container .checkout-section .checkout-btn {
@@ -291,7 +291,7 @@ const handleClearCart = async () => {
   margin-left: calc(100% - 120px);
   white-space: nowrap;
   padding: 8px 0px;
-  background: rgb(22, 92, 145);
+  background: #215486;
 }
 
 .wishlist-btn:hover {
@@ -309,7 +309,7 @@ const handleClearCart = async () => {
 }
 
 .remove-btn {
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   font-size: 1.2rem;
   white-space: nowrap;
@@ -319,7 +319,7 @@ const handleClearCart = async () => {
   transform: translateY(-2px);
   font-size: 1.3rem;
   background-color: white;
-  color: rgb(22, 92, 145);
+  color: #215486;
 }
 
 .remove-btn:active {
@@ -365,18 +365,18 @@ const handleClearCart = async () => {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 20px;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 84, 150, 0.3);
 }
 
 .checkout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
+  box-shadow: 0 6px 20px rgba(33, 84, 150, 0.4);
   background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
 }
 
 .checkout-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 2px 8px rgba(33, 84, 150, 0.3);
 }
 
 /* 加载状态样式 */
@@ -462,12 +462,12 @@ const handleClearCart = async () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 84, 150, 0.3);
 }
 
 .browse-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
+  box-shadow: 0 6px 20px rgba(33, 84, 150, 0.4);
   background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <swiper :modules="[Navigation, Pagination, Autoplay]" :autoplay="{ delay: 3000 }" :loop="true"
     :pagination="{ clickable: true }" :navigation="true" class="carousel">
-    <swiper-slide v-for="n in 9" :key="n">
+    <swiper-slide v-for="n in 3" :key="n">
       <img :src="`/src/images/image${n}.png`" class="carousel-img" />
     </swiper-slide>
     <div class="swiper-pagination" slot="pagination"></div>

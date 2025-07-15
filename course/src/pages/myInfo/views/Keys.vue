@@ -239,7 +239,7 @@ button {
   top: 3px;
   width: 130px;
   height: 50px;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   margin-top: 20px;
@@ -250,7 +250,7 @@ button {
   position: relative;
   left: 80%;
   width: fit-content;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   margin: 5px 20px;
@@ -260,11 +260,11 @@ button {
   height: 30px;
   font-size: 12px;
   transition: all 0.3s;
-  border: 1px rgb(22, 92, 145) solid;
+  border: 1px #215486 solid;
 }
 
 .save-button:hover,
 .save-button:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 </style>

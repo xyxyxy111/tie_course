@@ -341,7 +341,7 @@ const headerSpaceStyle = computed(() => ({
 }));
 
 const headerSearchInputStyle = computed(() => ({
-  width: `clamp(30vw, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 70vw)`,
+  width: `clamp(450px, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 70vw)`,
   transition: 'none'
 }));
 
@@ -536,6 +536,8 @@ const handleMyLearnPopupLeave = () => {
   overflow: visible;
   margin-bottom: 30px;
   height: 80px;
+  width: 100vw;
+  min-width: 1000px;
 }
 
 #logo {

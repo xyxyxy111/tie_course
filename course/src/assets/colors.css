@@ -3,11 +3,11 @@
 /* 主色调 - 品牌色 */
 :root {
   /* 主色调 */
-  --primary-color: rgb(22, 92, 145);
+  --primary-color: #215486;
   --primary-color-hex: #165c91;
-  --primary-color-light: rgba(22, 92, 145, 0.1);
-  --primary-color-medium: rgba(22, 92, 145, 0.3);
-  --primary-color-dark: rgba(22, 92, 145, 0.8);
+  --primary-color-light: rgba(33, 84, 150, 0.1);
+  --primary-color-medium: rgba(33, 84, 150, 0.3);
+  --primary-color-dark: rgba(33, 84, 150, 0.8);
 
   /* 主色调渐变 */
   --primary-gradient: linear-gradient(135deg, #165c91 0%, #134a7a 100%);

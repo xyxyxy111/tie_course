@@ -436,7 +436,7 @@ export default defineComponent({
 .course-update {
   font-size: 12px;
   font-weight: 500;
-  color: rgb(22, 92, 145);
+  color: #215486;
   margin-right: 5px;
 }
 
@@ -481,7 +481,7 @@ export default defineComponent({
   height: 32px;
   width: 100%;
   padding-top: 9px;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   border-radius: 4px;
@@ -493,7 +493,7 @@ export default defineComponent({
 
 .addToCartBtn:hover:not(:disabled) {
   background-color: white;
-  color: rgb(22, 92, 145)
+  color: #215486
 }
 
 .addToCartBtn:disabled {

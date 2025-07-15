@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { request } from '@/utils/request'; 
+import { request } from '@/utils/request';
 import { profileApi } from '@/api/user';
 import { defineComponent, onMounted, reactive, ref } from 'vue';
 import OSS from 'ali-oss';
@@ -204,14 +204,14 @@ img {
 }
 
 .upload-btn:hover {
-  border-color: rgb(22, 92, 145);
+  border-color: #215486;
 }
 
 button {
   position: relative;
   left: 80%;
   width: fit-content;
-  background-color: rgb(22, 92, 145);
+  background-color: #215486;
   color: white;
   border: none;
   margin: 5px 20px;
@@ -221,11 +221,11 @@ button {
   height: 30px;
   font-size: 12px;
   transition: all 0.3s;
-  border: 1px rgb(22, 92, 145) solid;
+  border: 1px #215486 solid;
 }
 
 button:hover:not(:disabled) {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 
 button:disabled {

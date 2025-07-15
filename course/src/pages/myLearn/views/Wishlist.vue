@@ -29,7 +29,6 @@
           <div class="course-image">
             <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
           </div>
-
           <div class="course-content">
             <h3 class="course-title">{{ course.title }}</h3>
             <div class="course-meta">
@@ -54,7 +53,7 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import { wishlistApi } from '@/api/user';
 import type { WishListVO } from '@/api/user';
-
+import '../myLearn.css'
 
 
 export default defineComponent({
@@ -214,16 +213,6 @@ export default defineComponent({
   margin: 0 auto 20px;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .empty-state {
   text-align: center;
   padding: 80px 20px;
@@ -259,7 +248,7 @@ export default defineComponent({
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 84, 150, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -277,7 +266,7 @@ export default defineComponent({
 
 .browse-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
+  box-shadow: 0 6px 20px rgba(33, 84, 150, 0.4);
   background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
 }
 
@@ -286,8 +275,7 @@ export default defineComponent({
 }
 
 .browse-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 2px 8px rgba(33, 84, 150, 0.3);
 }
 
 .wishlist-container {
@@ -326,191 +314,10 @@ export default defineComponent({
 }
 
 .wishlist-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 24px;
 }
 
-.course-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-}
-
-.course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.course-image {
-  position: relative;
-  height: 160px;
-  overflow: hidden;
-}
-
-.course-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.course-card:hover .course-image img {
-  transform: scale(1.05);
-}
-
-.course-content {
-  padding: 20px;
-}
-
-.course-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.course-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.course-rating {
-  display: flex;
-  align-items: center;
-}
-
-.stars {
-  color: #ffd700;
-  font-size: 14px;
-}
-
-.rating-text {
-  margin-left: 6px;
-  font-size: 12px;
-  color: #666;
-}
-
-.course-price {
-  text-align: right;
-}
-
-.current-price {
-  font-size: 18px;
-  font-weight: 600;
-  color: #165c91;
-  display: block;
-}
-
-.original-price {
-  font-size: 12px;
-  color: #999;
-  text-decoration: line-through;
-}
-
-.course-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.remove-btn {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
-  color: white;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
-  position: relative;
-  overflow: hidden;
-  padding: 0;
-}
-
-.remove-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.remove-btn:hover {
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
-  background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);
-}
-
-.remove-btn:hover::before {
-  left: 100%;
-}
-
-.remove-btn:active {
-  transform: translateY(0) scale(0.95);
-  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
-}
-
-.remove-btn svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.3s ease;
-}
-
-.remove-btn:hover svg {
-  transform: scale(1.1);
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .wishlist-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-  }
-
-  .wishlist-header {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .course-content {
-    padding: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .wishlist-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .learning-content {
-    padding: 10px;
-  }
-
-  .wishlist-container {
-    padding: 20px;
-  }
-}
 
 .clear-btn {
   margin-left: 20px;
@@ -533,6 +340,5 @@ export default defineComponent({
 
 button {
   white-space: nowrap;
-  width: fit-content;
 }
 </style>
