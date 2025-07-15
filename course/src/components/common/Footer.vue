@@ -1,8 +1,9 @@
 <template>
   <div class="bottom">
     <div class="footer-left">
-      <span id="i">i</span>
-      <span id="class">Class</span>
+      <div id="logo">
+        <img src="/src/images/iclass_dark.png" alt="">
+      </div>
       <span id="copyright">
         <span class="copyright-symbol">©</span>
         <span class="copyright-text">2025 Iclass, Inc.</span>
@@ -30,16 +31,23 @@ const { width, height } = useWindowSize()
 
 <style scoped>
 .bottom {
+  position: fixed;
+  bottom: 0px;
   width: 100vw;
   height: 60px;
   background-color: #101010;
   color: white;
+  z-index: 2000;
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 48px;
+  padding: 0 30px;
   box-sizing: border-box;
+}
+
+.bottom .footer-left #logo img {
+  height: 30px;
 }
 
 .footer-left,
@@ -47,6 +55,7 @@ const { width, height } = useWindowSize()
 .footer-right {
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .footer-left #i {
@@ -54,13 +63,6 @@ const { width, height } = useWindowSize()
   color: rgb(22, 92, 145);
   font-family: 'HarmonyOS_Sans_Condensed-black';
   margin-right: 4px;
-}
-
-.footer-left #class {
-  font-size: 36px;
-  color: #f2f2f2;
-  font-family: HarmonyOS_Sans_Condensed-black;
-  margin-right: 24px;
 }
 
 #copyright {

@@ -9,7 +9,7 @@
     </button>
     <div id="header-space"></div>
 
-    <div id="logo" @click="goToIndex()"><img src="/src/images/itie_logo.png" alt=""></div>
+    <div id="logo" @click="goToIndex()"><img src="/src/images/iclass.png" alt=""></div>
 
     <button @click="searchFlag = !searchFlag">
       <div class="icon">

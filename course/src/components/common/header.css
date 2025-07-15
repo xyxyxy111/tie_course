@@ -124,12 +124,13 @@ button:hover {
 }
 
 .explore-popup-content,
-.wishlist-popup,
+.wishlist-popup-content,
 .mylearn-popup-content,
 .cart-popup-content,
 .myinfo-popup-content {
+  width: 100%;
   background: white;
-  border-radius: 8px;
+  border-radius: 6px;
   position: relative;
   overflow: visible;
 }
@@ -138,24 +139,10 @@ button:hover {
   width: 270px;
 }
 
-.explore-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 16px;
-  padding: 0 20px 16px 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.explore-title h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  text-align: center;
-}
-
 .categories-list {
+  width: 270px;
+  left: -1px;
+  margin: 6px 0px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -167,7 +154,7 @@ button:hover {
   position: relative;
   padding: 14px 20px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -176,9 +163,8 @@ button:hover {
 
 .category-item:hover,
 .tag-item:hover {
-  background: linear-gradient(105deg, white 70%, rgba(22, 92, 145, 0.2) 100%);
+  background-color: rgba(22, 92, 145, 0.1);
   color: #495057;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .category-item:hover .category-name {
@@ -226,7 +212,8 @@ button:hover {
   position: absolute;
   left: 100%;
   top: 0;
-  width: 280px;
+  width: 270px;
+  border-radius: 0px 6px 6px 0px;
   background: white;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.8);
@@ -235,66 +222,83 @@ button:hover {
   padding: 0px;
 }
 
-.tags-header {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-}
-
-.tags-header h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
-  text-align: center;
-}
-
 .tags-list {
+  width: 270px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.mylearn-popup-content {
-  min-width: 340px;
+.mylearn-popup-content,
+.wishlist-popup-content,
+.cart-popup-content {
+  min-width: 320px;
   padding: 4px 6px
 }
 
-.mylearn-course-item {
+.mylearn-course-item,
+.wishlist-card-item,
+.cart-item {
   display: flex;
+  height: fit-content;
   align-items: center;
   padding: 10px 12px;
+}
+
+.mylearn-course-item,
+.wishlist-card,
+.cart-item {
   border-bottom: 1px solid #f0f0f0;
 }
 
+.wishlist-card {
+  display: flex;
+  flex-direction: column;
+}
 
-.mylearn-course-cover,
-.wishlist-card-cover {
+.mylearn-popup .mylearn-popup-content .mylearn-course-cover,
+.wishlist-card .wishlist-card-cover,
+.cart-item .cart-item-cover {
   width: 100px;
   height: 100px;
   border-radius: 8px;
   object-fit: cover;
-  margin-right: 16px;
   background: #f5f5f5;
   border: 1px solid #eee;
 }
 
-.mylearn-course-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.mylearn-course-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 12px;
-  white-space: nowrap;
+.mylearn-course-info,
+.wishlist-card-info,
+.cart-item-info {
+  height: 100%;
+  width: 100%;
+  padding: 12px;
   overflow: hidden;
 }
 
-.mylearn-progress-bar {
+.mylearn-course-info .mylearn-course-title,
+.wishlist-card-info .wishlist-card-title,
+.cart-item-info .cart-item-title {
+  font-size: 17px;
+  height: 30px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+}
+
+.mylearn-course-info .mylearn-course-author,
+.wishlist-card-info .wishlist-card-meta,
+.cart-item-info .cart-item-meta {
+  font-size: 14px;
+  height: 30px;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 12px;
+  white-space: nowrap;
+
+}
+
+.mylearn-course-info .mylearn-progress-bar {
   width: 100%;
   height: 8px;
   background: #e5e7eb;
@@ -309,7 +313,10 @@ button:hover {
   transition: width 0.3s;
 }
 
-.mylearn-popup .mylearn-popup-content .mylearn-btn {
+.mylearn-popup .mylearn-popup-content .mylearn-btn,
+.wishlist-popup .wishlist-popup-content .wishlist-popup-btn,
+.wishlist-popup .wishlist-popup-content .wishlist-card-btn,
+.cart-popup .cart-popup-content .cart-popup-footer .cart-popup-btn {
   width: 100%;
   margin-top: 12px;
   padding: 12px 0;
@@ -324,80 +331,27 @@ button:hover {
   letter-spacing: 1px;
 }
 
-.mylearn-popup .mylearn-popup-content .mylearn-btn:hover {
+.mylearn-popup .mylearn-popup-content .mylearn-btn:hover,
+.wishlist-popup .wishlist-popup-content .wishlist-popup-btn:hover,
+.cart-popup .cart-popup-content .cart-popup-footer .cart-popup-btn:hover {
   background-color: rgb(19, 118, 194);
 }
 
-.wishlist-popup {
-  top: 8px;
-  left: -260px;
-}
-
-.wishlist-popup-content {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
-  padding: 20px 24px 16px 24px;
-  min-width: 340px;
-}
-
-.wishlist-card {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 18px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.wishlist-card:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-
-.wishlist-card-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.wishlist-card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.wishlist-card-meta {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 4px;
-}
-
-.wishlist-card-price {
-  font-size: 15px;
-  color: #2563eb;
+.wishlist-card-price,
+.cart-item-info .cart-item-price {
+  font-size: 17px;
+  color: rgb(22, 92, 145);
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-.wishlist-card-btn {
-  width: 100%;
-  padding: 6px 0;
-  background: #fff;
-  color: #2563eb;
-  font-size: 15px;
-  font-weight: 500;
-  border: 1.5px solid #2563eb;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  margin-bottom: 0;
+.wishlist-popup .wishlist-popup-content .wishlist-card-btn {
+  margin-top: 0px;
+  background-color: #fff;
+  color: rgb(22, 92, 145);
+  box-shadow: 0 0 0 0.5px rgb(22, 92, 145);
+  border: none;
+  margin-bottom: 10px;
 }
 
 .wishlist-card-btn:hover {
@@ -405,22 +359,26 @@ button:hover {
   color: #fff;
 }
 
-.wishlist-popup-btn {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px 0;
-  background: #2563eb;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
+.cart-popup .cart-popup-content .cart-list {
+  overflow-y: scroll;
+  max-height: 600px;
 }
 
-.wishlist-popup-btn:hover {
-  background: #1742a0;
+.cart-popup-footer {
+  background: #fff;
+  border-top: 1.5px solid #e5e7eb;
+  padding: 18px 24px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cart-total {
+  font-size: 22px;
+  height: 24px;
+  font-weight: bolder;
+  color: #222;
+  margin-bottom: 8px;
 }
 
 .my-info .myinfo-popup {
@@ -526,12 +484,4 @@ button:hover {
   font-size: 14px;
   display: flex;
   align-items: center;
-}
-
-.lang-icon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  background: url('data:image/svg+xml;utf8,<svg fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="black" fill="none"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" stroke="black"/></svg>') no-repeat center/contain;
-  margin-left: 4px;
 }

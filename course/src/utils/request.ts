@@ -128,10 +128,14 @@ export const getCurrentUsername = (): string | null => {
 };
 
 const instance = axios.create({
+<<<<<<< HEAD
   baseURL: '/api',
 
 
   
+=======
+  baseURL: 'http://localhost:5173/api',
+>>>>>>> bfe3d0cb00b21c68babb0ec21713b7f2767b27fe
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -150,7 +154,6 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-// 这里维护所有"成功"code
 export const successCodes = [
   1,      // 通用成功
   1000,   // 操作成功
