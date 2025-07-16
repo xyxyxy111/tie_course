@@ -6,7 +6,7 @@ import MobileHeader from '@/components/common/MoblieHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
-import { useCourseDescription, useCart, Comments } from '../components/content';
+import { useCourseDescription, useCart } from '../components/content';
 
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
@@ -31,9 +31,6 @@ onMounted(async () => {
   const token = getValidToken();
   if (token) {
     userId.value = getCurrentUserId();
-  } else {
-    // 如果没有token，重定向到登录页面
-    window.location.href = '/login.html';
   }
   const searchParams = new URLSearchParams(window.location.search);
   const courseId = parseInt(searchParams.get('courseId')!);
@@ -209,19 +206,7 @@ const handleGift = () => {
       <button @click="CourseDescriptionFlag = !CourseDescriptionFlag;" class="course-descrpitionbtn">{{
         CourseDescription
         }}</button>
-      <h1>评论</h1>
-      <div class="comment-container .container-scroll-x">
-        <div class="comment">
-          <div v-for="(comment, index) in Comments" class="ones-comment">
-            <div class="user">
-              <img :src="comment.userpicture" alt="" class="user-picture">
-              <span>{{ comment.username }}</span>
-            </div>
-            <div class="comment-content">{{ comment.content }}</div>
-            <div class="comment-datetime">{{ comment.datetime }}</div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </main>
 </template>
