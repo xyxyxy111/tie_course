@@ -208,9 +208,9 @@ const handleBackdropClick = () => {
 }
 
 .search-result-container .price {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 700;
-  color: #215486;
+  color: #215496;
   text-align: right;
   display: block;
 }
@@ -274,6 +274,6 @@ const handleBackdropClick = () => {
 .page-info {
   margin-top: 10px;
   color: #666;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 </style>

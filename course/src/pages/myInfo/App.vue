@@ -74,7 +74,7 @@ const handleLogout = async () => {
       </router-link>
 
       <button @click="handleLogout"
-        style="display: flex; align-items: center; gap: 8px; color: white; background: none; border: none; cursor: pointer; font-size: 16px;">
+        style="display: flex; align-items: center; gap: 8px; color: white; background: none; border: none; cursor: pointer; font-size: 1.6rem;">
         <svg width="80" height="36" viewBox="0 0 16 16" fill="#35495e">
           <use href="#material-symbols--logout" />
         </svg>
@@ -114,7 +114,7 @@ const handleLogout = async () => {
 }
 
 .sidebar-icon.active {
-  background: #215486;
+  background: #215496;
 }
 
 .sidebar-icon img {
@@ -123,7 +123,7 @@ const handleLogout = async () => {
 }
 
 .sidebar-icon i {
-  font-size: 24px;
+  font-size: 2.2rem;
 }
 
 .my-info-sidebar button {

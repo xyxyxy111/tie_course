@@ -195,12 +195,14 @@ onMounted(() => {
 
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .content {
   width: 100vw;
 }
 
 .login-container .login-form {
   margin: 0 auto;
-  width: 80%;
+  width: 100%;
 }
 </style>

@@ -1,3 +1,9 @@
+@import "/src/assets/rem.css";
+
+h1 {
+  margin-top: 40px;
+}
+
 .what-you-will-learn {
   border: 1px gainsboro solid;
   padding: 20px;
@@ -23,14 +29,32 @@
 }
 
 .other-theme button:hover {
-  border: 1px #215486 solid;
-  color: #215486;
+  border: 1px #215496 solid;
+  color: #215496;
+}
+
+.course-content-header {
+  margin-top: 25px;
+  display: flex;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.course-content-header .open-all {
+  position: absolute;
+  font-weight: bolder;
+  color: #215694;
+  right: 20px;
+  margin-left: auto;
+  text-align: right;
+  display: inline-block;
+  cursor: pointer;
 }
 
 .course-content ul {
   width: 100%;
   padding-left: 0px;
-  border: 1px rgb(4, 35, 58) solid;
+  border: 1px #e1e1e1 solid;
   list-style: none
 }
 
@@ -40,7 +64,8 @@
   align-items: center;
   position: relative;
   padding: 10px 20px;
-  border-bottom: 0.5px rgb(200, 230, 255) solid;
+  background-color: #f2f2f2;
+  border-bottom: 0.5px #e1e1e1 solid;
   transition: all 0.3s;
 }
 
@@ -71,14 +96,14 @@
 .course-descrpition button {
   border: none;
   padding: 10px;
-  color: #215486;
+  color: #215496;
 }
 
 .course-descrpitionbtn {
   width: fit-content;
   border: none;
   background-color: white;
-  color: #215486;
+  color: #215496;
   font-weight: 700;
   padding: 10px 20px;
   margin: 10px 20px;
@@ -124,9 +149,13 @@
 /* 共有的课程列表样式 */
 .lesson-list {
   border: none;
-  padding-left: 32px;
   list-style: circle;
   cursor: default;
+  background-color: #fff;
+}
+
+.course-content .lesson-list li {
+  background-color: #fff;
 }
 
 /* 共有的动画样式 */
@@ -168,7 +197,7 @@
 }
 
 .course-title {
-  font-size: 32px;
+  font-size: 3.2rem;
   font-weight: bold;
   margin-bottom: 16px;
   color: var(--text-primary);
@@ -176,7 +205,7 @@
 }
 
 .course-subtitle {
-  font-size: 18px;
+  font-size: 1.8rem;
   color: var(--text-secondary);
   margin-bottom: 20px;
   line-height: 1.5;
@@ -196,7 +225,7 @@
   align-items: center;
   gap: 8px;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .meta-item .icon {
@@ -215,7 +244,7 @@
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -232,7 +261,7 @@
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -247,11 +276,6 @@
   color: white;
 }
 
-.course-content {
-  display: grid;
-  gap: 30px;
-}
-
 .course-main {
   background: white;
   border-radius: 12px;
@@ -260,7 +284,7 @@
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 2.2rem;
   font-weight: 600;
   margin-bottom: 20px;
   color: var(--text-primary);
@@ -299,7 +323,7 @@
   align-items: center;
   justify-content: center;
   color: var(--primary-color);
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .curriculum-content {
@@ -314,7 +338,7 @@
 
 .curriculum-duration {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .course-sidebar {
@@ -335,14 +359,14 @@
 }
 
 .price {
-  font-size: 36px;
+  font-size: 3.6rem;
   font-weight: bold;
   color: var(--error-color);
   margin-bottom: 8px;
 }
 
 .original-price {
-  font-size: 18px;
+  font-size: 1.8rem;
   color: var(--text-muted);
   text-decoration: line-through;
   margin-bottom: 8px;
@@ -353,7 +377,7 @@
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
@@ -367,12 +391,12 @@
   gap: 10px;
   margin-bottom: 12px;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .feature-item .icon {
   color: var(--success-color);
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .instructor-section {
@@ -390,7 +414,7 @@
 }
 
 .instructor-name {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 8px;
@@ -398,7 +422,7 @@
 
 .instructor-title {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 1.4rem;
   margin-bottom: 15px;
 }
 
@@ -408,7 +432,7 @@
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -416,57 +440,4 @@
 .btn-contact:hover {
   background: var(--primary-color);
   color: white;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .course-container {
-    padding: 10px;
-  }
-
-  .course-header {
-    padding: 20px;
-  }
-
-  .course-title {
-    font-size: 24px;
-  }
-
-  .course-subtitle {
-    font-size: 16px;
-  }
-
-  .course-meta {
-    gap: 15px;
-  }
-
-  .course-actions {
-    flex-direction: column;
-  }
-
-  .btn-enroll,
-  .btn-wishlist {
-    width: 100%;
-  }
-
-  .course-main {
-    padding: 20px;
-  }
-
-  .course-sidebar {
-    position: static;
-    padding: 20px;
-  }
-
-  .curriculum-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .curriculum-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-  }
 }

@@ -107,6 +107,8 @@ const floatingBoxStyle = () => ({
 </script>
 
 <style scoped>
+@import "/src/assets/rem.css";
+
 .floating-box {
   position: fixed;
   left: 65%;
@@ -130,27 +132,27 @@ const floatingBoxStyle = () => ({
 }
 
 .current-price {
-  font-size: 24px;
+  font-size: 2.2rem;
   font-weight: bold;
   color: #333;
   margin-right: 10px;
 }
 
 .original-price {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #999;
   text-decoration: line-through;
   margin-right: 10px;
 }
 
 .discount {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #d83b3b;
   font-weight: bold;
 }
 
 .time-left {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #d83b3b;
   margin-top: 5px;
 }
@@ -174,8 +176,8 @@ const floatingBoxStyle = () => ({
 
 .add-to-cart {
   background-color: #fff;
-  color: #215486;
-  border: 1px solid #215486;
+  color: #215496;
+  border: 1px solid #215496;
 }
 
 .add-to-cart:hover {
@@ -183,7 +185,7 @@ const floatingBoxStyle = () => ({
 }
 
 .buy-now {
-  background-color: #215486;
+  background-color: #215496;
   color: white;
 }
 
@@ -199,7 +201,7 @@ const floatingBoxStyle = () => ({
 }
 
 .features h3 {
-  font-size: 16px;
+  font-size: 1.6rem;
   margin-bottom: 10px;
 }
 
@@ -226,9 +228,9 @@ const floatingBoxStyle = () => ({
 }
 
 .action-links a {
-  color: #215486;
+  color: #215496;
   text-decoration: underline;
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
 }
 </style>

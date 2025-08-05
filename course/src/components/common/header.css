@@ -1,3 +1,5 @@
+@import "@/assets/rem.css";
+
 .header {
   display: flex;
   margin: 0 auto;
@@ -12,7 +14,9 @@
 
 #logo {
   font-weight: 700;
-  color: #215486;
+  width: 10rem;
+  padding: 0.4rem 1rem;
+  color: #215496;
   cursor: pointer;
   font-family: 'Times New Roman', Times, serif;
   margin-inline: 1%;
@@ -22,7 +26,7 @@
 .header input,
 #header-search input {
   display: inline-block;
-  border-radius: 25px;
+  border-radius: 2rem;
   overflow: hidden;
   border: 1px solid;
   padding-left: 2%;
@@ -31,7 +35,7 @@
 
 input:hover,
 input:focus {
-  border: 1.5px #215486 solid;
+  border: 1.5px #215496 solid;
   background-color: aliceblue;
   color: black;
   outline: none;
@@ -40,7 +44,7 @@ input:focus {
 .header button {
   font-weight: 600;
   height: 50px;
-  font-size: 16px;
+  font-size: 1.6rem;
   position: relative;
   white-space: nowrap;
   text-align: center;
@@ -56,7 +60,7 @@ input:focus {
 }
 
 button:hover {
-  color: #215486;
+  color: #215496;
   background-color: rgba(33, 84, 150, 0.1);
 }
 
@@ -111,7 +115,7 @@ button:hover {
   right: 0px;
   width: fit-content;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.8);
   z-index: 1000;
@@ -179,7 +183,7 @@ button:hover {
 }
 
 .category-icon {
-  font-size: 16px;
+  font-size: 1.6rem;
   opacity: 0.7;
   transition: all 0.3s;
 }
@@ -190,7 +194,7 @@ button:hover {
 }
 
 .category-arrow {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #999;
   transition: all 0.3s;
   opacity: 0.6;
@@ -202,7 +206,7 @@ button:hover {
 }
 
 .category-name {
-  font-size: 14px;
+  font-size: 1.1rem;
   font-weight: 500;
   color: #333;
   transition: color 0.3s ease;
@@ -210,7 +214,7 @@ button:hover {
 
 .tags-popup {
   position: absolute;
-  left: 100%;
+  left: 267px;
   top: 0;
   width: 270px;
   border-radius: 0px 6px 6px 0px;
@@ -232,7 +236,7 @@ button:hover {
 .mylearn-popup-content,
 .wishlist-popup-content,
 .cart-popup-content {
-  min-width: 320px;
+  min-width: 32rem;
   padding: 4px 6px
 }
 
@@ -242,7 +246,7 @@ button:hover {
   display: flex;
   height: fit-content;
   align-items: center;
-  padding: 10px 12px;
+  padding: 1rem 12px;
 }
 
 .mylearn-course-item,
@@ -259,8 +263,8 @@ button:hover {
 .mylearn-popup .mylearn-popup-content .mylearn-course-cover,
 .wishlist-card .wishlist-card-cover,
 .cart-item .cart-item-cover {
-  width: 100px;
-  height: 100px;
+  width: 10rem;
+  height: 10rem;
   border-radius: 8px;
   object-fit: cover;
   background: #f5f5f5;
@@ -272,14 +276,14 @@ button:hover {
 .cart-item-info {
   height: 100%;
   width: 100%;
-  padding: 12px;
+  padding: 0.8rem;
   overflow: hidden;
 }
 
 .mylearn-course-info .mylearn-course-title,
 .wishlist-card-info .wishlist-card-title,
 .cart-item-info .cart-item-title {
-  font-size: 17px;
+  font-size: 1.7rem;
   height: 30px;
   font-weight: 600;
   color: #222;
@@ -289,7 +293,7 @@ button:hover {
 .mylearn-course-info .mylearn-course-author,
 .wishlist-card-info .wishlist-card-meta,
 .cart-item-info .cart-item-meta {
-  font-size: 14px;
+  font-size: 1.4rem;
   height: 30px;
   font-weight: 600;
   color: #888;
@@ -307,7 +311,7 @@ button:hover {
 
 .mylearn-progress-inner {
   height: 100%;
-  background: #215486;
+  background: #215496;
   transition: width 0.3s;
 }
 
@@ -317,10 +321,9 @@ button:hover {
 .cart-popup .cart-popup-content .cart-popup-footer .cart-popup-btn {
   width: 100%;
   margin-top: 12px;
-  padding: 12px 0;
-  background-color: #215486;
+  background-color: #215496;
   color: #fff;
-  font-size: 17px;
+  font-size: 1.7rem;
   font-weight: 700;
   border: none;
   border-radius: 6px;
@@ -337,8 +340,8 @@ button:hover {
 
 .wishlist-card-price,
 .cart-item-info .cart-item-price {
-  font-size: 17px;
-  color: #215486;
+  font-size: 1.7rem;
+  color: #215496;
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -346,14 +349,14 @@ button:hover {
 .wishlist-popup .wishlist-popup-content .wishlist-card-btn {
   margin-top: 0px;
   background-color: #fff;
-  color: #215486;
-  box-shadow: 0 0 0 0.5px #215486;
+  color: #215496;
+  box-shadow: 0 0 0 0.5px #215496;
   border: none;
   margin-bottom: 10px;
 }
 
 .wishlist-card-btn:hover {
-  background: #2563eb;
+  background: #215496;
   color: #fff;
 }
 
@@ -365,18 +368,21 @@ button:hover {
 .cart-popup-footer {
   background: #fff;
   border-top: 1.5px solid #e5e7eb;
-  padding: 18px 24px 20px 24px;
+  padding: 24px 4px 12px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 
 .cart-total {
-  font-size: 22px;
+  font-size: 2.1rem;
   height: 24px;
   font-weight: bolder;
   color: #222;
-  margin-bottom: 8px;
+}
+
+.cart-popup .cart-popup-content .cart-popup-footer .cart-popup-btn {
+  margin-top: 0.4rem;
 }
 
 .my-info .myinfo-popup {
@@ -418,14 +424,14 @@ button:hover {
 }
 
 .myinfo-username {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 4px;
 }
 
 .myinfo-email {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #888;
 }
 
@@ -444,7 +450,7 @@ button:hover {
 
 .myinfo-menu-item {
   padding: 13px 28px;
-  font-size: 15px;
+  font-size: 1.5rem;
   color: #222;
   cursor: pointer;
   transition: background 0.18s;
@@ -461,7 +467,7 @@ button:hover {
   margin-left: 8px;
   min-width: 22px;
   height: 22px;
-  background: #2563eb;
+  background: #215496;
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -478,8 +484,8 @@ button:hover {
 }
 
 .myinfo-lang {
-  color: #2563eb;
-  font-size: 14px;
+  color: #215496;
+  font-size: 1.4rem;
   display: flex;
   align-items: center;
 }

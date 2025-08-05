@@ -35,7 +35,7 @@ const route = useRoute();
 }
 
 .profile-title {
-  font-size: 36px;
+  font-size: 3.6rem;
   margin: 20px 50px;
 }
 
@@ -46,7 +46,7 @@ const route = useRoute();
 }
 
 .nav-link {
-  font-size: 20px;
+  font-size: 2rem;
   white-space: nowrap;
   padding: 20px 20px 5px;
   color: rgb(4, 35, 58);
@@ -61,7 +61,7 @@ const route = useRoute();
   padding: 20px 50px 5px;
   ;
   font-weight: bolder;
-  color: #215486;
-  border-bottom: 8px solid #215486;
+  color: #215496;
+  border-bottom: 8px solid #215496;
 }
 </style>

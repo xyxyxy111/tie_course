@@ -78,11 +78,11 @@ defineProps<{
 <style scoped>
 .header {
   min-width: 400px;
-  font-size: 24px;
+  font-size: 2.2rem;
   background-color: white;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 #header-search {
@@ -112,18 +112,24 @@ defineProps<{
 }
 
 #header-search button:hover {
-  color: #215486;
+  color: #215496;
   background-color: rgba(33, 84, 150, 0.1);
 }
 
 .icon {
-  color: #215486;
+  color: #215496;
   background-color: transparent;
   border-radius: 25px;
 }
 
 #logo {
-  font-size: 20px;
+  font-size: 1rem;
+}
+
+#logo img {
+  width: fit-content;
+  height: 26px;
+  margin-bottom: 5px;
 }
 
 button {
@@ -160,6 +166,6 @@ button {
 }
 
 .menu-section li:hover {
-  color: #215486;
+  color: #215496;
 }
 </style>

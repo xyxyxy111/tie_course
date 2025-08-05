@@ -422,7 +422,7 @@ export default defineComponent({
 }
 
 .course-title {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 700;
   color: #333;
   margin-bottom: 8px;
@@ -430,19 +430,19 @@ export default defineComponent({
 }
 
 .course-update {
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 500;
-  color: #215486;
+  color: #215496;
   margin-right: 5px;
 }
 
 .course-duration {
-  font-size: 13px;
+  font-size: 1.3rem;
   color: #6a6f73;
 }
 
 .course-description {
-  font-size: 13px;
+  font-size: 1.3rem;
   line-height: 1.4;
   color: #333;
   margin: 10px 0;
@@ -454,14 +454,14 @@ export default defineComponent({
 }
 
 .course-learning-points h4 {
-  font-size: 14px;
+  font-size: 1.4rem;
   margin-bottom: 6px;
   color: #333;
   font-weight: 600;
 }
 
 .course-learning-points p {
-  font-size: 12px;
+  font-size: 1.2rem;
   line-height: 1.4;
   color: #333;
   height: 100px;
@@ -476,12 +476,11 @@ export default defineComponent({
   margin-top: 12px;
   height: 32px;
   width: 100%;
-  padding-top: 9px;
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: bolder;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -489,7 +488,7 @@ export default defineComponent({
 
 .addToCartBtn:hover:not(:disabled) {
   background-color: white;
-  color: #215486
+  color: #215496
 }
 
 .addToCartBtn:disabled {

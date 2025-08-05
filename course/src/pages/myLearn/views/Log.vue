@@ -179,7 +179,7 @@ export default defineComponent({
 .logs-header h1 {
   color: #333;
   margin: 0;
-  font-size: 24px;
+  font-size: 2.2rem;
 }
 
 .header-actions {
@@ -204,7 +204,7 @@ export default defineComponent({
   border: 1px solid #ddd;
   border-radius: 4px;
   background: white;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .clear-btn {
@@ -214,7 +214,7 @@ export default defineComponent({
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: 600;
   transition: background-color 0.3s;
 }
@@ -273,7 +273,7 @@ export default defineComponent({
   text-align: center;
   padding: 60px 20px;
   color: #6c757d;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .logs-list {
@@ -306,7 +306,7 @@ export default defineComponent({
 
 .log-time {
   color: #6c757d;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: 500;
 }
 
@@ -315,7 +315,7 @@ export default defineComponent({
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
@@ -334,13 +334,13 @@ export default defineComponent({
 .log-info .label {
   font-weight: 600;
   color: #666;
-  font-size: 14px;
+  font-size: 1.4rem;
   min-width: 60px;
 }
 
 .log-info .value {
   color: #333;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .refresh-section {
@@ -357,7 +357,7 @@ export default defineComponent({
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   transition: background-color 0.3s;
 }

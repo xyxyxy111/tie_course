@@ -1,10 +1,13 @@
+@import "/src/assets/rem.css";
+;
+
 .course-card button {
   position: relative;
   justify-content: center;
   display: inline-flex;
   min-width: 32px;
   margin: 0 auto;
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   font-weight: 400;
   border: none;
@@ -35,7 +38,7 @@
 .icon-demo {
   display: inline-block;
   color: white;
-  background-color: #215486;
+  background-color: #215496;
   border-radius: 25px;
 }
 
@@ -123,7 +126,7 @@
 }
 
 .hero-subtitle {
-  font-size: 20px;
+  font-size: 2rem;
   margin-bottom: 30px;
   opacity: 0.9;
 }
@@ -139,7 +142,7 @@
   padding: 15px 30px;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -181,7 +184,7 @@
 }
 
 .section-title {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: bold;
   color: var(--text-primary);
 }
@@ -219,7 +222,7 @@
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 500;
 }
 
@@ -228,7 +231,7 @@
 }
 
 .course-title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--text-primary);
@@ -237,7 +240,7 @@
 
 .course-description {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 1.5;
   margin-bottom: 16px;
   display: -webkit-box;
@@ -254,7 +257,7 @@
 }
 
 .course-price {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: bold;
   color: var(--error-color);
 }
@@ -264,7 +267,7 @@
   align-items: center;
   gap: 4px;
   color: var(--warning-color);
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .course-actions {
@@ -280,7 +283,7 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: 500;
   transition: background-color 0.3s ease;
 }

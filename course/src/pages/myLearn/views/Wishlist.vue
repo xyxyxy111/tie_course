@@ -1,66 +1,116 @@
 <template>
-  <div class="learning-content">
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading">
-      <div class="loading-spinner"></div>
-      <p>加载中...</p>
-    </div>
+  <!-- 加载状态 -->
+  <div v-if="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <p>加载中...</p>
+  </div>
 
-    <!-- 空状态 -->
-    <div v-else-if="wishlist.length === 0" class="empty-state">
-      <div class="empty-icon">💝</div>
-      <h3>心愿单为空</h3>
-      <p>您还没有添加任何课程到心愿单</p>
-      <button class="browse-btn" @click="goToCourse">浏览课程</button>
-    </div>
+  <!-- 空状态 -->
+  <div v-else-if="wishlist.length === 0" class="empty-state">
+    <div class="empty-icon">💝</div>
+    <h3>心愿单为空</h3>
+    <p>您还没有添加任何课程到心愿单</p>
+    <button class="browse-btn" @click="goToCourse">浏览课程</button>
+  </div>
 
-    <!-- 课程列表 -->
-    <div v-else class="wishlist-container">
-      <div class="wishlist-header">
-        <h2 style="display: flex; align-items: center; gap: 16px;">
+  <!-- 课程列表 -->
+  <div v-else class="wishlist-container">
+    <div class="wishlist-header">
+      <!-- <h2 style="display: flex; align-items: center; gap: 16px;">
           我的心愿单
           <span class="course-count">{{ wishlist.length }} 门课程</span>
-        </h2>
-        <button class="clear-btn" @click="clearWishlist">清空心愿单</button>
-      </div>
+        </h2> -->
+      <input v-model="searchText" class="search-input" placeholder="搜索心愿单课程" style="margin-right: 16px;" />
 
-      <div class="wishlist-grid">
-        <div class="course-card" v-for="(course, index) in wishlist" :key="course.courseId || course.courseId || index">
-          <div class="course-image">
-            <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
-          </div>
-          <div class="course-content">
-            <h3 class="course-title">{{ course.title }}</h3>
-            <div class="course-meta">
-              <div class="course-rating">
-                <span class="stars">★★★★★</span>
-                <span class="rating-text">4.8 (2,187)</span>
-              </div>
-              <button class="remove-btn" @click="removeFromWishlist(course.courseId)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 13H5v-2h14v2z" />
-                </svg>
-              </button>
-            </div>
-          </div>
+      <button class="search-button">
+        <div class="icon" @click="searchWishlist">
+          <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 16 16" fill="#35495e">
+            <use href="#material-symbols--search" />
+          </svg>
         </div>
+      </button>
+
+    </div>
+
+    <div class="wishlist-grid">
+      <div class="course-card" v-for="(course, index) in (searchResult !== null ? searchResult : wishlist)"
+        :key="course.courseId || index">
+
+        <div class="course-image">
+          <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
+          <span class="card-heart" @click="removeFromWishlist(course.courseId)">
+            <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="2">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </span>
+        </div>
+
+        <div class="course-content">
+          <h3 class="course-title">{{ course.title }}</h3>
+          <div class="course-meta">iClass</div>
+
+          <div class="course-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-text">4.8 (2,187)</span>
+          </div>
+          <div class="course-duration">
+            总共 {{ formatTime(course.totalMinutes) }} · 44个讲座
+          </div>
+
+          <div class="current-price">￥{{ course.currentPrice.toFixed(2) }}</div>
+        </div>
+
       </div>
     </div>
+
+    <button class="clear-btn" @click="clearWishlist">清空心愿单</button>
   </div>
+
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { wishlistApi } from '@/api/user';
 import type { WishListVO } from '@/api/user';
 import '../myLearn.css'
+import { useWindowSize } from '@/useWindowSize';
 
 
 export default defineComponent({
   name: 'Wishlist',
   setup() {
+
+    const { width } = useWindowSize();
+
+    let iconWidth = ref(24 + (width.value - 1920) / 100);
+    iconWidth.value = (iconWidth.value > 24) ? iconWidth.value : 26;
+
     const wishlist = ref<WishListVO[]>([]);
     const loading = ref(true);
+    const searchText = ref('');
+    const searchResult = ref<WishListVO[] | null>(null);
+
+    const formatTime = (totalMinutes: number) => {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      let result = '';
+      if (hours > 0) result += `${hours}小时`;
+      if (minutes > 0) result += `${minutes}分钟`;
+      if (!result) result = '0分钟';
+      return result;
+    };
+
+    const searchWishlist = () => {
+      const keyword = searchText.value.trim().toLowerCase();
+      if (!keyword) {
+        searchResult.value = null; // 搜索框为空，显示全部
+        return;
+      }
+      searchResult.value = wishlist.value.filter(course =>
+        course.title && course.title.toLowerCase().includes(keyword)
+      );
+    };
 
     // 获取愿望单列表
     const fetchWishlist = async () => {
@@ -179,24 +229,23 @@ export default defineComponent({
     });
 
     return {
+      iconWidth,
       wishlist,
       loading,
+      formatTime,
       removeFromWishlist,
       clearWishlist,
       goToCourse,
-      debugCourse
+      debugCourse,
+      searchText,
+      searchWishlist,
+      searchResult
     };
   }
 });
 </script>
 
 <style scoped>
-.learning-content {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .loading {
   text-align: center;
   padding: 60px;
@@ -230,12 +279,12 @@ export default defineComponent({
 .empty-state h3 {
   margin-bottom: 10px;
   color: #333;
-  font-size: 24px;
+  font-size: 2.2rem;
 }
 
 .empty-state p {
   margin-bottom: 30px;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .browse-btn {
@@ -244,7 +293,7 @@ export default defineComponent({
   border: none;
   padding: 14px 28px;
   border-radius: 30px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -278,24 +327,24 @@ export default defineComponent({
   box-shadow: 0 2px 8px rgba(33, 84, 150, 0.3);
 }
 
+/* 
 .wishlist-container {
-  background-color: white;
-  border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .wishlist-header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 54px;
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #eee;
 }
 
 .wishlist-header h2 {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 600;
   color: #333;
   display: flex;
@@ -305,7 +354,7 @@ export default defineComponent({
 }
 
 .course-count {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #666;
   background: #f8f9fa;
   padding: 8px 16px;
@@ -313,14 +362,59 @@ export default defineComponent({
   margin-left: 0;
 }
 
+.search-input,
+.search-button {
+  position: absolute;
+  height: 3.4rem;
+  border: .1px solid #215496;
+  border-radius: 4px;
+  padding: 0 1rem;
+  font-size: 1.6rem;
+  margin-left: 16px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.search-input {
+  right: 3.7rem;
+  width: 17rem;
+}
+
+.search-input:focus {
+  border-color: #215496;
+}
+
+.search-button {
+  padding: 0.3rem;
+  margin-top: 0.1rem;
+  width: 3.4rem;
+  background-color: #215496;
+  color: white;
+  right: 1.7rem;
+}
+
 .wishlist-grid {
-  display: flex;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
 }
 
 
+.course-card .course-title,
+.course-card .course-meta {
+  margin: 0px;
+}
+
+.course-duration {
+  color: #666;
+  font-size: 1.2rem;
+}
+
+
+
+
 .clear-btn {
-  margin-left: 20px;
+  margin: 30px 0px 0px 1030px;
   background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
   color: white;
   border: none;
@@ -328,7 +422,7 @@ export default defineComponent({
   padding: 0px 12px;
   height: 42px;
   border-radius: 20px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;

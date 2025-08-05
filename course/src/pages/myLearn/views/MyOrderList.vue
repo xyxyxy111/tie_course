@@ -87,7 +87,7 @@ export default defineComponent({
   padding: 18px 20px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1.6rem;
   border-bottom: 1px solid #f0f0f0;
   user-select: none;
 }
@@ -95,7 +95,7 @@ export default defineComponent({
 .order-header .arrow {
   margin-left: 12px;
   transition: transform 0.2s;
-  font-size: 18px;
+  font-size: 1.8rem;
   display: inline-block;
 }
 

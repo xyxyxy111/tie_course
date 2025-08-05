@@ -31,14 +31,13 @@ const { width, height } = useWindowSize()
 
 <style scoped>
 .bottom {
-  position: fixed;
-  bottom: 0px;
   width: 100vw;
+  min-width: 1400px;
   height: 60px;
   background-color: #101010;
   color: white;
   z-index: 2000;
-  font-size: 16px;
+  font-size: 1.6rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -59,8 +58,8 @@ const { width, height } = useWindowSize()
 }
 
 .footer-left #i {
-  font-size: 40px;
-  color: #215486;
+  font-size: 4rem;
+  color: #215496;
   font-family: 'HarmonyOS_Sans_Condensed-black';
   margin-right: 4px;
 }
@@ -68,12 +67,12 @@ const { width, height } = useWindowSize()
 #copyright {
   display: flex;
   align-items: center;
-  font-size: 18px;
+  font-size: 1.8rem;
   color: #fff;
 }
 
 .copyright-symbol {
-  font-size: 20px;
+  font-size: 2rem;
   margin-right: 6px;
 }
 
@@ -81,12 +80,12 @@ const { width, height } = useWindowSize()
   flex: 1;
   justify-content: center;
   color: #fff;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .footer-right {
   color: #fff;
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: bold;
 }
 
@@ -95,6 +94,6 @@ const { width, height } = useWindowSize()
 }
 
 .lang-text {
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 </style>

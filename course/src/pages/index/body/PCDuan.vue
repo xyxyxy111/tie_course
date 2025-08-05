@@ -111,7 +111,7 @@ const courseSliderStyle = computed(() => ({
         <div class="course-slider-container">
           <button class="button-prev" :style="PrevButtonStyle" @click="Prev">
             <span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <svg width="24" height="24" viewBox="0 0 24 24">
                 <use href="#grommet-icons--previous" />
               </svg>
             </span>
@@ -209,7 +209,7 @@ const courseSliderStyle = computed(() => ({
 
       <div v-if="userId" class="recommend-section">
         <h2 class="recommend-title">为您精心挑选的课程</h2>
-        <div class="recommend-card">
+        <div class="recommend-card" @click="goToCourse(hottestCourseList[0].courseId)">
           <div class="recommend-card-cover">
             <img :src="hottestCourseList[0]?.coverImgUrl" alt="课程封面" />
           </div>
@@ -270,10 +270,11 @@ const courseSliderStyle = computed(() => ({
               </template>
             </HoverPopup>
           </div>
+          <!-- 
+          //右侧箭头按钮 
+          <button class="watching-arrow-btn right"><span>›</span></button> -->
         </div>
 
-        <!-- 右侧箭头按钮 -->
-        <button class="watching-arrow-btn right"><span>›</span></button>
       </div>
 
     </div>
@@ -283,10 +284,21 @@ const courseSliderStyle = computed(() => ({
 </template>
 
 <style scoped>
+@import "@/assets/rem.css";
+
+.header {
+  min-width: 1400px;
+}
+
+.header input {
+  min-width: 800px;
+}
+
 #main-content {
   margin: 0 auto;
   padding-bottom: 100px;
-  max-width: 1400px;
+  width: 1400px;
+  overflow: hidden;
 }
 
 #main-content .user {
@@ -306,7 +318,7 @@ const courseSliderStyle = computed(() => ({
   font-weight: bold;
   font-style: normal;
   color: #101010;
-  font-size: 24px;
+  font-size: 2.2rem;
   letter-spacing: auto;
   line-height: 34px;
   word-spacing: 5px;
@@ -324,7 +336,7 @@ const courseSliderStyle = computed(() => ({
   font-style: normal;
   height: 40px;
   color: #101010;
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: bold;
   line-height: 39px;
   letter-spacing: auto;
@@ -340,7 +352,7 @@ const courseSliderStyle = computed(() => ({
   font-style: normal;
   height: 40px;
   color: #101010;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: normal;
   line-height: 20px;
   letter-spacing: auto;
@@ -359,7 +371,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .navigator-btn {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: bold;
   color: #888;
   background: none;
@@ -404,7 +416,7 @@ const courseSliderStyle = computed(() => ({
   background: #ededed;
   color: #222;
   font-weight: 500;
-  font-size: 18px;
+  font-size: 1.8rem;
   cursor: pointer;
   transition: all 0.2s;
   margin-bottom: 8px;
@@ -417,13 +429,13 @@ const courseSliderStyle = computed(() => ({
 }
 
 .category-tab-title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 2px;
 }
 
 .category-tab-desc {
-  font-size: 13px;
+  font-size: 1.3rem;
   color: #fff;
   opacity: 0.8;
   font-weight: normal;
@@ -452,7 +464,12 @@ const courseSliderStyle = computed(() => ({
   padding-inline: 15px;
   margin: 0 auto;
   width: fit-content;
+  max-width: 100%;
   transition: all 0.3s;
+}
+
+.course-slider {
+  max-width: none;
 }
 
 .course-card,
@@ -479,21 +496,21 @@ const courseSliderStyle = computed(() => ({
 
 .course-card .course-title,
 .watching-card .watching-card-title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: bold;
   margin: 6px 20px;
 }
 
 .course-author,
 .watching-card-author {
-  font-size: 12px;
+  font-size: 1.2rem;
   color: #6a6f73;
   margin: 0px 20px;
 }
 
 .course-card .course-rating,
 .watching-card .watching-card-rating {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #F36224;
   font-weight: bold;
   margin: 5px 20px;
@@ -501,7 +518,7 @@ const courseSliderStyle = computed(() => ({
 
 .course-card .course-price,
 .watching-card .watching-card-price {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   margin: 0px 20px;
   color: red;
@@ -520,7 +537,7 @@ const courseSliderStyle = computed(() => ({
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 3rem;
   transition: all 0.2s;
   z-index: 300;
   padding-bottom: 7px;
@@ -547,7 +564,7 @@ const courseSliderStyle = computed(() => ({
 
 .button-next:after,
 .button-prev:after {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: bold;
 }
 
@@ -559,10 +576,10 @@ const courseSliderStyle = computed(() => ({
   border-radius: 6px;
   margin-left: 30px;
   padding: 6px 18px;
-  font-size: 14px;
+  font-size: 1.4rem;
   width: 200px;
   height: 40px;
-  font-size: 15px;
+  font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -589,14 +606,14 @@ const courseSliderStyle = computed(() => ({
 }
 
 .start-section .start-header h1 {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 700;
   color: #111;
   margin: 0;
 }
 
 .start-section .start-header h3 {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 700;
   color: rgb(22, 92, 125);
   cursor: pointer;
@@ -645,7 +662,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .start-section .mylearn-course-title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 8px;
@@ -655,7 +672,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .start-section .mylearn-course-author {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #888;
   margin-bottom: 12px;
 }
@@ -684,7 +701,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .next-title {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #111;
   margin-bottom: 24px;
@@ -739,7 +756,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .next-card-title {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 4px;
@@ -749,7 +766,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .next-card-author {
-  font-size: 13px;
+  font-size: 1.3rem;
   color: #888;
   margin-bottom: 8px;
 }
@@ -757,7 +774,7 @@ const courseSliderStyle = computed(() => ({
 .next-card-rating {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: 1.4rem;
   margin-bottom: 8px;
 }
 
@@ -770,7 +787,7 @@ const courseSliderStyle = computed(() => ({
 .next-card-stars {
   color: #f59e42;
   margin-right: 4px;
-  font-size: 15px;
+  font-size: 1.5rem;
 }
 
 .next-card-stars .star {
@@ -784,11 +801,11 @@ const courseSliderStyle = computed(() => ({
 
 .next-card-count {
   color: #888;
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 .next-card-price {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #1742a0;
   font-weight: 700;
   margin-bottom: 8px;
@@ -798,7 +815,7 @@ const courseSliderStyle = computed(() => ({
   display: inline-block;
   background: #e5e7eb;
   color: rgb(22, 92, 125);
-  font-size: 13px;
+  font-size: 1.3rem;
   font-weight: 600;
   border-radius: 6px;
   padding: 2px 10px;
@@ -815,7 +832,7 @@ const courseSliderStyle = computed(() => ({
   border-radius: 50%;
   width: 36px;
   height: 36px;
-  font-size: 22px;
+  font-size: 2.2rem;
   color: rgb(22, 92, 125);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -832,7 +849,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .recommend-title {
-  font-size: 24px;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #111;
   margin-bottom: 24px;
@@ -846,8 +863,9 @@ const courseSliderStyle = computed(() => ({
   border: 1.5px solid #f3f4f6;
   padding: 32px 36px 32px 36px;
   height: 350px;
-  width: 1260px;
+  max-width: 1260px;
   margin-bottom: 24px;
+  cursor: pointer;
 }
 
 .recommend-card-cover {
@@ -879,18 +897,24 @@ const courseSliderStyle = computed(() => ({
 
 .recommend-card-title {
   height: 32px;
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 16px;
 }
 
 .recommend-card-desc {
-  height: 90px;
-  font-size: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  height: auto;
+  min-height: 95px;
+  font-size: 1.5rem;
   color: #444;
   margin-bottom: 10px;
   line-height: 1.7;
+  overflow: hidden;
 }
 
 .recommend-card-meta-label,
@@ -898,12 +922,12 @@ const courseSliderStyle = computed(() => ({
   height: 24px;
   color: #888;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .recommend-card-meta-link {
   height: 24px;
-  color: #215486;
+  color: #215496;
   font-weight: 600;
   margin-right: 10px;
 }
@@ -912,7 +936,7 @@ const courseSliderStyle = computed(() => ({
   height: 24px;
   display: flex;
   align-items: center;
-  font-size: 15px;
+  font-size: 1.5rem;
   margin-bottom: 14px;
 }
 
@@ -925,7 +949,7 @@ const courseSliderStyle = computed(() => ({
 .recommend-card-stars {
   color: #f59e42;
   margin-right: 4px;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .recommend-card-stars .star {
@@ -939,15 +963,15 @@ const courseSliderStyle = computed(() => ({
 
 .recommend-card-count {
   color: #888;
-  font-size: 13px;
+  font-size: 1.3rem;
   margin-right: 12px;
 }
 
 .recommend-card-tag {
   display: inline-block;
   background: #e5e7eb;
-  color: #215486;
-  font-size: 13px;
+  color: #215496;
+  font-size: 1.3rem;
   font-weight: 600;
   border-radius: 6px;
   padding: 2px 10px;
@@ -957,7 +981,7 @@ const courseSliderStyle = computed(() => ({
 .recommend-card-price {
   position: relative;
   bottom: 0px;
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 700;
 }
 
@@ -966,7 +990,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .watching-title {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #111;
   margin-bottom: 50px;
@@ -1023,7 +1047,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .watching-card-title {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 4px;
@@ -1033,7 +1057,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .watching-card-author {
-  font-size: 13px;
+  font-size: 1.3rem;
   color: #888;
   margin-bottom: 8px;
 } */
@@ -1041,7 +1065,7 @@ const courseSliderStyle = computed(() => ({
 .watching-card-rating {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: 1.4rem;
   margin-bottom: 8px;
 }
 
@@ -1054,7 +1078,7 @@ const courseSliderStyle = computed(() => ({
 .watching-card-stars {
   color: #f59e42;
   margin-right: 4px;
-  font-size: 15px;
+  font-size: 1.5rem;
 } */
 /* 
 .watching-card-stars .star {
@@ -1068,11 +1092,11 @@ const courseSliderStyle = computed(() => ({
 /* 
 .watching-card-count {
   color: #888;
-  font-size: 13px;
+  font-size: 1.3rem;
 } */
 
 /* .watching-card-price {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #1742a0;
   font-weight: 700;
   margin-bottom: 8px;
@@ -1082,7 +1106,7 @@ const courseSliderStyle = computed(() => ({
   display: inline-block;
   background-color: rgba(33, 84, 150, 0.13);
   color: rgb(22, 92, 125);
-  font-size: 13px;
+  font-size: 1.3rem;
   font-weight: 600;
   border-radius: 6px;
   padding: 2px 10px;
@@ -1099,8 +1123,8 @@ const courseSliderStyle = computed(() => ({
   border-radius: 50%;
   width: 36px;
   height: 36px;
-  font-size: 22px;
-  color: #215486;
+  font-size: 2.2rem;
+  color: #215496;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -1111,7 +1135,7 @@ const courseSliderStyle = computed(() => ({
 }
 
 .watching-arrow-btn:hover {
-  background: #215486;
+  background: #215496;
   color: #fff;
 }
 </style>

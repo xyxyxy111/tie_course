@@ -69,7 +69,7 @@ import 'swiper/css/pagination'
 
 .swiper-button-next:after,
 .swiper-button-prev:after {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: bold;
 }
 </style>

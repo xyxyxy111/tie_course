@@ -11,7 +11,7 @@ import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
 import { goToCart } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
-import { useCourseDescription, useCart, Comments } from '../components/content';
+import { useCourseDescription, useCart } from '../components/content';
 
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
@@ -36,9 +36,6 @@ onMounted(async () => {
   const token = getValidToken();
   if (token) {
     userId.value = getCurrentUserId();
-  } else {
-    // 如果没有token，重定向到登录页面
-    window.location.href = '/login.html';
   }
   const searchParams = new URLSearchParams(window.location.search);
   const courseId = parseInt(searchParams.get('courseId')!);
@@ -85,16 +82,29 @@ const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => 
   }
 }
 
+const chaptersState = ref('展开');
+
 const toggleChapter = async (courseId: number, sortOrder: number) => {
   const idx = expandedChapters.value.indexOf(sortOrder);
   if (idx > -1) {
-    // 已展开则收起
     expandedChapters.value.splice(idx, 1);
   } else {
-    // 展开并加载lesson
     await getLessonListBySortOrder(courseId, sortOrder);
     expandedChapters.value.push(sortOrder);
   }
+};
+
+const openAllChapter = async () => {
+  chapters.value.forEach(chapter => {
+    if (!expandedChapters.value.includes(chapter.chapterSortOrder)) {
+      toggleChapter(chapter.chapterId, chapter.chapterSortOrder);
+    }
+  });
+  chaptersState.value = '收起';
+};
+const closeAllChapter = () => {
+  expandedChapters.value = [];
+  chaptersState.value = '展开';
 };
 
 const CourseDescriptionStyle = computed(() => ({
@@ -124,7 +134,7 @@ const handleAddToCart = async () => {
     } else {
       alert('添加至购物车失败，请重试');
     }
-  } catch (error:any) {
+  } catch (error: any) {
     console.log("添加错误")
     alert('该课程已在购物车中');
     // if(error === "商品已在购物车中") {
@@ -152,10 +162,7 @@ const handleBuyNow = async() =>{
   <IconSprite />
   <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
   <PCHeader :userId="userId" />
-  <FloatingBox 
-    @addToCart="handleAddToCart" 
-    @buyNow="handleBuyNow"
-  />
+  <FloatingBox @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
 
   <div id="top-container">
     <div class="content">
@@ -214,26 +221,33 @@ const handleBuyNow = async() =>{
 
   <div id="course-detail">
     <div class="what-you-will-learn">
-      <h1>您将会学到</h1>
+      <h2>您将会学到</h2>
       <p> <span class="checkmark">✔</span>{{ courseVo?.whatYouWillLearn }}</p>
     </div>
-
+    <h1>浏览相关主题</h1>
     <div class="other-theme">
-      <h1>浏览相关主题</h1>
+
       <!-- <button v-for="otherTheme in otherThemes">
         {{ otherTheme.title }}
       </button> -->
 
     </div>
-
+    <h1>课程内容</h1>
     <div class="course-content">
-      <h1>课程内容</h1>
-      <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟</h3>
+      <div class="course-content-header">
+        <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟</h3>
+        <span class="open-all" @click="chaptersState === '展开' ? openAllChapter() : closeAllChapter()">
+          {{ chaptersState }}所有章节
+        </span>
+      </div>
+
       <ul>
         <template v-for="courseCurriculum in chapters" :key="courseCurriculum.chapterSortOrder">
           <li @click="toggleChapter(courseCurriculum.courseId, courseCurriculum.chapterSortOrder)">
-            <span>第{{ courseCurriculum.chapterSortOrder }}章 </span>
-            <span class="curriculum-title">{{ courseCurriculum.title }}</span>
+            <span class="arrow" :class="{ open: expandedChapters.includes(courseCurriculum.chapterSortOrder) }"></span>
+            <span class="curriculum-title">
+              第{{ courseCurriculum.chapterSortOrder }}章
+              &nbsp; {{ courseCurriculum.title }}</span>
             <span class="lectrue-duration">
               {{ courseCurriculum.lessonNum }}个讲座·
               <template v-if="courseCurriculum.hours !== 0">
@@ -249,15 +263,28 @@ const handleBuyNow = async() =>{
               v-if="expandedChapters.includes(courseCurriculum.chapterSortOrder) && courseCurriculum.lessons">
               <li v-for="lesson in courseCurriculum.lessons" :key="lesson.lessonId"
                 style="padding-left:32px;list-style:circle;cursor:default;">
-                {{ lesson.title }}
+                <svg :width="28" :height="28" viewBox="0 0 24 24" fill="none">
+                  <use href="#bx--file" />
+                </svg>
+                <span> {{ lesson.title }}</span>
               </li>
             </ul>
           </transition>
         </template>
       </ul>
     </div>
+
+    <!-- 要求 -->
+    <h1>要求</h1>
+    <ul class="section-list">
+      <li>准备好学习Python课程</li>
+      <li>不用担心学不会，也不需要在任何程式语言背景或知识</li>
+      <li>有一台电脑就可以轻松上手</li>
+    </ul>
+
+    <h1>描述</h1>
     <div class="course-descrpition" :style="CourseDescriptionStyle">
-      <h1>描述</h1>
+
 
       <h4>
         {{ courseVo?.description }}
@@ -265,25 +292,45 @@ const handleBuyNow = async() =>{
     </div>
     <button @click="CourseDescriptionFlag = !CourseDescriptionFlag" class="course-descrpitionbtn">显示更多</button>
 
+    <!-- 讲师 -->
+    <div class="section-block teacher-block">
+      <h1>讲师</h1>
+      <div class="teacher-info">
+        <img class="teacher-avatar" src="@/images/userPic.png" alt="讲师头像" />
+        <div class="teacher-meta">
+          <a class="teacher-name" href="#">iClass</a>
+          <div class="teacher-stats">
+            <span class="teacher-score">★ 4.8 讲师评分</span>
+            <span class="teacher-student">9713 学员</span>
+            <span class="teacher-course">2066 门课程</span>
+            <span class="teacher-comment">5 评价</span>
+          </div>
+        </div>
+        <div class="teacher-desc">
+          我是iClass，拥有超过五年的开发教学经验，致力于数据分析和人工智能领域。主讲Python、数据分析、机器学习等课程。分阶段（2025 Python全攻略、2026 Python进阶、2027
+          Python实战、2028 Python数据分析、2029 Python深度学习）带你系统掌握Python技能。
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+@import "@/assets/rem.css";
+
 #top-container {
   display: flex;
   background-color: #101010;
   color: #fff;
   width: 100%;
   padding: 20px 0px 20px 10px;
-  font-size: 20px;
+  font-size: 2rem;
   height: 400px;
 }
 
 .content {
   margin: 0 auto;
   width: calc(30% + 660px);
-  min-width: 650px;
-  max-width: 1320px;
   padding: 20px;
   padding-right: 340px;
 }
@@ -296,16 +343,15 @@ const handleBuyNow = async() =>{
 .content .course-title {
   color: #fff;
   font-weight: bold;
-  font-size: 32px;
+  font-size: 3.2rem;
 }
 
 .content .course-introduction {
   color: #fff;
-  font-size: 18px;
+  font-size: 1.8rem;
   height: 90px;
   overflow: hidden;
 }
-
 
 .course-meta-row {
   margin: 15px 0px 0px;
@@ -313,7 +359,7 @@ const handleBuyNow = async() =>{
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 18px;
+  font-size: 1.8rem;
   color: #fff;
   margin-bottom: 8px;
 }
@@ -321,7 +367,7 @@ const handleBuyNow = async() =>{
 .hot-tag {
   background: #eaf6ff;
   color: #165c91;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   border-radius: 6px;
   padding: 2px 10px;
@@ -333,7 +379,7 @@ const handleBuyNow = async() =>{
 .rating-score {
   color: #FFC800;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 2rem;
   margin-right: 2px;
 }
 
@@ -349,7 +395,7 @@ const handleBuyNow = async() =>{
 
 .review-link {
   color: #7cb1ff;
-  font-size: 16px;
+  font-size: 1.6rem;
   margin-right: 8px;
   text-decoration: underline;
   cursor: pointer;
@@ -357,13 +403,13 @@ const handleBuyNow = async() =>{
 
 .student-count {
   color: #fff;
-  font-size: 16px;
+  font-size: 1.6rem;
   margin-left: 4px;
 }
 
 .creator-link {
-  color: #7cb1ff;
-  font-size: 16px;
+  color: #444;
+  font-size: 1.6rem;
   margin-left: 4px;
   text-decoration: underline;
 }
@@ -382,12 +428,34 @@ const handleBuyNow = async() =>{
   padding-right: 360px;
 }
 
-.lesson-list {
-  border: none;
-  padding-left: 32px;
-  list-style: circle;
-  cursor: default;
+.arrow {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  transition: transform 0.2s;
+  position: relative;
 }
+
+.arrow::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid #888;
+  border-bottom: 2px solid #888;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transform: rotate(-45deg);
+  transition: transform 0.2s;
+}
+
+.arrow.open::before {
+  transform: rotate(135deg);
+  top: 5px;
+}
+
 
 .slide-lesson-enter-active,
 .slide-lesson-leave-active {
@@ -404,4 +472,113 @@ const handleBuyNow = async() =>{
 .slide-lesson-leave-from {
   max-height: 500px;
 }
+
+
+
+
+
+
+
+.course-detail-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px 32px 24px 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: "Inter", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  color: #222;
+}
+
+.section-block {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+.section-list {
+  list-style: disc inside;
+  margin: 0 0 12px 0;
+  padding-left: 18px;
+  color: #222;
+}
+
+.section-list li {
+  margin-bottom: 6px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.section-desc {
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.7;
+  margin-top: 8px;
+}
+
+.teacher-block {
+  border-top: 1px solid #eee;
+  padding-top: 24px;
+}
+
+.teacher-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.teacher-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f5f5f5;
+  border: 1px solid #eee;
+}
+
+.teacher-meta {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.teacher-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #215496;
+  text-decoration: none;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+.teacher-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.98rem;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.teacher-score {
+  color: #e67c17;
+  font-weight: 600;
+}
+
+.teacher-desc {
+  font-size: 0.98rem;
+  color: #444;
+  line-height: 1.7;
+  margin-top: 4px;
+  flex: 2 1 0;
+}
 </style>
+
+<!-- 
+<style scoped>
+</style>
+-->
