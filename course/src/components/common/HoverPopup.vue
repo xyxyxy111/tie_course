@@ -182,15 +182,11 @@ export default defineComponent({
         alert(`✅ 课程 "${courseInfo.value.title}" 已成功添加到购物车！`);
 
       } catch (err: any) {
-<<<<<<< HEAD
         if(err === "商品已在购物车中") {
           alert('该课程已在购物车中');
         }
         // console.error('添加课程到购物车失败:', err);
 
-=======
-        console.error('添加课程到购物车失败:', err);
->>>>>>> bfe3d0cb00b21c68babb0ec21713b7f2767b27fe
         let errorMessage = '添加课程到购物车失败';
         let errorType = 'unknown';
         emit('course-added', {

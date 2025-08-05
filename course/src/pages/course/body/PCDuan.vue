@@ -138,7 +138,7 @@ const handleAddToCart = async () => {
 
 const handleBuyNow = async() =>{
     try {
-      // console.log(courseVo.value?.currentPrice!)
+      console.log(courseVo.value?.currentPrice!)
       goToCheckout(courseVo.value?.coverImgUrl!,courseVo.value?.currentPrice!);
   } catch (error:any) {
       console.error('购买失败:', error);
