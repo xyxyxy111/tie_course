@@ -26,8 +26,8 @@ const userId = ref<string | null>(null);
 // const totalPages = ref(1);
 // const totalOrders = ref(0);
 // 筛选相关
-////const selectedStatus = ref<string>('all'); // all, pending, paid, completed, cancelled
-//const selectedTimeRange = ref<string>('all'); // all, week, month, year
+// const selectedStatus = ref<string>('all'); // all, pending, paid, completed, cancelled
+// const selectedTimeRange = ref<string>('all'); // all, week, month, year
 
 const payAmount = ref(0.01);
 const payLoading = ref(false);
@@ -52,7 +52,11 @@ const initializeData = async () => {
   console.log(token)
   loadCartData();
 
-  console.log(userId.value, cartCourses.value[0])
+
+  //区分两种情况 一个course和一个courseList 主要是获取的时候设置这个course为一个项目了 这不对 
+  console.log(userId.value)
+  console.log(cartCourses.value)
+
   calculateFinalPrice();
 };
 const useOrderData = () => {
@@ -250,10 +254,15 @@ const timeRangeOptions = [
 const loadCartData = () => {
   try {
     const storedData = localStorage.getItem('tempCartData');
+    console.log(storedData)
     if (storedData) {
       cartData.value = JSON.parse(storedData);
+      console.log(cartData.value)
+
       cartCourses.value = cartData.value.courses || [];
       cartTotal.value = cartData.value.total || 0;
+
+      //这两个数据是？
       cartOriginalTotal.value = cartData.value.originalTotal || 0;
       cartSaved.value = cartData.value.saved || 0;
     } else {

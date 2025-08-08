@@ -14,9 +14,6 @@ import {
 goToIndex
 } from '@/components/common/header.ts';
 
-import {
-  createAliPayment,
-} from '@/pages/order/content';
 const { width, height } = useWindowSize();
 
 // 使用共享的数据和逻辑
@@ -137,7 +134,7 @@ const handleClearCart = async () => {
     </div>
     <div v-else class="cart-layout">
       <div class="cart-title">
-        <h1>购物车</h1>
+        <h1>结账</h1>
       </div>
       <div class="cart-main-content">
 

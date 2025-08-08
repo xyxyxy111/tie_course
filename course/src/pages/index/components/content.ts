@@ -99,7 +99,8 @@ export const useIndexData = () => {
       await fetchProfile();
     }
     await fetchHottestCourse();
-    console.log(hottestCourseList.value?.length)
+    console.log('热门')
+    console.log(hottestCourseList.value)
     await fetchCategories();
     selectedCategoryId.value = 1;
     await getTagListByCategoryId(1);
@@ -169,6 +170,8 @@ const fetchHottestCourse = async () => {
     const response = await courseApi.getHottestCourse();
     if (response && response.data && Array.isArray(response.data)) {
       hottestCourseList.value = response.data as CourseListVO[];
+          console.log('热门A')
+      console.log(hottestCourseList.value);
       hottestCourseQuickViews.value = hottestCourseList.value.map(
         course => {
           return new CourseQuickView(

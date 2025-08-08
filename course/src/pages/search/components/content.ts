@@ -44,7 +44,7 @@ export const useSearchData = () => {
       const page = searchParams.get('page');
 
       if (keyword) {
-        searchKeyword.value = keyword;
+        searchKeyword.value = decodeURIComponent(keyword);
       }
       if (categoryId) {
         selectedCategoryId.value = parseInt(categoryId);

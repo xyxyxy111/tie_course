@@ -216,13 +216,13 @@ const courseSliderStyle = computed(() => ({
           <div class="recommend-card-content">
             <div class="recommend-card-title">{{ hottestCourseList[0]?.title }}</div>
             <div class="recommend-card-desc">
-              超过40小时的内容，学习Python语法、程式逻辑、识别Python资料类型与使用，用正规表达式处理资料、处理文件系统、通用Python网络爬虫、链接SQL数据库、处理Excel和Csv、发送Email，一步步成为Python达人！
+              {{ hottestCourseList[0]?.description }}
             </div>
 
             <div class="recommend-card-meta-label">讲师：iClass</div>
             <div class="recommend-card-meta">
-              <span class="recommend-card-meta-link">上次更新日期：2025年6月</span>
-              <span class="recommend-card-meta-label">总时长：</span>45小时28分
+              <span class="recommend-card-meta-link">上次更新日期：{{ hottestCourseList[0]?.updateTime }}</span>
+              <span class="recommend-card-meta-label">总时长：</span>{{ hottestCourseList[0]?.totalMinutes }}
               <span class="recommend-card-meta-label">24个章节</span>
               <span class="recommend-card-meta-label">213个讲解</span>
             </div>
@@ -234,7 +234,7 @@ const courseSliderStyle = computed(() => ({
               <span class="recommend-card-count">(1,025)</span>
               <span class="recommend-card-tag">热门课程</span>
             </div>
-            <div class="recommend-card-price">￥19.99</div>
+            <div class="recommend-card-price">￥{{ hottestCourseList[0]?.currentPrice }}</div>
           </div>
         </div>
       </div>
@@ -263,7 +263,7 @@ const courseSliderStyle = computed(() => ({
                       </span>
                       <span class="watching-card-count">(1,025)</span>
                     </div>
-                    <div class="watching-card-price">￥19.99</div>
+                    <div class="watching-card-price">￥{{ course.originalPrice }}</div>
                     <div class="cart-tag">热门课程</div>
                   </div>
                 </div>

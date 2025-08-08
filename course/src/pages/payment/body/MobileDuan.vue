@@ -1,22 +1,16 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue';
 import { useWindowSize } from '@/useWindowSize';
 import IconSprite from '@/components/Icon/IconSprite.vue';
-import PCHeader from '@/components/common/PCHeader.vue';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
 
 // 导入共享的数据和逻辑
 import { useCartLogic, useCartUtils } from '../components/content';
 import { wishlistApi } from '@/api/user';
-import '../cart.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { cartApi } from '@/api/cart';
-import {
-goToIndex
-} from '@/components/common/header.ts';
+import '../cart.css';
 
-import {
-  createAliPayment,
-} from '@/pages/order/content';
 const { width, height } = useWindowSize();
 
 // 使用共享的数据和逻辑
@@ -45,6 +39,14 @@ const {
   goToLogin
 } = useCartUtils();
 
+onMounted(() => {
+  // 从token获取userId
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  }
+});
+
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 const headerSpaceStyle = computed(() => ({
   padding: `calc(3vw * ${headerSpaceWidth.value})`
@@ -54,13 +56,22 @@ const CourseInstructorStyle = () => ({});
 const CourseTitleStyle = () => ({});
 const CourseIncartStyle = () => ({});
 
-onMounted(() => {
-  // 从token获取userId
-  const token = getValidToken();
-  if (token) {
-    userId.value = getCurrentUserId();
+// 清空购物车
+const clearing = ref(false);
+const handleClearCart = async () => {
+  if (clearing.value) return;
+  if (isCartEmpty(cart.value)) return;
+  if (!confirm('确定要清空购物车吗？')) return;
+  clearing.value = true;
+  try {
+    await clearCart();
+    alert('购物车已清空');
+  } catch (error) {
+    alert('清空购物车失败，请重试');
+  } finally {
+    clearing.value = false;
   }
-});
+};
 
 // 加入心愿单
 const addToWishlist = async (courseId: number) => {
@@ -98,30 +109,12 @@ const removeFromCart = async (courseId: number) => {
     alert('删除失败，请重试');
   }
 };
-
-// 清空购物车
-const clearing = ref(false);
-const handleClearCart = async () => {
-  if (clearing.value) return;
-  if (isCartEmpty(cart.value)) return;
-  if (!confirm('确定要清空购物车吗？')) return;
-  clearing.value = true;
-  try {
-    await clearCart();
-    alert('购物车已清空');
-  } catch (error) {
-    alert('清空购物车失败，请重试');
-  } finally {
-    clearing.value = false;
-  }
-};
 </script>
 
 <template>
   <IconSprite />
-  <PCHeader />
+  <MobileHeader />
   <div class="cart-container">
-
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>
       <p>加载中...</p>
@@ -131,9 +124,6 @@ const handleClearCart = async () => {
       <div class="empty-icon">🛒</div>
       <h2>购物车为空</h2>
       <p>您还没有添加任何课程到购物车</p>
-      <div @click="goToIndex()">
-        <a href="#">挑选你喜欢的课程</a>
-      </div>
     </div>
     <div v-else class="cart-layout">
       <div class="cart-title">
@@ -146,7 +136,10 @@ const handleClearCart = async () => {
 
           <div class="cart-items">
             <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
-              <img :src="item.courseImage" :alt="item.courseName" class="course-image">
+              <div class="course-image">
+                <img :src="item.courseImage" :alt="item.courseName" class="course-image">
+                <div class="course-price">¥{{ item.currentPrice.toFixed(2) }}</div>
+              </div>
               <div class="course-info">
                 <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
                 <p class="course-instructor" :style="CourseInstructorStyle()">iClass</p>
@@ -168,8 +161,6 @@ const handleClearCart = async () => {
                 <button @click="removeFromCart(item.courseId)">删除</button>
                 <button>保存以供之后购买</button>
               </div>
-              <div class="course-price">¥{{ item.currentPrice.toFixed(2) }}</div>
-
             </div>
           </div>
           <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
@@ -235,5 +226,55 @@ const handleClearCart = async () => {
 </template>
 
 <style scoped>
-@import "/src/assets/rem.css";
+@import "@/assets/rem.css";
+
+.cart-container {
+  padding-inline: 0px;
+}
+
+.cart-title h1 {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0px 16px 12px;
+}
+
+.cart-main-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+}
+
+.cart-items {
+  padding: 10px 0px;
+}
+
+.course-image {
+  width: 150px;
+  height: 125px;
+}
+
+.course-image img {
+  width: 100%;
+  height: 100px;
+}
+
+.course-price {
+  padding-top: 0px;
+  font-size: 1.2rem;
+}
+
+.course-title {
+  font-size: 1.6rem;
+}
+
+.course-instructor,
+.course-rating,
+.course-tag {
+  font-size: 1rem;
+}
+
+.course-actions button {
+  font-size: 1rem;
+}
 </style>

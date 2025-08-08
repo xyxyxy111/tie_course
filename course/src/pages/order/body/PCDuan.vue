@@ -33,7 +33,7 @@ import {
   testCancel,
   testRefund,
   queryOrder,
-  getStatusText
+  getStatusText,
 } from '../content';
 import PCHeader from '@/components/common/PCHeader.vue'
 

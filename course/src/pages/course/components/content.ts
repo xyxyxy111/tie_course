@@ -1,5 +1,6 @@
 // src/composables/content.ts
 import { ref, computed } from 'vue';
+import { getValidToken } from '@/utils/request';
 
 
 // 课程描述相关逻辑
@@ -60,7 +61,7 @@ function useCart() {
         price: currentPrice
       },
       total: currentPrice,
-      userId: 'user123'
+      userId: getValidToken()
     };
 
     localStorage.setItem('tempCartData', JSON.stringify(cartData));
