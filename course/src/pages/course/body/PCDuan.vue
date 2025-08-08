@@ -9,7 +9,7 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
-import { goToCart } from '@/components/common/header';
+import { goToCart, goToLogin } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription, useCart } from '../components/content';
 
@@ -44,9 +44,11 @@ onMounted(async () => {
 
   const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
   courseVo.value = courseVoResponse.data;
-  console.log(courseVo.value);
+  console.log(courseVoResponse);
 
   const chaptersResponse = await courseApi.getChapterListById(courseId);
+  console.log(chaptersResponse);
+
   chapters.value = chaptersResponse.data;
   chapters.value.forEach(chapter => { // 注意：这里是 users.value
     let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
@@ -121,13 +123,15 @@ const handleAddToCart = async () => {
       alert('课程ID无效');
       return;
     }
-    console.log("调用添加api")
+    // console.log("调用添加api")
 
     // 调用购物车API
     const { cartApi } = await import('@/api/cart');
     const response = await cartApi.addCourseToCart(courseId);
+    console.log(response)
 
-    if (response.status === 1302) {
+    console.log(response);
+    if (response.status === 1300) {
       alert('添加至购物车成功！');
       // Element
       showCart.value = true;
@@ -137,31 +141,46 @@ const handleAddToCart = async () => {
   } catch (error: any) {
     console.log("添加错误")
     alert('该课程已在购物车中');
-    // if(error === "商品已在购物车中") {
-    //   alert('该课程已在购物车中');
-    // }else{
-    //   console.error('添加至购物车失败:', error);
-    //   alert('添加至购物车失败，请重试'); 
-    // }
   }
 };
 
-const handleBuyNow = async () => {
-  try {
-    goToCheckout(courseVo.value?.coverImgUrl!, courseVo.value?.currentPrice!);
-  } catch (error: any) {
-    console.error('购买失败:', error);
-    alert('购买失败，请重试');
+
+const handleBuyNow = async() =>{
+    try {
+      const token = getValidToken();
+      //应该是要使用token验证器
+      if(token){
+        console.log(token);
+        console.log(courseVo.value?.currentPrice!)
+        goToCheckout(courseVo.value?.coverImgUrl!,courseVo.value?.currentPrice!);
+      }else{
+        goToLogin();
+      }
+  } catch (error:any) {
+      console.error('购买失败:', error);
+      alert('购买失败，请重试'); 
+
   }
 }
+/*
 
+*/ 
 </script>
 
 <template>
   <IconSprite />
-  <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
+  <CartPopup :style="`width:${width};height:${height}`" 
+    v-model="showCart" 
+
+  />
   <PCHeader :userId="userId" />
-  <FloatingBox @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
+  <FloatingBox 
+  v-if="courseVo"
+  :courseVideo="courseVo?.coverImgUrl"
+  :currentPrice="courseVo?.currentPrice"
+  :originalPrice="courseVo?.originalPrice"
+  :discount="courseVo?.discountValue"
+  @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
 
   <div id="top-container">
     <div class="content">

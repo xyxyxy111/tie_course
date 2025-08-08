@@ -4,9 +4,9 @@
       <span class="video-pictrue">
         <img :src="courseVideo" alt="">
       </span>
-      <span class="current-price">{{ currentPrice }}</span>
-      <span class="original-price">{{ originalPrice }}</span>
-      <span class="discount">{{ discount }}</span>
+      <span class="current-price">¥{{ currentPrice }}</span>
+      <span class="original-price">¥{{ originalPrice }}</span>
+      <span class="discount">{{ discount }}%折扣优惠</span>
       <div class="time-left" v-if="timeLeft">{{ timeLeft }}</div>
     </div>
     <div class="action-buttons">
@@ -58,16 +58,16 @@ const props = defineProps({
     default: '/src/images/image1.png'
   },
   currentPrice: {
-    type: String,
-    default: '¥13.99'
+    type: Number,
+    default: 13.99
   },
   originalPrice: {
-    type: String,
-    default: '¥94.99'
+    type: Number,
+    default: 94.99
   },
   discount: {
-    type: String,
-    default: '85% 折扣'
+    type: Number,
+    default: 85
   },
   timeLeft: {
     type: String,
@@ -102,7 +102,7 @@ const props = defineProps({
 
 const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon', 'couponApplied']);
 const floatingBoxStyle = () => ({
-  top: (scrollY.value > 120) ? '10px' : `${120 - scrollY.value}` + "px"
+  // top: (scrollY.value > 120) ? '10px' : `${120 - scrollY.value}` + "px"
 })
 </script>
 

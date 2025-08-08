@@ -1,6 +1,5 @@
 import '@/assets/main.css'
 import '@/assets/rem.css'
-import "video.js/dist/video-js.css";
 import { createApp } from 'vue'
 import App from './App.vue'
 
