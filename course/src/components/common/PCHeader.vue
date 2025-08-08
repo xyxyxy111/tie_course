@@ -533,28 +533,16 @@ const handleMyLearnPopupLeave = () => {
 
 <style>
 .header {
-  overflow: visible;
-  margin-bottom: 30px;
-  height: 80px;
+  margin-bottom: 0px;
+  height: 7.2rem;
   width: 100vw;
-  min-width: 1000px;
 }
 
-#logo {
-  font-size: 32px;
-  width: 100px;
-  padding: 0 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-}
 
 input {
   position: relative;
   top: -3%;
-  height: 50px;
+  height: 4rem;
   margin-left: 1%;
 }
 

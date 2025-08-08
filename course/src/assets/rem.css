@@ -1,3 +1,50 @@
 html {
   font-size: 10px;
 }
+
+/* PC默认 */
+
+@media (max-width: 4000px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 3000px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 2000px) {
+  html {
+    font-size: 11px;
+  }
+}
+
+
+/* Mobile端分段 */
+@media (max-width: 1000px) {
+  html {
+    font-size: 9px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  html {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 500px) {
+  html {
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 400px) {
+  html {
+    font-size: 6px;
+  }
+}

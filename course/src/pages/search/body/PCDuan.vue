@@ -169,6 +169,6 @@ const addToCart = async (courseId: number) => {
 .page-info {
   margin-top: 10px;
   color: #666;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 </style>

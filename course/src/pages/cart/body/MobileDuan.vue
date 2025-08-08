@@ -113,439 +113,168 @@ const removeFromCart = async (courseId: number) => {
 
 <template>
   <IconSprite />
-  <MobileHeader :userId="userId" />
-  <div class="shopping-cart-container" :style="headerSpaceStyle">
-    <!-- 加载状态 -->
+  <MobileHeader />
+  <div class="cart-container">
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>
       <p>加载中...</p>
     </div>
 
-    <!-- 错误状态 -->
-    <div v-else-if="error" class="error">
-      <p>{{ error }}</p>
-    </div>
-
-    <!-- 空购物车状态 -->
     <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
       <div class="empty-icon">🛒</div>
       <h2>购物车为空</h2>
       <p>您还没有添加任何课程到购物车</p>
     </div>
-
-    <!-- 购物车内容 -->
-    <div v-else class="content">
-      <div class="title">Shopping Cart</div>
-      <div class="course-list">
-        <h1>{{ cart.cartItemList.length }} Courses in Cart</h1>
-        <div class="course-items-container">
-          <div v-for="course in cart.cartItemList" :key="course.id" class="course-item">
-            <!-- 图片区域 -->
-            <div class="course-image-section">
-              <img :src="course.courseImage" alt="" class="course-image">
-            </div>
-
-            <!-- 内容区域 -->
-            <div class="course-content-section">
-              <h2 class="course-title">{{ course.courseName }}</h2>
-              <div class="course-price">¥{{ course.currentPrice }}</div>
-            </div>
-
-            <!-- 按钮区域 -->
-            <div class="course-actions-section">
-              <button class="wishlist-btn" @click="() => addToWishlist(course.courseId)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path
-                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-              </button>
-              <button class="remove-btn" @click="() => removeFromCart(course.courseId)">删除</button>
-            </div>
-          </div>
-        </div>
-        <!-- 清空购物车按钮 -->
-        <button class="clearcart-btn" @click="handleClearCart" :disabled="clearing || loading"
-          v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
-          {{ clearing ? '清空中...' : '清空购物车' }}
-        </button>
+    <div v-else class="cart-layout">
+      <div class="cart-title">
+        <h1>购物车</h1>
       </div>
+      <div class="cart-main-content">
 
-      <div class="checkout-section">
-        <div class="checkout-summary">
-          <div class="summary-item">
-            <span>课程数量:</span>
-            <span>{{ cart.cartItemList.length }} 门课程</span>
+        <div class="cart-items-section">
+          <div class="cart-count">购物车中有{{ cart?.cartItemList?.length || 0 }}门课程</div>
+
+          <div class="cart-items">
+            <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
+              <div class="course-image">
+                <img :src="item.courseImage" :alt="item.courseName" class="course-image">
+                <div class="course-price">¥{{ item.currentPrice.toFixed(2) }}</div>
+              </div>
+              <div class="course-info">
+                <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
+                <p class="course-instructor" :style="CourseInstructorStyle()">iClass</p>
+
+                <div class="course-rating">
+                  <span class="course-score">4.9</span>
+                  <span class="course-stars">
+                    <span v-for="i in 5" :key="i" class="star filled">★</span>
+                  </span>
+                  <span class="course-count">(1,025)</span>
+                </div>
+
+                <div class="course-tag">热门课程</div>
+              </div>
+              <div class="course-actions">
+                <button @click="addToWishlist(item.courseId)">
+                  移至心愿单
+                </button>
+                <button @click="removeFromCart(item.courseId)">删除</button>
+                <button>保存以供之后购买</button>
+              </div>
+            </div>
           </div>
-          <div class="summary-item" v-if="savedAmount > 0">
-            <span>原价:</span>
-            <span class="original-price">¥{{ totalOriginalPrice.toFixed(2) }}</span>
+          <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
+            v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
+            {{ clearing ? '清空中...' : '清空' }}
+          </button>
+        </div>
+
+        <div class="checkout-section">
+          <div class="checkout-summary">
+            <div>总计:</div>
+            <div class="summary-item total-row">
+
+              <div class="total-price">¥{{ totalPrice.toFixed(2) }}</div>
+            </div>
+            <div class="summary-item">
+              <span>课程数量:</span>
+              <span>{{ cart.cartItemList.length }} 门课程</span>
+            </div>
+            <div class="summary-item" v-if="savedAmount > 0">
+              <span>原价:</span>
+              <span class="original-price">¥{{ totalOriginalPrice.toFixed(2) }}</span>
+            </div>
+            <div class="summary-item" v-if="savedAmount > 0">
+              <span>节省:</span>
+              <span class="saved-amount">-¥{{ savedAmount.toFixed(2) }}</span>
+            </div>
+
+
+            <div class="pay-btn-group">
+              <button class="pay-btn wechat" @click="">
+                <span class="icon">
+                  <svg width="29" height="28" viewBox="0 0 24 24" fill="#27b148">
+                    <use href="#ic--baseline-wechat" />
+                  </svg>
+                </span>
+                微信进行结算
+                <span class="arrow">→</span>
+                <span class="lightning"></span>
+              </button>
+              <div class="pay-divider"><span></span>或<span></span></div>
+              <button class="pay-btn alipay" @click="">
+                <span class="icon">
+                  <svg width="26" height="28" viewBox="0 0 24 24" fill="#27b148">
+                    <use href="#bi--alipay" />
+                  </svg>
+                </span>
+                支付宝进行结算
+                <span class="arrow">→</span>
+                <span class="lightning"></span>
+              </button>
+            </div>
+
+            <!-- 
+              <button class="checkout-btn" @click="goToCheckout">去结算</button> -->
+
           </div>
-          <div class="summary-item" v-if="savedAmount > 0">
-            <span>节省:</span>
-            <span class="saved-amount">-¥{{ savedAmount.toFixed(2) }}</span>
-          </div>
-          <div class="summary-item total-row">
-            <span>总计:</span>
-            <span class="total-price">¥{{ totalPrice.toFixed(2) }}</span>
-          </div>
-          <button class="checkout-btn" @click="goToCheckout">去结算</button>
         </div>
       </div>
     </div>
   </div>
+
 </template>
 
 <style scoped>
-.shopping-cart-container .content {
+@import "@/assets/rem.css";
+
+.cart-container {
+  padding-inline: 0px;
+}
+
+.cart-title h1 {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0px 16px 12px;
+}
+
+.cart-main-content {
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
-  border-radius: 10px;
-  width: 100%;
   min-width: 400px;
-  padding: 20px 0px;
-  border: none;
-  margin-bottom: 100px;
 }
 
-.shopping-cart-container .course-list {
-  width: 100%;
-}
-
-.shopping-cart-container .checkout-section {
-  margin: 0 auto;
-  width: 90%;
-}
-
-.shopping-cart-container .title {
-  min-width: fit-content;
-  font-size: 36px;
-  text-align: left;
-  font-weight: 600;
-  padding-top: 10px;
-  padding-left: 10%;
-  white-space: nowrap;
-  font-family: 'Times New Roman', Times, serif
-}
-
-.shopping-cart-container .course-item img {
-  width: 100%;
-  max-width: 180px;
-  height: 120px;
-  margin-right: 20px;
-}
-
-.shopping-cart-container .course-title {
-  margin-bottom: 10px;
-  overflow: hidden;
-}
-
-.shopping-cart-container .checkout-summary {
-  border: none;
-  margin: 0 auto;
-}
-
-.shopping-cart-container .checkout-summary div {
-  margin: 0 auto;
-  font-weight: 700;
-  font-size: 16px;
-  padding-inline: 20px;
-}
-
-.shopping-cart-container .checkout-summary #totalPrice {
-  font-size: 36px;
-}
-
-.shopping-cart-container .course-list h1 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
-  padding: 0 20px;
-}
-
-/* 加载状态样式 */
-.loading {
-  text-align: center;
-  padding: 60px;
-  color: #666;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #165c91;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.error {
-  text-align: center;
-  padding: 40px;
-  color: #dc3545;
-}
-
-.error button {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.error button:hover {
-  background: #c82333;
-}
-
-.empty-cart {
-  text-align: center;
-  padding: 80px 20px;
-  color: #666;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  margin: 20px;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-}
-
-.empty-cart h2 {
-  margin-bottom: 10px;
-  color: #333;
-  font-size: 24px;
-}
-
-.empty-cart p {
-  margin-bottom: 30px;
-  font-size: 16px;
-}
-
-.course-items-container {
-  padding: 0 20px;
-}
-
-.course-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.course-image-section {
-  flex: 0 0 120px;
-  margin-right: 15px;
+.cart-items {
+  padding: 10px 0px;
 }
 
 .course-image {
-  width: 120px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  height: 125px;
 }
 
-.course-content-section {
-  flex: 1;
-  min-width: 0;
-  margin-right: 15px;
-}
-
-.course-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.course-image img {
+  width: 100%;
+  height: 100px;
 }
 
 .course-price {
-  font-size: 18px;
-  font-weight: bold;
-  color: #165c91;
+  padding-top: 0px;
+  font-size: 1.2rem;
 }
 
-/* 按钮区域 */
-.course-actions-section {
-  flex: 0 0 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-start;
+.course-title {
+  font-size: 1.6rem;
 }
 
-.wishlist-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: none;
-  border: 1px solid #ddd;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
+.course-instructor,
+.course-rating,
+.course-tag {
   font-size: 1rem;
-  color: #666;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  width: 80px;
 }
 
-.wishlist-btn:hover {
-  background-color: #f8f9fa;
-  border-color: red;
-  color: red;
-}
-
-.wishlist-btn svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.3s ease;
-}
-
-.wishlist-btn:hover svg {
-  transform: scale(1.1);
-}
-
-.remove-btn {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-  color: white !important;
-  border: none !important;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
+.course-actions button {
   font-size: 1rem;
-  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-  white-space: nowrap;
-  width: 80px;
-}
-
-.remove-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
-  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%) !important;
-  color: white !important;
-}
-
-.remove-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
-}
-
-.clearcart-btn {
-  margin-bottom: 10px;
-  margin-left: calc(100vw - 120px);
-  width: fit-content;
-  white-space: nowrap;
-  padding: 8px 18px;
-  background: #fff;
-  color: #dc3545;
-  border: none;
-  height: 30px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-
-/* 响应式设计 */
-@media (max-width: 480px) {
-  .course-item {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 15px;
-  }
-
-  .course-image-section {
-    flex: none;
-    margin-right: 0;
-    margin-bottom: 15px;
-  }
-
-  .course-image {
-    width: 100%;
-    max-width: 200px;
-    height: 120px;
-  }
-
-  .course-content-section {
-    flex: none;
-    margin-right: 0;
-    margin-bottom: 15px;
-    width: 100%;
-  }
-
-  .course-title {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-
-  .course-price {
-    font-size: 20px;
-  }
-
-  .course-actions-section {
-    flex: none;
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .wishlist-btn {
-    padding: 10px 16px;
-    font-size: 14px;
-    min-width: 80px;
-  }
-
-  .remove-btn {
-    padding: 10px 16px;
-    font-size: 14px;
-    min-width: 80px;
-  }
-}
-
-@media (max-width: 360px) {
-  .course-actions-section {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .wishlist-btn {
-    width: 100%;
-    max-width: 120px;
-  }
-
-  .remove-btn {
-    width: 100%;
-    max-width: 120px;
-  }
 }
 </style>

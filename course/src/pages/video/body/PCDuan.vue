@@ -171,6 +171,8 @@ export default {
 </script>
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .course-page {
   display: flex;
   width: 2200px;
@@ -370,7 +372,7 @@ export default {
 
 .course-title h1 {
   text-align: left;
-  font-size: 28px;
+  font-size: 2.8rem;
   margin-bottom: 10px;
   color: #2c3e50;
 }
@@ -384,12 +386,12 @@ export default {
 
 .stars {
   color: #f8d64e;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .rating-value {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .reviews {
@@ -421,7 +423,7 @@ export default {
 .description-content h3 {
   margin: 20px 0 10px 0;
   color: #2c3e50;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .description-content ul,
@@ -434,7 +436,7 @@ export default {
 }
 
 .video-title {
-  font-size: 24px;
+  font-size: 2.4rem;
   font-weight: bold;
   margin-bottom: 10px;
   color: var(--text-primary);
@@ -540,7 +542,7 @@ export default {
 
 .video-item-duration {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 /* 响应式设计 */

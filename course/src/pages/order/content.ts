@@ -292,7 +292,10 @@ const applyCoupon = () => {
 // 处理支付
 const handlePayment = () => {
   console.log(`使用${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付 ¥${finalPrice.value.toFixed(2)}`);
+
   if (selectedPayment.value === 'alipay') {
+    console.log("pay")
+
     createAliPayment();
   }
 };
@@ -316,12 +319,17 @@ async function createAliPayment() {
       paymentType: "alipay",
       orderItemList: orderItemList
     };
-    const res = await fetch(`${apiBase}/api/pay/alipay/create`, {
+    console.log(orderData)
+    const res = await fetch('https://itie.sumixer.com/api/api/pay/alipay/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(orderData)
     });
+    console.log(payStatusType)
     const result = await res.json();
+    console.log(result)
     if (result.status === 1202 && result.data) {
       currentOrderId.value = result.data.orderId;
       payOrderInfo.value = {
@@ -340,6 +348,7 @@ async function createAliPayment() {
         if (form) form.submit();
       }
     } else {
+      console.log("error")
       payStatusType.value = 'error';
       payStatusMsg.value = `❌ 创建支付订单失败: ${result.message}`;
     }

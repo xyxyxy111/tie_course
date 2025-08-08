@@ -124,6 +124,8 @@ onMounted(() => {
 
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .payment-container {
   display: flex;
   max-width: 800px;
@@ -160,7 +162,7 @@ label {
 }
 
 .payment-method.active {
-  border-color: #215486;
+  border-color: #215496;
   background-color: rgba(33, 84, 150, 0.1);
 }
 
@@ -209,7 +211,7 @@ label {
 
 .coupon-section h3 {
   margin-bottom: 10px;
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #333;
   text-align: left;
 }
@@ -224,7 +226,7 @@ label {
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .coupon-code-input:focus {
@@ -239,7 +241,7 @@ label {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
   transition: background-color 0.3s;
   white-space: nowrap;
   min-width: fit-content;
@@ -260,7 +262,7 @@ label {
 
 .price-breakdown h3 {
   margin-bottom: 15px;
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #333;
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
@@ -270,7 +272,7 @@ label {
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .price-item.total {
@@ -278,7 +280,7 @@ label {
   padding-top: 8px;
   margin-top: 8px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .discount {
@@ -295,12 +297,12 @@ label {
 }
 
 .pay-button {
-  background-color: #215486;
+  background-color: #215496;
   color: white;
   border: none;
   padding: 12px 24px;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   cursor: pointer;
   width: 100%;

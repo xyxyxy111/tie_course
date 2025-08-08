@@ -228,13 +228,13 @@ defineExpose({
 
 .toast__title {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 1.4;
   margin-bottom: 4px;
 }
 
 .toast__message {
-  font-size: 13px;
+  font-size: 1.3rem;
   line-height: 1.4;
   opacity: 0.8;
   word-break: break-word;

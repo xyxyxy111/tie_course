@@ -191,7 +191,7 @@ onMounted(() => {
 
 .sidebar-body .sidebar-title {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.8rem;
   padding: 15px 0 0px 20px;
   color: var(--text-primary);
 }
@@ -249,7 +249,7 @@ onMounted(() => {
 .user-id {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .user-actions {
@@ -326,7 +326,7 @@ onMounted(() => {
 .tag-btn {
   width: 100%;
   margin: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   padding: 6px 10px;
   color: var(--text-primary);
   border: none;
@@ -372,7 +372,7 @@ onMounted(() => {
 }
 
 .tag-btn {
-  font-size: 14px;
+  font-size: 1.4rem;
   padding: 4px 8px;
   background: var(--bg-primary);
   border: 1px solid var(--border-primary);

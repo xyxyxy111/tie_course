@@ -1,6 +1,6 @@
 <script lang="ts" setup name="App">
-import { RouterView, RouterLink} from 'vue-router';
-import { toRef,ref,onMounted } from 'vue';
+import { RouterView, RouterLink } from 'vue-router';
+import { toRef, ref, onMounted } from 'vue';
 import { defineComponent } from 'vue'
 import PCDuan from './body/PCDuan.vue';
 import MobileDuan from './body/MobileDuan.vue';
@@ -14,8 +14,8 @@ const { width, height } = useWindowSize()
   <main>
 
     <div class="app">
-      <PCDuan v-if="width > 800" />
-      <MobileDuan v-else />
+      <PCDuan />
+      <!-- <MobileDuan v-else /> -->
     </div>
   </main>
 
@@ -28,7 +28,6 @@ const { width, height } = useWindowSize()
   border: none;
   padding: 0 0;
 }
-
 </style>
 
 <!--
