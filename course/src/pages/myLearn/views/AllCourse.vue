@@ -58,8 +58,8 @@
 
     <div class="mycourses-container">
       <div class="course-card" v-for="(course, index) in mylist" :key="index" @mouseenter="hoverIndex = index"
-        @mouseleave="hoverIndex = -1">
-        <div class="img-wrapper" :class="{ 'hovered': hoverIndex === index }">
+        @mouseleave="hoverIndex = -1" @click="goToVideo(course.courseId)">
+        <div class="img-wrapper" :class="{ 'hovered': hoverIndex === index }" @click.stop="goToVideo(course.courseId)">
           <img :src="course.coverImgUrl" alt="" />
           <div v-if="hoverIndex === index" class="overlay">
             <svg width="50" height="50" viewBox="0 0 16 16" fill="#eee">
@@ -88,6 +88,7 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import { myListApi } from '@/api/user';
 import type { MyListVO } from '@/api/user';
+import { goToVideo } from '@/components/common/header';
 export default defineComponent({
   name: 'AllCourse',
   setup() {
@@ -118,7 +119,7 @@ export default defineComponent({
       fetchMylist();
     });
 
-    return { mylist, hoverIndex };
+    return { mylist, hoverIndex, goToVideo };
   }
 });
 </script>
@@ -305,15 +306,20 @@ export default defineComponent({
 }
 
 .mycourses-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin: 24px 0;
+  height: fit-content;
+}
+
+.mycourses-container .course-card {
+  height: fit-content;
+  padding-bottom: 1rem;
 }
 
 .img-wrapper {
   width: 100%;
-  height: 120px;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
@@ -353,7 +359,7 @@ export default defineComponent({
 
 .progress-bar {
   width: 100%;
-  height: 7px;
+  height: 1rem;
   background: #e5e7eb;
   margin: 10px 0 0 0;
   overflow: hidden;

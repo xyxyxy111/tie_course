@@ -10,7 +10,7 @@
           <span class="arrow" :class="{ open: expandedIndex === idx }">▼</span>
         </div>
         <ul v-if="expandedIndex === idx" class="course-list">
-          <li v-for="course in order.orderItemList" :key="course.id" class="course-card">
+          <div v-for="course in order.orderItemList" :key="course.id" class="course-card">
             <div class="course-image">
               <img :src="course.courseImage" :alt="course.courseName">
             </div>
@@ -23,7 +23,7 @@
                 </div>
               </div>
             </div>
-          </li>
+          </div>
         </ul>
       </li>
     </ul>
@@ -104,10 +104,18 @@ export default defineComponent({
 }
 
 .course-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
   list-style: none;
   margin: 0;
   padding: 20px;
   background: #fafbfc;
   border-radius: 0 0 8px 8px;
+}
+
+.course-list .course-card {
+  height: fit-content;
+  padding-bottom: 1rem;
 }
 </style>

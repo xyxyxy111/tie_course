@@ -4,7 +4,7 @@
 .course-card {
   background: white;
   border-radius: 12px;
-  height: 27rem;
+  height: 28rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -32,19 +32,21 @@
   font-size: 1.8rem;
   font-weight: 700;
   color: #222;
-  margin: 0 0 8px 0;
+  margin: 0rem 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .course-card .iclass {
+  margin: 0rem 1rem;
   color: #888;
   font-weight: 500;
 }
 
 .course-card .watchProgress {
   font-weight: 700;
+  padding-left: 1rem;
 }
 
 .card-heart {
@@ -59,34 +61,43 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.course-image,
-.course-card img {
+/* 统一卡片图片容器高度与样式（AllCourse 的 .img-wrapper、Wishlist/MyOrderList 的 .course-image）*/
+.course-card .course-image,
+.course-card .img-wrapper {
   position: relative;
   width: 100%;
   height: 14rem;
   overflow: hidden;
   z-index: 10;
+  border-radius: 8px;
+  background: #f5f5f5;
 }
 
-.course-image img {
+/* 统一图片填充方式 */
+.course-card .course-image img,
+.course-card .img-wrapper img,
+.course-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-
-.course-content {
+/* 统一内容区域的最小高度与内边距 */
+.course-card .course-content {
   width: 100%;
-  height: 115px;
+  min-height: fit-content;
   padding: 12px;
   margin-top: 0px;
 }
 
-.course-title {
-  font-size: 1.6rem;
+/* 统一标题最多两行显示（Wishlist/MyOrderList 使用 .course-title，AllCourse 使用 h5）*/
+.course-card .course-title,
+.course-card h5 {
+  font-size: 1.7rem;
   font-weight: 600;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -94,16 +105,9 @@
   overflow: hidden;
 }
 
-.course-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #666;
-  font-size: 1.2rem;
-  margin-bottom: 16px;
-}
-
-.course-rating {
+/* 统一评分/元信息区域的高度与布局 */
+.course-card .course-meta,
+.course-card .course-rating {
   display: flex;
   align-items: center;
 }

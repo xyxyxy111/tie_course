@@ -42,6 +42,13 @@ function addToCart(course: any) {
 
 function handleCourseAdded(event: any) {
   console.log('课程已添加到购物车:', event);
+  if (!event || event.success !== true) {
+    return;
+  }
+  selectedCourse.value = {
+    title: event.courseName,
+    courseId: event.courseId
+  };
   showCart.value = true;
 }
 

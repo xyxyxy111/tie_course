@@ -1,13 +1,19 @@
 <template>
   <div class="floating-box" :style="floatingBoxStyle()">
     <div class="price-section">
-      <span class="video-pictrue">
+      <span class="video-pictrue" @mouseover="hovered = true" @mouseleave="hovered = false"
+        :class="{ hovered: hovered }" @click="goToVideoPage" title="点击播放">
         <img :src="courseVideo" alt="">
+        <div class="overlay">
+          <svg width="50" height="50" viewBox="0 0 16 16" fill="#eee">
+            <use href="#solar--play-broken" />
+          </svg>
+        </div>
       </span>
+
       <span class="current-price">¥{{ currentPrice }}</span>
       <span class="original-price">¥{{ originalPrice }}</span>
-      <span class="discount">{{ discount }}%折扣优惠</span>
-      <div class="time-left" v-if="timeLeft">{{ timeLeft }}</div>
+      <span class="time-left" v-if="timeLeft">{{ timeLeft }}</span>
     </div>
     <div class="action-buttons">
       <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
@@ -36,11 +42,24 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { goToCart } from '@/components/common/header';
+import { goToVideo } from '@/components/common/header';
 import { useWindowSize } from '@/useWindowSize'
 
 const { width, height } = useWindowSize()
 
+// 从URL中读取 courseId 以便跳转视频页
+const getCourseIdFromQuery = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(searchParams.get('courseId') || '');
+  return Number.isFinite(courseId) ? courseId : null;
+};
+
+const goToVideoPage = () => {
+  const courseId = getCourseIdFromQuery();
+  if (courseId) {
+    goToVideo(courseId);
+  }
+};
 
 const scrollY = ref(0); // 存储滚动距离
 
@@ -104,6 +123,8 @@ const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon',
 const floatingBoxStyle = () => ({
   // top: (scrollY.value > 120) ? '10px' : `${120 - scrollY.value}` + "px"
 })
+
+const hovered = ref(false);  // 控制hover状态
 </script>
 
 <style scoped>
@@ -125,6 +146,46 @@ const floatingBoxStyle = () => ({
 .floating-box img {
   width: 100%;
   height: 140px;
+}
+
+.video-pictrue {
+  display: block;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-pictrue:hover img {
+  transform: scale(1.03);
+  transition: transform 0.2s ease-in-out;
+}
+
+.video-pictrue {
+  position: relative;
+}
+
+.video-pictrue .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.2s;
+}
+
+.video-pictrue.hovered .overlay {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .price-section {
@@ -191,7 +252,6 @@ const floatingBoxStyle = () => ({
 
 .buy-now:hover {
   background-color: rgba(33, 84, 150, 0.8);
-
 }
 
 .divider {

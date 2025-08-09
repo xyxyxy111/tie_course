@@ -253,6 +253,21 @@ const timeRangeOptions = [
 
 const loadCartData = () => {
   try {
+    // 优先读取 buyCourseNow
+    const buyNowRaw = localStorage.getItem('buyCourseNow');
+    if (buyNowRaw) {
+      const buyNow = JSON.parse(buyNowRaw);
+      cartData.value = buyNow;
+      cartCourses.value = buyNow.courses || [];
+      cartTotal.value = buyNow.total || 0;
+      cartOriginalTotal.value = buyNow.originalTotal || 0;
+      cartSaved.value = buyNow.saved || 0;
+      // 读取后清理，避免重复购买
+      localStorage.removeItem('buyCourseNow');
+      return;
+    }
+
+    // 回退读取购物车数据 tempCartData
     const storedData = localStorage.getItem('tempCartData');
     console.log(storedData)
     if (storedData) {

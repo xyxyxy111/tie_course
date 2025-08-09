@@ -53,18 +53,23 @@ function useCart() {
     }
   };
 
-  const goToCheckout = (courseVideo: string, currentPrice: number) => {
-    const cartData = {
-      courses: {
-        image: courseVideo,
-        title: "course.title",
-        price: currentPrice
-      },
-      total: currentPrice,
-      userId: getValidToken()
+  const goToCheckout = (course: { courseId: number; title: string; coverImgUrl: string; currentPrice: number; originalPrice: number; }) => {
+    const buyNowData = {
+      courses: [
+        {
+          image: course.coverImgUrl,
+          title: course.title,
+          price: course.currentPrice,
+          originalPrice: course.originalPrice,
+          courseId: course.courseId
+        }
+      ],
+      total: course.currentPrice,
+      originalTotal: course.originalPrice,
+      saved: Number((course.originalPrice - course.currentPrice).toFixed(2)),
     };
 
-    localStorage.setItem('tempCartData', JSON.stringify(cartData));
+    localStorage.setItem('buyCourseNow', JSON.stringify(buyNowData));
     window.location.href = '/checkout.html';
   };
 

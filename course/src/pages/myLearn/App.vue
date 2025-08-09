@@ -124,7 +124,7 @@ onMounted(() => {
 }
 
 .learning-content {
-  width: 120rem;
+  width: 110rem;
   min-width: 1000px;
   max-width: 1400px;
   margin: 1rem auto;

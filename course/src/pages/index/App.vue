@@ -15,7 +15,6 @@ const { width, height } = useWindowSize()
 
     <div class="app">
       <PCDuan />
-      <!-- <MobileDuan v-else /> -->
     </div>
   </main>
 

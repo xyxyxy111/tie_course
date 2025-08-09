@@ -40,8 +40,6 @@ onMounted(async () => {
   const searchParams = new URLSearchParams(window.location.search);
   const courseId = parseInt(searchParams.get('courseId')!);
 
-  //if(!searchParams.get('courseId')){return;}&&error
-
   const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
   courseVo.value = courseVoResponse.data;
   console.log(courseVoResponse);
@@ -145,42 +143,39 @@ const handleAddToCart = async () => {
 };
 
 
-const handleBuyNow = async() =>{
-    try {
-      const token = getValidToken();
-      //应该是要使用token验证器
-      if(token){
-        console.log(token);
-        console.log(courseVo.value?.currentPrice!)
-        goToCheckout(courseVo.value?.coverImgUrl!,courseVo.value?.currentPrice!);
-      }else{
-        goToLogin();
-      }
-  } catch (error:any) {
-      console.error('购买失败:', error);
-      alert('购买失败，请重试'); 
+const handleBuyNow = async () => {
+  try {
+    const token = getValidToken();
+    if (token && courseVo.value) {
+      goToCheckout({
+        courseId: courseVo.value.courseId,
+        title: courseVo.value.title,
+        coverImgUrl: courseVo.value.coverImgUrl,
+        currentPrice: courseVo.value.currentPrice,
+        originalPrice: courseVo.value.originalPrice
+      });
+    } else {
+      goToLogin();
+    }
+  } catch (error: any) {
+    console.error('购买失败:', error);
+    alert('购买失败，请重试');
 
   }
 }
 /*
 
-*/ 
+*/
 </script>
 
 <template>
   <IconSprite />
-  <CartPopup :style="`width:${width};height:${height}`" 
-    v-model="showCart" 
-
-  />
+  <CartPopup :style="`width:${width};height:${height}`" v-model="showCart" :courseName="courseVo?.title || ''"
+    :courseId="courseVo?.courseId" />
   <PCHeader :userId="userId" />
-  <FloatingBox 
-  v-if="courseVo"
-  :courseVideo="courseVo?.coverImgUrl"
-  :currentPrice="courseVo?.currentPrice"
-  :originalPrice="courseVo?.originalPrice"
-  :discount="courseVo?.discountValue"
-  @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
+  <FloatingBox v-if="courseVo" :courseVideo="courseVo?.coverImgUrl" :currentPrice="courseVo?.currentPrice"
+    :originalPrice="courseVo?.originalPrice" :discount="courseVo?.discountValue" @addToCart="handleAddToCart"
+    @buyNow="handleBuyNow" />
 
   <div id="top-container">
     <div class="content">
@@ -279,14 +274,14 @@ const handleBuyNow = async() =>{
           <transition name="slide-lesson">
             <ul class="lesson-list"
               v-if="expandedChapters.includes(courseCurriculum.chapterSortOrder) && courseCurriculum.lessons">
-              <li v-for="lesson in courseCurriculum.lessons" :key="lesson.lessonId"
-                style="padding-left:32px;list-style:circle;cursor:default;">
+              <li v-for="lesson in courseCurriculum.lessons" :key="lesson.lessonId" class="lesson-item">
                 <svg :width="28" :height="28" viewBox="0 0 24 24" fill="none">
                   <use href="#bx--file" />
                 </svg>
-                <span> {{ lesson.title }}</span>
+                <span class="lesson-title"> {{ lesson.title }} </span>
               </li>
             </ul>
+
           </transition>
         </template>
       </ul>
@@ -491,10 +486,20 @@ const handleBuyNow = async() =>{
   max-height: 500px;
 }
 
+.lesson-item {
+  padding-left: 32px;
+  list-style: circle;
+  cursor: default;
+  display: flex;
+  align-items: center;
+}
 
-
-
-
+.lesson-title {
+  margin-left: 8px;
+  text-align: left;
+  flex-grow: 1;
+  /* Ensures the title takes up the available space */
+}
 
 
 .course-detail-section {

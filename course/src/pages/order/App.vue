@@ -36,8 +36,7 @@ const headerSpaceStyle = computed(() => ({
   </div>
 
   <div class="app">
-    <PCDuan v-if="width > 800" />
-    <MobileDuan v-else />
+    <PCDuan />
   </div>
 
 </template>

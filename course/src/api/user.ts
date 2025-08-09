@@ -6,7 +6,7 @@ export interface LoginByCaptchaParams {
 }
 
 export interface LoginByPasswordParams {
-  phone: string;
+  account: string;
   password: string;
 }
 
@@ -105,7 +105,7 @@ export const authApi = {
     });
   },
 
-    // 手机号+验证码登录
+  // 手机号+验证码登录
   loginTest: () => {
     return request<string>({
       method: 'POST',

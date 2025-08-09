@@ -106,7 +106,6 @@ export function useCartLogic() {
   // 跳转到结账页面
   const goToCheckout = () => {
     if (!cart.value?.cartItemList) return;
-
     const cartData = {
       courses: cart.value.cartItemList.map(course => ({
         image: course.courseImage,
@@ -120,7 +119,6 @@ export function useCartLogic() {
       saved: savedAmount.value,
       userId: cart.value.userId
     };
-
     localStorage.setItem('tempCartData', JSON.stringify(cartData));
     window.location.href = '/checkout.html';
   };
