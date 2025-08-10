@@ -61,13 +61,23 @@ onMounted(() => {
       <div class="payment-method" :class="{ active: selectedPayment === 'alipay' }"
         @click="handlePaymentChange('alipay')">
         <input type="radio" id="alipay" name="payment" value="alipay" :checked="selectedPayment === 'alipay'">
-        <label for="alipay">支付宝</label>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#27b148">
+          <use href="#bi--alipay" />
+        </svg>
+        <label for="alipay">
+
+          支付宝</label>
       </div>
 
       <div class="payment-method" :class="{ active: selectedPayment === 'wechat' }"
         @click="handlePaymentChange('wechat')">
         <input type="radio" id="wechat" name="payment" value="wechat" :checked="selectedPayment === 'wechat'">
-        <label for="wechat">微信支付</label>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#27b148">
+          <use href="#ic--baseline-wechat" />
+        </svg>
+        <label for="wechat">
+
+          微信支付</label>
       </div>
 
       <div class="order-summary">
@@ -153,17 +163,43 @@ label {
   margin-bottom: 20px;
 }
 
-.payment-method {
-  padding: 15px;
-  border: 1px solid #d1d7dc;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  cursor: pointer;
+.payment-method.active {
+  background-color: #215496;
+  color: #fff;
 }
 
-.payment-method.active {
-  border-color: #215496;
-  background-color: rgba(33, 84, 150, 0.1);
+.payment-method {
+  display: flex;
+  background: #fff;
+  color: #215496;
+  border: 1px #215496 solid;
+  font-size: 1.6rem;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  margin: 2rem;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.payment-method .icon {
+  margin-right: 15px;
+  width: 28px;
+  height: 28px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.payment-method input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.payment-method label {
+  margin-left: 1rem;
 }
 
 .order-summary {
@@ -183,15 +219,26 @@ label {
   justify-content: space-between;
   padding: 10px 0;
   border-bottom: 1px solid #e0e0e0;
+  font-size: 1.6rem;
+}
+
+.course-item img {
+  width: 200px;
+  height: 120px;
+  border-radius: 6px;
 }
 
 .title {
-  padding: 5px;
+  width: calc(100% - 260px);
+  padding-left: 1rem;
 }
 
 .price {
+  width: 60px;
   font-weight: bold;
 }
+
+
 
 .total-section {
   flex: 1;

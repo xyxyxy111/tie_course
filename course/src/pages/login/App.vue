@@ -3,7 +3,6 @@ import { RouterView, RouterLink } from 'vue-router';
 import { toRef, ref, onMounted } from 'vue';
 import { defineComponent } from 'vue';
 import PCduan from '@/pages/login/body/PCDuan.vue';
-import MobileDuan from '@/pages/login/body/MobileDuan.vue';
 import { useWindowSize } from '@/useWindowSize'
 
 const { width, height } = useWindowSize()
@@ -12,9 +11,7 @@ const { width, height } = useWindowSize()
 <!-- html -->
 <template>
   <main>
-   
       <PCduan />
-   
   </main>
 
 </template>
