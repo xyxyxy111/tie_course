@@ -115,7 +115,7 @@ export const getCurrentUsername = (): string | null => {
 };
 
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:5173/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
