@@ -327,10 +327,11 @@ export default defineComponent({
   box-shadow: 0 2px 8px rgba(33, 84, 150, 0.3);
 }
 
-/* 
 .wishlist-container {
-  padding: 30px;
-} */
+  width: 110rem;
+  min-width: 900px;
+  padding: 2rem;
+}
 
 .wishlist-header {
   position: relative;
@@ -396,7 +397,7 @@ export default defineComponent({
 .wishlist-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
+  gap: 24px;
 }
 
 

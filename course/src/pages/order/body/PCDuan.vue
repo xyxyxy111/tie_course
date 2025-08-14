@@ -34,6 +34,10 @@ import {
   testRefund,
   queryOrder,
   getStatusText,
+  qrCodeImage,
+  showWechatModal,
+  isConfirmingPayment,
+  confirmPayment
 } from '../content';
 import PCHeader from '@/components/common/PCHeader.vue'
 
@@ -49,7 +53,40 @@ onMounted(() => {
 <!-- html -->
 <template>
   <IconSprite />
-
+  <transition name="fade">
+    <div v-if="showWechatModal" class="wechat-modal-overlay" @click.self="showWechatModal = false">
+      <div class="wechat-modal">
+        <div class="modal-header">
+          <h3>微信支付</h3>
+          <button class="close-btn" @click="showWechatModal = false">
+            <SvgIcon name="close" width="20" height="20" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="qr-code-container">
+            <img :src="qrCodeImage" alt="微信支付二维码" v-if="qrCodeImage" />
+            <div v-else class="qr-loading">
+              <SvgIcon name="loading" spin width="40" height="40" />
+              <p>正在生成支付二维码...</p>
+            </div>
+          </div>
+          <div class="payment-info">
+            <p class="amount">支付金额：<span>¥{{ finalPrice.toFixed(2) }}</span></p>
+            <p class="order-id">订单号：{{ currentOrderId }}</p>
+          </div>
+          <button 
+            class="confirm-btn" 
+            @click="confirmPayment" 
+            :disabled="isConfirmingPayment"
+          >
+            <SvgIcon v-if="isConfirmingPayment" name="loading" spin width="16" height="16" />
+            {{ isConfirmingPayment ? "支付确认中..." : "已完成支付" }}
+          </button>
+          <p class="hint-text">请打开微信扫一扫完成支付</p>
+        </div>
+      </div>
+    </div>
+  </transition>
   <div class="payment-container">
 
 
@@ -61,13 +98,23 @@ onMounted(() => {
       <div class="payment-method" :class="{ active: selectedPayment === 'alipay' }"
         @click="handlePaymentChange('alipay')">
         <input type="radio" id="alipay" name="payment" value="alipay" :checked="selectedPayment === 'alipay'">
-        <label for="alipay">支付宝</label>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#27b148">
+          <use href="#bi--alipay" />
+        </svg>
+        <label for="alipay">
+
+          支付宝</label>
       </div>
 
       <div class="payment-method" :class="{ active: selectedPayment === 'wechat' }"
         @click="handlePaymentChange('wechat')">
         <input type="radio" id="wechat" name="payment" value="wechat" :checked="selectedPayment === 'wechat'">
-        <label for="wechat">微信支付</label>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#27b148">
+          <use href="#ic--baseline-wechat" />
+        </svg>
+        <label for="wechat">
+
+          微信支付</label>
       </div>
 
       <div class="order-summary">
@@ -153,17 +200,43 @@ label {
   margin-bottom: 20px;
 }
 
-.payment-method {
-  padding: 15px;
-  border: 1px solid #d1d7dc;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  cursor: pointer;
+.payment-method.active {
+  background-color: #215496;
+  color: #fff;
 }
 
-.payment-method.active {
-  border-color: #215496;
-  background-color: rgba(33, 84, 150, 0.1);
+.payment-method {
+  display: flex;
+  background: #fff;
+  color: #215496;
+  border: 1px #215496 solid;
+  font-size: 1.6rem;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  margin: 2rem;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.payment-method .icon {
+  margin-right: 15px;
+  width: 28px;
+  height: 28px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.payment-method input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.payment-method label {
+  margin-left: 1rem;
 }
 
 .order-summary {
@@ -183,15 +256,26 @@ label {
   justify-content: space-between;
   padding: 10px 0;
   border-bottom: 1px solid #e0e0e0;
+  font-size: 1.6rem;
+}
+
+.course-item img {
+  width: 200px;
+  height: 120px;
+  border-radius: 6px;
 }
 
 .title {
-  padding: 5px;
+  width: calc(100% - 260px);
+  padding-left: 1rem;
 }
 
 .price {
+  width: 60px;
   font-weight: bold;
 }
+
+
 
 .total-section {
   flex: 1;
@@ -320,4 +404,171 @@ label {
   background-color: #f7f9fa;
   border-radius: 4px;
 }
+/* 遮罩层样式 */
+.wechat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+/* 弹窗容器 */
+.wechat-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+/* 弹窗头部 */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #666;
+}
+
+/* 弹窗内容 */
+.modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+/* 二维码容器 */
+.qr-code-container {
+  margin: 0 auto 20px;
+  padding: 10px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.qr-code-container img {
+  width: 200px;
+  height: 200px;
+  display: block;
+}
+
+.qr-loading {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+}
+
+/* 支付信息 */
+.payment-info {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.amount {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.amount span {
+  font-weight: bold;
+  color: #f56c6c;
+  font-size: 20px;
+}
+
+.order-id {
+  font-size: 12px;
+  color: #999;
+  word-break: break-all;
+}
+
+/* 确认按钮 */
+.confirm-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #07c160;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.confirm-btn:hover {
+  background-color: #06ad56;
+}
+
+.confirm-btn:disabled {
+  background-color: #a0d8b3;
+  cursor: not-allowed;
+}
+
+/* 提示文字 */
+.hint-text {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #999;
+}
+
+/* 动画效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes modalFadeIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
 </style>

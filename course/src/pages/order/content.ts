@@ -1,8 +1,10 @@
 import { ref, computed } from 'vue';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { orderApi } from '@/api/order';
+import { goToCart, goToIndex } from '@/components/common/header';
 import type { OrderVO, Order } from '@/api/order';
 // 购物车数据
+
 const cartData = ref<any>(null);
 const cartCourses = ref<any[]>([]);
 const cartTotal = ref(0);
@@ -37,7 +39,10 @@ const payOrderInfo = ref<any>(null);
 const currentOrderId = ref<string | null>(null);
 
 const apiBase = 'https://itie.sumixer.com/api';
-
+const qrCodeImage = ref('');
+// 在 content.ts 的响应式变量部分添加
+const showWechatModal = ref(false);
+const isConfirmingPayment = ref(false);
 
 const initializeData = async () => {
   //用户名
@@ -253,6 +258,21 @@ const timeRangeOptions = [
 
 const loadCartData = () => {
   try {
+    // 优先读取 buyCourseNow
+    const buyNowRaw = localStorage.getItem('buyCourseNow');
+    if (buyNowRaw) {
+      const buyNow = JSON.parse(buyNowRaw);
+      cartData.value = buyNow;
+      cartCourses.value = buyNow.courses || [];
+      cartTotal.value = buyNow.total || 0;
+      cartOriginalTotal.value = buyNow.originalTotal || 0;
+      cartSaved.value = buyNow.saved || 0;
+      // 读取后清理，避免重复购买
+      localStorage.removeItem('buyCourseNow');
+      return;
+    }
+
+    // 回退读取购物车数据 tempCartData
     const storedData = localStorage.getItem('tempCartData');
     console.log(storedData)
     if (storedData) {
@@ -301,19 +321,94 @@ const applyCoupon = () => {
 // 处理支付
 const handlePayment = () => {
   console.log(`使用${selectedPayment.value === 'alipay' ? '支付宝' : '微信支付'}支付 ¥${finalPrice.value.toFixed(2)}`);
-
-  if (selectedPayment.value === 'alipay') {
-    console.log("pay")
-
-    createAliPayment();
-  }
-};
-
-async function createAliPayment() {
   payLoading.value = true;
   payStatusType.value = 'loading';
   payStatusMsg.value = '🔄 正在创建支付订单...';
   payOrderInfo.value = null;
+  if (selectedPayment.value === 'alipay') {
+    console.log("pay")
+    createAliPayment();
+  } else {
+    console.log("pay")
+    createWechatPayment();
+    console.log(showWechatModal.value);
+  }
+};
+
+async function createWechatPayment() {
+  try {
+    // 准备订单数据
+    const orderItemList = cartCourses.value.map(course => ({
+      courseId: course.courseId,
+      courseName: course.title,
+      coursePrice: course.price,
+      courseImage: course.imageUrl || "https://example.com/course.jpg"
+    }));
+
+    const orderData = {
+      userId: userId.value,
+      paymentPrice: finalPrice.value,
+      paymentType: "wechat",
+      orderItemList
+    };
+
+    payLoading.value = true;
+    payStatusMsg.value = "🔄 正在创建微信支付订单...";
+
+    // 使用API调用替代直接fetch
+    const res = await orderApi.createWechatOrder(orderData);
+
+    if (res?.status === 1202 && res?.data) {
+      currentOrderId.value = res.data.orderId;
+
+      // 处理支付链接
+      const payUrl = res.data.formHtml;
+      if (!payUrl) {
+        throw new Error("未获取到支付链接");
+      }
+
+      // 生成二维码
+      qrCodeImage.value = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payUrl)}`;
+      showWechatModal.value = true;
+      payStatusMsg.value = "✅ 请扫码完成支付";
+
+    } else {
+      throw new Error(res?.message || "创建订单失败");
+    }
+  } catch (error: any) {
+    console.error("微信支付错误:", error);
+    payStatusMsg.value = `❌ 支付失败: ${error.message}`;
+  } finally {
+    payLoading.value = false;
+  }
+}
+
+// 从 formHtml 中提取支付链接
+function extractPayUrl(formHtml: string): string | null {
+  const div = document.createElement('div');
+  div.innerHTML = formHtml;
+  const form = div.querySelector('form');
+  return form?.getAttribute('action') || null;
+}
+
+async function confirmPayment() {
+  isConfirmingPayment.value = true;
+  try {
+    // 模拟支付确认过程，实际项目中应该查询订单状态
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // 支付成功后跳转到购物车
+    goToCart();
+  } catch (error) {
+    console.error('确认支付失败:', error);
+  } finally {
+    isConfirmingPayment.value = false;
+    showWechatModal.value = false;
+  }
+}
+
+async function createAliPayment() {
+
   try {
     const orderItemList = cartCourses.value.map(course => ({
       courseId: course.courseId,
@@ -323,7 +418,7 @@ async function createAliPayment() {
       courseDiscount: course.price / course.originalPrice
     }));
     const orderData = {
-      userId: userId.value,
+      userId: 123,
       paymentPrice: finalPrice.value,
       paymentType: "alipay",
       orderItemList: orderItemList
@@ -452,8 +547,6 @@ async function testRefund() {
   }
 }
 
-
-
 async function queryOrder() {
   if (!currentOrderId.value) {
     payStatusType.value = 'error';
@@ -537,7 +630,7 @@ export {
   initializeData,
   useOrderData,
   useOrderUtils,
-
+  qrCodeImage,
   orderStatusOptions,
   timeRangeOptions,
   handlePayment,
@@ -547,5 +640,8 @@ export {
   testCancel,
   testRefund,
   queryOrder,
-  getStatusText
+  getStatusText,
+  showWechatModal,
+  isConfirmingPayment,
+  confirmPayment
 }

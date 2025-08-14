@@ -167,10 +167,6 @@
             <div class="myinfo-menu-item" @click="goTo('message')">消息</div>
           </div> -->
             <div class="myinfo-menu-group">
-              <div class="myinfo-menu-item">账户设置</div>
-              <div class="myinfo-menu-item">付款方式</div>
-              <div class="myinfo-menu-item">订阅</div>
-              <div class="myinfo-menu-item">iClass 积分</div>
               <div class="myinfo-menu-item">购买记录</div>
             </div>
             <div class="myinfo-menu-group">
@@ -533,7 +529,7 @@ const handleMyLearnPopupLeave = () => {
 
 <style>
 .header {
-  margin-bottom: 0px;
+  margin-bottom: 1rem;
   height: 7.2rem;
   width: 100vw;
 }
@@ -568,7 +564,7 @@ button .header-icon {
 
 .myinfo {
   position: relative;
-  z-index: 10;
+  z-index: 9999;
   display: inline-block;
 }
 
@@ -576,11 +572,11 @@ button .header-icon {
   position: absolute;
   top: 58px;
   right: 0px;
-  z-index: 20;
+  z-index: 9999;
   min-width: 320px;
 }
 
-.header img {
+#logo img {
   height: 40px;
 }
 

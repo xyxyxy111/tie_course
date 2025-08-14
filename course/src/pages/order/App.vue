@@ -3,7 +3,6 @@ import { RouterView, RouterLink, useRouter } from 'vue-router';
 import { toRef, ref, onMounted, computed } from 'vue';
 import { defineComponent } from 'vue';
 import PCDuan from '@/pages/order/body/PCDuan.vue';
-import MobileDuan from '@/pages/order/body/MobileDuan.vue';
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
 
@@ -36,8 +35,7 @@ const headerSpaceStyle = computed(() => ({
   </div>
 
   <div class="app">
-    <PCDuan v-if="width > 800" />
-    <MobileDuan v-else />
+    <PCDuan />
   </div>
 
 </template>

@@ -116,7 +116,8 @@ const handleGift = () => {
 
 <template>
   <IconSprite />
-  <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" />
+  <CartPopup v-model="showCart" :style="`width:${width};height:${height}`" :courseName="courseVo?.title || ''"
+    :courseId="courseVo?.courseId" />
   <MobileHeader :userId="userId" />
   <main>
     <div id="top-container">
@@ -144,14 +145,15 @@ const handleGift = () => {
           <img :src="courseVo?.coverImgUrl || '/src/images/image1.png'" alt="">
         </div>
         <span class="current-price">{{ courseVo?.currentPrice ? '¥' + courseVo.currentPrice : '¥13.99'
-          }}</span>
+        }}</span>
         <span class="original-price">{{ courseVo?.originalPrice ? '¥' + courseVo.originalPrice : '¥94.99'
-          }}</span>
+        }}</span>
         <span class="discount">85% 折扣</span>
         <div class="time-left">此优惠价格仅剩1天！</div>
         <div class="action-buttons">
           <button class="add-to-cart" @click="addToCart(courseVo?.title || '课程')">添加至购物车</button>
-          <button class="buy-now" @click="">立即购买</button>
+          <button class="buy-now"
+            @click="courseVo && goToCheckout({ courseId: courseVo.courseId, title: courseVo.title, coverImgUrl: courseVo.coverImgUrl, currentPrice: courseVo.currentPrice, originalPrice: courseVo.originalPrice })">立即购买</button>
         </div>
 
         <div class="divider"></div>
@@ -205,7 +207,7 @@ const handleGift = () => {
       </div>
       <button @click="CourseDescriptionFlag = !CourseDescriptionFlag;" class="course-descrpitionbtn">{{
         CourseDescription
-        }}</button>
+      }}</button>
 
     </div>
   </main>

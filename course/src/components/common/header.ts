@@ -35,6 +35,12 @@ export const goToCourse = (courseId: number) => {
   window.location.href = url.toString();
 };
 
+export const goToVideo = (courseId: number) => {
+  const url = new URL('/video.html', window.location.origin);
+  url.searchParams.set('courseId', courseId.toString());
+  window.location.href = url.toString();
+};
+
 export const goToLearning = () => {
   const url = new URL('/learning.html', window.location.origin);
   url.hash = '#/learning/all-courses';

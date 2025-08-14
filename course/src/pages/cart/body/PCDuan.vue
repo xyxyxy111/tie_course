@@ -11,7 +11,7 @@ import '../cart.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { cartApi } from '@/api/cart';
 import {
-goToIndex
+  goToIndex
 } from '@/components/common/header.ts';
 
 import {
@@ -200,7 +200,7 @@ const handleClearCart = async () => {
 
 
             <div class="pay-btn-group">
-              <button class="pay-btn wechat" @click="">
+              <!-- <button class="pay-btn wechat" @click="">
                 <span class="icon">
                   <svg width="29" height="28" viewBox="0 0 24 24" fill="#27b148">
                     <use href="#ic--baseline-wechat" />
@@ -220,11 +220,12 @@ const handleClearCart = async () => {
                 支付宝进行结算
                 <span class="arrow">→</span>
                 <span class="lightning"></span>
-              </button>
+              </button> -->
+
+              <button class="pay-btn" @click="goToCheckout">去结算</button>
+
             </div>
 
-            <!-- 
-              <button class="checkout-btn" @click="goToCheckout">去结算</button> -->
 
           </div>
         </div>
