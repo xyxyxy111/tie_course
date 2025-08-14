@@ -126,10 +126,12 @@ const useLoginData = () => {
         }, 1000);
       } else {
         error.value = response.message || '登录失败';
+        alert('服务器繁忙，请稍后再试');
       }
     } catch (err: any) {
       
       error.value = err.response?.data?.message || '登录失败，请检查网络连接';
+      alert('服务器繁忙，请稍后再试');
       console.error('登录失败:', err);
       loginStatus.value.loading = false;
     } finally {

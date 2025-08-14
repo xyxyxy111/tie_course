@@ -172,6 +172,21 @@ export const categoryApi = {
   },
 }
 
+export const videoApi = {
+  getLessonVideoOssSignatureUrl: (fileName: string) => {
+    return request<String>({
+      method: 'GET',
+      url: `/videos/lessons/signature-url/${fileName}`
+    });
+  },
+  // getCoverVideoOssSignatureUrl: () => {
+  //   return request<String>({
+  //     method: 'GET',
+  //     url: '/categories'
+  //   });
+  // },
+}
+
 export const courseSuccessCodes = [
   1101, // 获取标签列表成功
   1110, // 获取课程列表信息成功

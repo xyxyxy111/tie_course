@@ -2,23 +2,13 @@
   <div class="course-page">
 
     <div class="video-container">
-      <video class="video-js" id="my-video"></video>
-      <!-- <video ref="videoRef" class="video-js vjs-default-skin"></video> -->
-      <!-- <div class="video-player">
-        <div v-if="currentLesson" class="video-info">
-          <h2>{{ currentLesson.name }}</h2>
-          <p>时长: {{ currentLesson.duration }}</p>
-        </div>  
-        <div v-else class="video-placeholder">
-          <p>请从左侧选择课程</p>
-        </div>
-      </div> -->
+      <VideoPlayer />
     </div>
 
     <div class="course-sidebar">
       <div class="course-container">
         <h1 class="course-title">课程内容</h1>
-
+        
         <div class="chapter" v-for="(chapter, index) in chapters" :key="index">
           <div class="chapter-header" @click="toggleChapter(index)">
             <h2 class="chapter-title">{{ chapter.title }}</h2>
@@ -116,22 +106,18 @@ import videojs from 'video.js';
 import 'video.js/dist/video-js.min.css'
 import 'videojs-contrib-quality-levels';
 
+
+import VideoPlayer from './VideoPlayer.vue';
 export default {
   name: 'CoursePage',
   components: {
-    PCHeader
+    PCHeader,
+    VideoPlayer
   },
   setup() {
     const { width, height } = useWindowSize()
-    const playerId = "my-video"
     // 获取userId - 从token中获取而不是URL
     const userId = ref<string | null>(null)
-
-
-    const videoRef = ref<HTMLVideoElement | null>(null);
-    const url = "./test.mp4"
-    let playerInstance: ReturnType<typeof videojs> | null = null;
-    // let playerInstance: videojs.Player | null = null; // 用于存储播放器实例
     onMounted(() => {
       // 从token获取userId
       const token = getValidToken()
@@ -139,57 +125,7 @@ export default {
         userId.value = getCurrentUserId()
       }
       // 如果没有token，userId保持为null，用户仍然可以观看视频
-
-
-      const player = videojs('my-video', {
-        // 启用质量等级插件
-        plugins: {
-          qualityLevels: {},
-        },
-      });
-
-      player.src({
-        src: './test.m3u8',
-        type: 'application/x-mpegURL', // 或 'application/dash+xml'
-      });
-            // if (videoRef.value) {
-      //   playerInstance = videojs(videoRef.value, { /* options */ });
-      // }
-
-      // if (playerInstance) {
-      //   playerInstance.dispose();
-      // }
-      // const videoOptions = {
-      // language: 'zh-CN',
-      // controls: true,
-      // preload: 'auto',
-      // autoplay: true,
-      // fluid: true,
-      // src: url
-      // };
-
-      // if (videoRef.value) {
-      // const player = videojs(videoRef.value, videoOptions);
-      // // 可以在这里添加更多的播放器逻辑
-      // }
-
-      // const videoElement = document.getElementById(playerId);
-      // if (videoElement) {
-      //   playerInstance = videojs(playerId, {
-      //     autoplay: false, // 建议初始autoplay为false以避免浏览器限制
-      //     controls: true,
-      //   });
-      //   playerInstance.src(url); // 使用修正后的URL
-      //   playerInstance.on("ended", () => {
-      //     console.log("视频播放完成！");
-      //   });
-      // } else {
-      //   console.error(`未找到ID为 '${playerId}' 的视频元素！`);
-      // }
-
-
     })
-
     return {
       userId
     }
