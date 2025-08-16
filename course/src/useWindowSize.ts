@@ -1,9 +1,9 @@
 // useWindowSize.ts
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 
 export function useWindowSize() {
-  const width = ref(window.innerWidth)  // 自动推断为 Ref<number>
-  const height = ref(window.innerHeight)  // 自动推断为 Ref<number>
+  const width: Ref<number> = ref(window.innerWidth)
+  const height: Ref<number> = ref(window.innerHeight)
 
   const update = (): void => {
     width.value = window.innerWidth

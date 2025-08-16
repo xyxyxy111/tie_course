@@ -3,30 +3,57 @@ import { toRef, ref, onMounted, watch, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
-import { useFilterStore } from '../../../stores/filter'
 import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import '../search.css'
-import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { cartApi } from '@/api/cart';
 
-const searchQuery = ref('');
-const filterStore = useFilterStore()
-const showFilter = ref(true)
+// 导入共享的数据和逻辑
+import { useSearchData } from '../components/content';
+import { useFilterStore } from '../components/filterStore';
+
 const { width, height } = useWindowSize()
 
-// 获取userId - 从token中获取而不是URL
-const userId = ref<string | null>(null);
+const filterStore = useFilterStore()
 
-onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  searchQuery.value = urlParams.get('q') || '';
-  // 从token获取userId
-  const token = getValidToken();
-  if (token) {
-    userId.value = getCurrentUserId();
-  }
-  // 如果没有token，userId保持为null，用户仍然可以搜索课程
+// 使用共享的数据和逻辑
+const {
+  searchResults,
+  categories,
+  tags,
+  userId,
+  loading,
+  totalPages,
+  currentPage,
+  pageSize,
+  total,
+  searchKeyword,
+  selectedCategoryId,
+  selectedTagIds,
+  priceRange,
+  sortBy,
+  initializeData,
+  performSearch,
+  handleCategoryChange,
+  handleTagChange,
+  handlePriceRangeChange,
+  handleSortChange,
+  handlePageChange,
+  clearFilters,
+  formatPrice,
+  formatDuration
+} = useSearchData();
+
+onMounted(async () => {
+  await initializeData();
 });
+
+watch(
+  () => filterStore.selectedTag,
+  () => {
+    performSearch();
+  }
+);
 
 const SearchResultWidth = computed(() => {
   const calculatedValue = (width.value - 900);
@@ -41,43 +68,26 @@ const SearchResultCourseTitleStyle = computed(() => ({
   width: `calc( 200px + 1px * ${SearchResultWidth.value})`
 }));
 
-const courses = ref([
-  {
-    id: 1,
-    image: '/src/images/image1.png',
-    title: 'Ultimate AWS Certified Solutions Architect Associate 2025',
-    instructor: 'Shizhane Muresi',
-    price: 109.99
-  },
-  {
-    id: 2,
-    image: '/src/images/image2.png',
-    title: 'The Complete AI Guide: Learn ChatGPT, Generative AI & More',
-    instructor: 'Julian Melancon',
-    price: 79.99
+const handleCurrentChange = (page: number) => {
+  handlePageChange(page);
+};
+
+// 添加至购物车
+const addToCart = async (courseId: number) => {
+  try {
+    const response = await cartApi.addCourseToCart(courseId);
+    if (response.status === 1302) {
+      alert('添加至购物车成功！');
+    } else if (response.status === 2301) {
+      alert('该课程已在购物车中');
+    } else {
+      alert('添加至购物车失败，请重试');
+    }
+  } catch (error) {
+    console.error('添加至购物车失败:', error);
+    alert('添加至购物车失败，请重试');
   }
-])
-
-watch(
-  () => [
-    filterStore.sortBy,
-    filterStore.selectedThemes,
-    filterStore.selectedLanguage,
-    filterStore.selectedLevel,
-    filterStore.selectedPrice
-  ],
-  () => {
-    console.log('筛选条件变化:', {
-      sortBy: filterStore.sortBy,
-      themes: filterStore.selectedThemes,
-      languages: filterStore.selectedLanguage,
-      level: filterStore.selectedLevel,
-      price: filterStore.selectedPrice
-    })
-  },
-  { deep: true }
-)
-
+};
 </script>
 
 <template>
@@ -86,22 +96,28 @@ watch(
   <PCHeader :userId="userId" />
   <div class="search-result-container">
     <div class="content">
-      <Filter @close="showFilter = true" />
+      <Filter />
 
       <div class="search-result" :style="SearchResultStyle">
-        <div class="title">“{{ searchQuery }}”的1000个结果</div>
-        <div v-for="course in courses" :key="course.id" class="course-item">
-          <img :src="course.image" alt="" class="course-img">
+        <div class="title">"{{ searchKeyword }}"的{{ searchResults.length }}个结果</div>
+        <div v-for="course in searchResults" :key="course.courseId" class="course-item">
+          <img :src="course.coverImgUrl" alt="" class="course-img">
           <div>
             <div class="course-title" :style="SearchResultCourseTitleStyle">{{ course.title }}</div>
-            <div class="course-instruction">By {{ course.instructor }}</div>
+            <div class="course-instruction"> {{ course.categoryName }}</div>
           </div>
           <div class="course-price">
-            <div class="price"> ${{ course.price }}</div>
-            <button class="arrToCartBtn">Add to Cart</button>
+            <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
+            <button class="arrToCartBtn" @click="addToCart(course.courseId)">添加至购物车</button>
           </div>
-
         </div>
+
+        <div v-if="total > 0" class="pagination-container">
+          <el-pagination :current-page="currentPage" :page-size="pageSize" :total="total" layout="prev, pager, next"
+            @current-change="handleCurrentChange" />
+          <div class="page-info">共 {{ totalPages }} 页</div>
+        </div>
+        <div v-else-if="!loading" style="text-align:center;color:#888;">暂无课程</div>
       </div>
     </div>
 
@@ -137,28 +153,22 @@ watch(
 }
 
 .search-result .course-item button {
-  margin-top: 80px;
-  width: fit-content;
-  height: 42px;
-  padding: 10px;
-  border: none;
-  font-size: 20px;
-  font-weight: 700;
-  white-space: nowrap;
-  color: rgb(22, 92, 145);
-  background-color: white;
-  border-radius: 8px;
-
+  height: 40px;
 }
 
-.search-result .course-item button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+.pagination-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  padding: 20px 0;
 }
 
-.search-result .course-item .course-price {
-  width: 80px;
-  padding: 0px 5px;
-  font-size: 20px;
-  font-weight: 600;
+.page-info {
+  margin-top: 10px;
+  color: #666;
+  font-size: 1.4rem;
 }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts" setup name="App">
-import { RouterView, RouterLink } from 'vue-router';
+import { RouterView, RouterLink, useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import PCHeader from '@/components/common/PCHeader.vue'
 import MobileHeader from '@/components/common/MoblieHeader.vue'
@@ -10,6 +10,7 @@ import './myLearn.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 const { width, height } = useWindowSize()
+const route = useRoute();
 
 // 获取userId - 从token中获取而不是URL
 const userId = ref<string | null>(null);
@@ -28,28 +29,31 @@ onMounted(() => {
 <template>
   <IconSprite />
   <main>
-    <PCHeader :userId="userId" v-if="width > 800" />
-    <MobileHeader :userId="userId" v-else />
+    <div></div>
+    <PCHeader :userId="userId" />
+    <div class="container">
 
-    <div class="my-learning-container">
-      <!-- 导航栏 -->
-      <h1>我的学习</h1>
-      <nav class="learning-nav">
-        <router-link to="/learning/all-courses" class="nav-link"
-          :class="{ active: $route.path.includes('all-courses') }">
-          所有课程
-        </router-link>
-        <router-link to="/learning/my-list" class="nav-link" :class="{ active: $route.path.includes('my-list') }">
-          我的列表
-        </router-link>
-        <router-link to="/learning/wishlist" class="nav-link" :class="{ active: $route.path.includes('wishlist') }">
-          心愿单
-        </router-link>
-        <router-link to="/learning/log" class="nav-link" :class="{ active: $route.path.includes('log') }">
-          个人日志
-        </router-link>
-      </nav>
+      <div class="my-learning-container">
+        <!-- 导航栏 -->
+        <h1>我的学习</h1>
+        <nav class="learning-nav">
+          <router-link to="/learning/all-courses" class="nav-link"
+            :class="{ active: route.path.includes('all-courses') }">
+            所有课程
+          </router-link>
+          <router-link to="/learning/my-list" class="nav-link" :class="{ active: route.path.includes('my-list') }">
+            我的订单
+          </router-link>
+          <router-link to="/learning/wishlist" class="nav-link" :class="{ active: route.path.includes('wishlist') }">
+            心愿单
+          </router-link>
+          <router-link to="/learning/log" class="nav-link" :class="{ active: route.path.includes('log') }">
+            个人日志
+          </router-link>
+        </nav>
+      </div>
     </div>
+
 
     <!-- 内容区域 -->
     <div class="learning-content">
@@ -59,13 +63,30 @@ onMounted(() => {
 </template>
 
 <!-- css -->
-<style scoped>
-.my-learning-container {
-  max-width: 1200px;
-  position: relative;
-  top: -30px;
-  margin: 0 auto;
+<style>
+.header {
+  min-width: 1200px;
+}
+
+.header input {
+  min-width: 600px;
+}
+
+.container {
+  width: 100%;
+  padding-top: 20px;
   background-color: rgb(4, 35, 58);
+  min-width: 1200px;
+}
+
+@media(max-width:2000px) {}
+
+.my-learning-container {
+  width: 120rem;
+  min-width: 1000px;
+  max-width: 1400px;
+  position: relative;
+  margin: 0 auto;
   font-family: '宋体';
 }
 
@@ -73,7 +94,7 @@ onMounted(() => {
   color: white;
   padding: 30px 40px;
   font-weight: bolder;
-  font-size: 40px;
+  font-size: 4rem;
 }
 
 .learning-nav {
@@ -103,7 +124,9 @@ onMounted(() => {
 }
 
 .learning-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 110rem;
+  min-width: 1000px;
+  max-width: 1400px;
+  margin: 1rem auto;
 }
 </style>

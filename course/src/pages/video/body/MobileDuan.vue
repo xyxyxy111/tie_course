@@ -1,4 +1,5 @@
 <template>
+  <MobileHeader :userId="userId" />
   <div class="course-page">
     <!-- 左侧课程目录 -->
     <div class="course-sidebar">
@@ -6,10 +7,9 @@
         <h1 class="course-title">课程内容</h1>
 
         <div class="chapter" v-for="(chapter, index) in chapters" :key="index">
-          <div class="chapter-header" @click="toggleChapter(index)">
+          <div class="chapter-header" @click="toggleChapter(chapter.chapterSortOrder)">
             <h2 class="chapter-title">{{ chapter.title }}</h2>
-            <span class="chapter-progress">{{ chapter.completed }}/{{ chapter.lessons.length }} | {{ chapter.duration
-            }}</span>
+            <span class="chapter-progress">{{ chapter.lessonNum }}个讲座 | {{ chapter.lessonTotalMinute }}分钟</span>
             <span class="toggle-icon">{{ isChapterOpen(index) ? '−' : '+' }}</span>
           </div>
 
@@ -19,8 +19,8 @@
               <input type="checkbox" :id="`lesson-${index}-${lessonIndex}`" v-model="lesson.completed"
                 class="lesson-checkbox" @click.stop>
               <label :for="`lesson-${index}-${lessonIndex}`" class="lesson-label">
-                <span class="lesson-name">{{ lesson.name }}</span>
-                <span class="lesson-duration">{{ lesson.duration }}</span>
+                <span class="lesson-name">{{ lesson.title }}</span>
+                <span class="lesson-duration">{{ lesson.duration || '5分钟' }}</span>
               </label>
             </div>
           </div>
@@ -32,8 +32,8 @@
     <div class="video-container">
       <div class="video-player">
         <div v-if="currentLesson" class="video-info">
-          <h2>{{ currentLesson.name }}</h2>
-          <p>时长: {{ currentLesson.duration }}</p>
+          <h2>{{ currentLesson.title }}</h2>
+          <p>时长: {{ currentLesson.duration || '5分钟' }}</p>
         </div>
         <div v-else class="video-placeholder">
           <p>请从左侧选择课程</p>
@@ -44,14 +44,101 @@
 </template>
 
 <script lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useWindowSize } from '@/useWindowSize';
+import MobileHeader from '@/components/common/MoblieHeader.vue';
+import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { courseApi } from '@/api/course.ts';
+import type { Chapter, Lesson } from '@/api/course.ts';
 
 export default {
   name: 'MobileDuan',
+  components: {
+    MobileHeader
+  },
+  setup() {
+    const { width, height } = useWindowSize();
+    const userId = ref<string | null>(null);
+    const courseId = ref<number | null>(null);
+    const chapters = ref<Chapter[]>([]);
+    const currentLesson = ref<Lesson | null>(null);
+    const expandedChapters = ref<number[]>([]);
+
+    onMounted(async () => {
+      // 用户身份校验
+      const token = getValidToken();
+      if (token) {
+        userId.value = getCurrentUserId();
+      } else {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      // 获取课程ID
+      const searchParams = new URLSearchParams(window.location.search);
+      courseId.value = parseInt(searchParams.get('courseId')!);
+      if (!courseId.value) return;
+
+      // 获取章节列表
+      try {
+        const chaptersResponse = await courseApi.getChapterListById(courseId.value);
+        chapters.value = chaptersResponse.data;
+
+        // 默认展开第一章
+        if (chapters.value.length > 0) {
+          await loadChapterLessons(courseId.value, chapters.value[0].chapterSortOrder);
+          expandedChapters.value.push(chapters.value[0].chapterSortOrder);
+        }
+      } catch (error) {
+        console.error('获取章节失败:', error);
+      }
+    });
+
+    const loadChapterLessons = async (courseId: number, sortOrder: number) => {
+      const chapter = chapters.value.find(ch => ch.chapterSortOrder === sortOrder);
+      if (!chapter?.hasLoadedLessons) {
+        try {
+          const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
+          if (chapter) {
+            chapter.lessons = lessonsResponse.data;
+            chapter.hasLoadedLessons = true;
+          }
+        } catch (error) {
+          console.error('获取讲座失败:', error);
+        }
+      }
+    };
+
+    const toggleChapter = async (sortOrder: number) => {
+      const idx = expandedChapters.value.indexOf(sortOrder);
+      if (idx > -1) {
+        expandedChapters.value.splice(idx, 1);
+      } else {
+        if (courseId.value) {
+          await loadChapterLessons(courseId.value, sortOrder);
+          expandedChapters.value.push(sortOrder);
+        }
+      }
+    };
+
+    const selectLesson = (chapter: Chapter, lesson: Lesson) => {
+      currentLesson.value = lesson;
+      // 这里可以添加视频播放逻辑
+    };
+
+    return {
+      userId,
+      chapters,
+      currentLesson,
+      expandedChapters,
+      toggleChapter,
+      selectLesson
+    };
+  },
   data() {
     return {
-      currentLesson: null as any,
-      chapters: [
+      // 保留原有的静态数据作为备用
+      staticChapters: [
         {
           title: "第1节：Git Basic",
           completed: 0,
@@ -66,190 +153,15 @@ export default {
           ],
           duration: "27分钟",
           isOpen: true
-        },
-        {
-          title: "第2节：Git Local Deep Dive 基本原理详解",
-          completed: 0,
-          lessons: [
-            { name: "1. Git仓库初始化", duration: "8分钟", completed: false },
-            { name: "2. 工作区与暂存区", duration: "10分钟", completed: false },
-            { name: "3. 提交历史查看", duration: "7分钟", completed: false },
-            { name: "4. 版本回退", duration: "12分钟", completed: false },
-            { name: "5. 撤销修改", duration: "9分钟", completed: false },
-            { name: "6. 删除文件", duration: "5分钟", completed: false },
-            { name: "7. 忽略文件配置", duration: "6分钟", completed: false },
-            { name: "8. 差异比较", duration: "7分钟", completed: false },
-            { name: "9. 修改最后一次提交", duration: "4分钟", completed: false },
-            { name: "10. 重命名文件", duration: "3分钟", completed: false },
-            { name: "11. 储藏更改", duration: "8分钟", completed: false },
-            { name: "12. 标签管理", duration: "6分钟", completed: false },
-            { name: "13. 别名配置", duration: "4分钟", completed: false },
-            { name: "14. 日志美化", duration: "5分钟", completed: false },
-            { name: "15. 二分查找", duration: "7分钟", completed: false },
-            { name: "16. 子模块", duration: "10分钟", completed: false },
-            { name: "17. 大型项目优化", duration: "9分钟", completed: false },
-            { name: "18. 实战演练", duration: "10分钟", completed: false }
-          ],
-          duration: "2小时4分钟",
-          isOpen: false
-        },
-        {
-          title: "第3节：Branch分支和HEAD",
-          completed: 0,
-          lessons: [
-            { name: "1. 分支概念", duration: "6分钟", completed: false },
-            { name: "2. 创建分支", duration: "5分钟", completed: false },
-            { name: "3. 切换分支", duration: "4分钟", completed: false },
-            { name: "4. 合并分支", duration: "8分钟", completed: false },
-            { name: "5. 删除分支", duration: "3分钟", completed: false },
-            { name: "6. HEAD指针", duration: "7分钟", completed: false },
-            { name: "7. 分离HEAD状态", duration: "10分钟", completed: false },
-            { name: "8. 实战演练", duration: "12分钟", completed: false }
-          ],
-          duration: "55分钟",
-          isOpen: false
-        },
-        {
-          title: "第4节：分支合并Branch Merge",
-          completed: 0,
-          lessons: [
-            { name: "1. 快进合并", duration: "8分钟", completed: false },
-            { name: "2. 三方合并", duration: "10分钟", completed: false },
-            { name: "3. 解决冲突", duration: "12分钟", completed: false },
-            { name: "4. 合并策略", duration: "7分钟", completed: false },
-            { name: "5. 合并日志", duration: "5分钟", completed: false },
-            { name: "6. 中止合并", duration: "3分钟", completed: false },
-            { name: "7. 合并最佳实践", duration: "10分钟", completed: false },
-            { name: "8. 实战演练", duration: "10分钟", completed: false }
-          ],
-          duration: "1小时5分钟",
-          isOpen: false
-        },
-        {
-          title: "第5节：Git Remote远程仓库",
-          completed: 0,
-          lessons: [
-            { name: "1. 远程仓库概念", duration: "5分钟", completed: false },
-            { name: "2. 添加远程仓库", duration: "4分钟", completed: false },
-            { name: "3. 查看远程仓库", duration: "3分钟", completed: false },
-            { name: "4. 推送分支", duration: "8分钟", completed: false },
-            { name: "5. 拉取更新", duration: "7分钟", completed: false },
-            { name: "6. 远程分支", duration: "8分钟", completed: false },
-            { name: "7. 实战演练", duration: "6分钟", completed: false }
-          ],
-          duration: "41分钟",
-          isOpen: false
-        },
-        {
-          title: "第6节：本地仓库和远程仓库的交互",
-          completed: 0,
-          lessons: [
-            { name: "1. 克隆仓库", duration: "6分钟", completed: false },
-            { name: "2. 获取更新", duration: "7分钟", completed: false },
-            { name: "3. 拉取与合并", duration: "9分钟", completed: false },
-            { name: "4. 推送冲突解决", duration: "10分钟", completed: false },
-            { name: "5. 跟踪分支", duration: "8分钟", completed: false },
-            { name: "6. 删除远程分支", duration: "4分钟", completed: false },
-            { name: "7. 远程标签", duration: "6分钟", completed: false },
-            { name: "8. 多人协作流程", duration: "12分钟", completed: false },
-            { name: "9. 远程仓库重命名", duration: "3分钟", completed: false },
-            { name: "10. 远程仓库删除", duration: "2分钟", completed: false },
-            { name: "11. 多远程仓库管理", duration: "8分钟", completed: false },
-            { name: "12. 实战演练", duration: "15分钟", completed: false }
-          ],
-          duration: "2小时22分钟",
-          isOpen: false
-        },
-        {
-          title: "第7节：Pull Request",
-          completed: 0,
-          lessons: [
-            { name: "1. PR概念", duration: "5分钟", completed: false },
-            { name: "2. 创建PR", duration: "8分钟", completed: false },
-            { name: "3. 评审PR", duration: "7分钟", completed: false },
-            { name: "4. 解决冲突", duration: "6分钟", completed: false },
-            { name: "5. 合并PR", duration: "5分钟", completed: false },
-            { name: "6. 实战演练", duration: "4分钟", completed: false }
-          ],
-          duration: "35分钟",
-          isOpen: false
-        },
-        {
-          title: "第8节：Git SSH KEY",
-          completed: 0,
-          lessons: [
-            { name: "1. SSH原理", duration: "7分钟", completed: false },
-            { name: "2. 生成SSH Key", duration: "6分钟", completed: false },
-            { name: "3. 添加公钥到Git平台", duration: "5分钟", completed: false },
-            { name: "4. 测试连接", duration: "3分钟", completed: false },
-            { name: "5. 实战演练", duration: "4分钟", completed: false }
-          ],
-          duration: "25分钟",
-          isOpen: false
-        },
-        {
-          title: "第9节：Git标签Tag",
-          completed: 0,
-          lessons: [
-            { name: "1. 标签概念", duration: "5分钟", completed: false },
-            { name: "2. 创建标签", duration: "6分钟", completed: false },
-            { name: "3. 查看标签", duration: "4分钟", completed: false },
-            { name: "4. 删除标签", duration: "3分钟", completed: false },
-            { name: "5. 检出标签", duration: "8分钟", completed: false },
-            { name: "6. 实战演练", duration: "13分钟", completed: false }
-          ],
-          duration: "39分钟",
-          isOpen: false
-        },
-        {
-          title: "第10节：Git Hooks",
-          completed: 0,
-          lessons: [
-            { name: "1. Hooks概念", duration: "6分钟", completed: false },
-            { name: "2. 常用Hooks", duration: "8分钟", completed: false },
-            { name: "3. 自定义Hook", duration: "10分钟", completed: false },
-            { name: "4. 团队共享Hooks", duration: "7分钟", completed: false },
-            { name: "5. 实战演练", duration: "6分钟", completed: false }
-          ],
-          duration: "37分钟",
-          isOpen: false
-        },
-        {
-          title: "第11节：GitLab基础",
-          completed: 0,
-          lessons: [
-            { name: "1. GitLab介绍", duration: "5分钟", completed: false },
-            { name: "2. 创建项目", duration: "6分钟", completed: false },
-            { name: "3. 用户权限", duration: "8分钟", completed: false },
-            { name: "4. Issue跟踪", duration: "7分钟", completed: false },
-            { name: "5. CI/CD基础", duration: "10分钟", completed: false },
-            { name: "6. Wiki文档", duration: "5分钟", completed: false },
-            { name: "7. 代码审查", duration: "12分钟", completed: false },
-            { name: "8. 实战演练", duration: "8分钟", completed: false }
-          ],
-          duration: "1小时1分钟",
-          isOpen: false
         }
-      ],
-      openChapters: [0] // 默认展开第一章
-    }
+        // ... 其他章节数据
+      ]
+    };
   },
   methods: {
-    toggleChapter(index: number) {
-      const chapterIndex = this.openChapters.indexOf(index);
-      if (chapterIndex > -1) {
-        this.openChapters.splice(chapterIndex, 1);
-      } else {
-        this.openChapters.push(index);
-      }
-    },
     isChapterOpen(index: number) {
-      return this.openChapters.includes(index);
-    },
-    selectLesson(chapter: any, lesson: any) {
-      this.currentLesson = lesson;
-      // 这里可以添加视频播放逻辑
-      console.log('播放课程:', lesson.name);
+      const chapter = this.chapters[index];
+      return chapter ? this.expandedChapters.includes(chapter.chapterSortOrder) : false;
     }
   },
   watch: {
@@ -266,6 +178,8 @@ export default {
 </script>
 
 <style scoped>
+@import "@/assets/rem.css";
+
 .course-page {
   display: flex;
   height: 100vh;

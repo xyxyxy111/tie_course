@@ -1,4 +1,4 @@
-import { request } from '@/utils/request.ts';
+import { request } from '@/utils/request';
 // 登录/注册相关
 export interface LoginByCaptchaParams {
   phone: string;
@@ -6,7 +6,7 @@ export interface LoginByCaptchaParams {
 }
 
 export interface LoginByPasswordParams {
-  phone: string;
+  account: string;
   password: string;
 }
 
@@ -33,7 +33,7 @@ export interface UserProfile {
   allowSMSNotify?: boolean;
 }
 
-export interface UserBindInfo{
+interface UserBindInfo {
   phone: string;
   email: string;
   passwordSet: boolean;
@@ -45,7 +45,23 @@ export interface UploadAvatarResponse {
   avatarUrl: string;
 }
 
-//avatarUrl: string;
+export interface MyListVO {
+  id: number;
+  myCourseId: number;
+  userId: string;
+  courseId: number;
+  title: string;
+  coverImgUrl: string;
+  watchProgress: number;
+  lastViewedChapterId: number;
+  lastViewedLessonId: number;
+  lastViewedAt: number;
+  lastViewedTime: string;
+  createTime: string;
+  updateTime: string | null;
+  deleteTime: string | null;
+  unused: any;
+}
 
 export interface WishListVO {
   courseId: number;
@@ -90,6 +106,14 @@ export const authApi = {
   },
 
   // 手机号+验证码登录
+  loginTest: () => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/loginTest',
+    });
+  },
+
+  // 手机号+验证码登录
   loginByCaptcha: (data: LoginByCaptchaParams) => {
     return request<string>({
       method: 'POST',
@@ -103,15 +127,6 @@ export const authApi = {
     return request<string>({
       method: 'POST',
       url: '/auth/sessions/by-password',
-      data
-    });
-  },
-
-  // 手机号注册
-  register: (data: RegisterParams) => {
-    return request<string>({
-      method: 'POST',
-      url: '/auth/registrations',
       data
     });
   },
@@ -139,8 +154,7 @@ export const authApi = {
   getWxLoginQrcode: () => {
     return request({
       method: 'GET',
-      url: '/auth/wxLogin-qrcode',
-      responseType: 'arraybuffer'
+      url: '/auth/wxLogin-qrcode'
     });
   },
 
@@ -149,7 +163,6 @@ export const authApi = {
     return request({
       method: 'GET',
       url: '/auth/sessions/by-wx',
-      params: { state }
     });
   }
 };
@@ -200,15 +213,16 @@ export const userApi = {
 
   getBindInfo: () => {
     return request({
-      method:'GET',
-      url:'/account/user'
-    })  }
+      method: 'GET',
+      url: '/account/user'
+    })
+  }
 };
 
 export const profileApi = {
   // 获取个人资料
   getProfile: () => {
-    return request({
+    return request<UserProfile>({
       method: 'GET',
       url: '/account/profile'
     });
@@ -292,4 +306,13 @@ export const logApi = {
       method: 'DELETE'
     })
   }
+}
+
+export const myListApi = {
+  getMyList: () => {
+    return request({
+      url: '/my-courses/',
+      method: 'GET'
+    })
+  },
 }

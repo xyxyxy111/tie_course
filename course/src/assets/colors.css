@@ -1,0 +1,258 @@
+/* 颜色管理系统 */
+
+/* 主色调 - 品牌色 */
+:root {
+  /* 主色调 */
+  --primary-color: #215496;
+  --primary-color-hex: #165c91;
+  --primary-color-light: rgba(33, 84, 150, 0.1);
+  --primary-color-medium: rgba(33, 84, 150, 0.3);
+  --primary-color-dark: rgba(33, 84, 150, 0.8);
+
+  /* 主色调渐变 */
+  --primary-gradient: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
+
+  /* 辅助色 */
+  --secondary-color: #134a7a;
+  --secondary-color-light: rgba(19, 74, 122, 0.1);
+
+  /* 成功色 */
+  --success-color: #28a745;
+  --success-color-light: rgba(40, 167, 69, 0.1);
+
+  /* 警告色 */
+  --warning-color: #ffc107;
+  --warning-color-light: rgba(255, 193, 7, 0.1);
+
+  /* 错误色 */
+  --error-color: #dc3545;
+  --error-color-light: rgba(220, 53, 69, 0.1);
+  --error-color-dark: #c82333;
+  --error-gradient: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  --error-gradient-hover: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+
+  /* 信息色 */
+  --info-color: #17a2b8;
+  --info-color-light: rgba(23, 162, 184, 0.1);
+
+  /* 微信绿色 */
+  --wechat-color: #07C160;
+  --wechat-color-dark: #06AD56;
+
+  /* 文本颜色 */
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-muted: #888;
+  --text-light: #999;
+  --text-white: #fff;
+
+  /* 背景颜色 */
+  --bg-primary: #fff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f5f5f5;
+  --bg-dark: #000;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* 边框颜色 */
+  --border-primary: #e0e0e0;
+  --border-secondary: #ddd;
+  --border-light: #eee;
+  --border-dark: #ccc;
+
+  /* 阴影颜色 */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-dark: rgba(0, 0, 0, 0.2);
+
+  /* 特殊颜色 */
+  --gainsboro: gainsboro;
+  --transparent: transparent;
+}
+
+/* 颜色工具类 */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-light {
+  color: var(--text-light) !important;
+}
+
+.text-white {
+  color: var(--text-white) !important;
+}
+
+.text-success {
+  color: var(--success-color) !important;
+}
+
+.text-error {
+  color: var(--error-color) !important;
+}
+
+.text-warning {
+  color: var(--warning-color) !important;
+}
+
+.text-info {
+  color: var(--info-color) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary) !important;
+}
+
+.bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-success {
+  background-color: var(--success-color) !important;
+}
+
+.bg-error {
+  background-color: var(--error-color) !important;
+}
+
+.bg-warning {
+  background-color: var(--warning-color) !important;
+}
+
+.bg-info {
+  background-color: var(--info-color) !important;
+}
+
+.border-primary {
+  border-color: var(--primary-color) !important;
+}
+
+.border-secondary {
+  border-color: var(--border-secondary) !important;
+}
+
+.border-light {
+  border-color: var(--border-light) !important;
+}
+
+/* 渐变背景 */
+.bg-primary-gradient {
+  background: var(--primary-gradient) !important;
+}
+
+.bg-error-gradient {
+  background: var(--error-gradient) !important;
+}
+
+/* 透明度工具类 */
+.opacity-10 {
+  opacity: 0.1 !important;
+}
+
+.opacity-30 {
+  opacity: 0.3 !important;
+}
+
+.opacity-50 {
+  opacity: 0.5 !important;
+}
+
+.opacity-80 {
+  opacity: 0.8 !important;
+}
+
+/* 状态颜色 */
+.state-active {
+  color: var(--primary-color);
+}
+
+.state-hover {
+  color: var(--primary-color-dark);
+}
+
+.state-disabled {
+  color: var(--text-muted);
+}
+
+/* 按钮颜色 */
+.btn-primary {
+  background: var(--primary-gradient);
+  color: var(--text-white);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--primary-gradient-hover);
+}
+
+.btn-error {
+  background: var(--error-gradient);
+  color: var(--text-white);
+  border: none;
+}
+
+.btn-error:hover {
+  background: var(--error-gradient-hover);
+}
+
+.btn-outline-primary {
+  background: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-color-light);
+}
+
+/* 链接颜色 */
+a {
+  color: var(--primary-color);
+}
+
+a:hover {
+  color: var(--secondary-color);
+}
+
+/* 输入框焦点颜色 */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-light);
+}
+
+/* 选中文本颜色 */
+::selection {
+  background-color: var(--primary-color-light);
+  color: var(--primary-color);
+}
+
+/* 滚动条颜色 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f9f9f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}

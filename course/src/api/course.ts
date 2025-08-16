@@ -131,6 +131,24 @@ export const courseApi = {
       url: `/courses/${courseId}/lessons/${sortOrder}`
     });
   },
+
+  getHottestCourse: () => {
+    return request<CourseListVO[]>({
+      method: 'GET',
+      url: 'courses/hottest'
+    })
+  },
+
+  getCourseTogetherBuy: (tagId: string, courseId: string) => {
+    return request<CourseListVO>({
+      method: 'GET',
+      url: '/courses/togetherBuy',
+      params: {
+        tagId: tagId,
+        courseId: courseId
+      }
+    })
+  }
 };
 
 export const categoryApi = {
@@ -154,6 +172,21 @@ export const categoryApi = {
   },
 }
 
+export const videoApi = {
+  getLessonVideoOssSignatureUrl: (fileName: string) => {
+    return request<String>({
+      method: 'GET',
+      url: `/videos/lessons/signature-url/${fileName}`
+    });
+  },
+  // getCoverVideoOssSignatureUrl: () => {
+  //   return request<String>({
+  //     method: 'GET',
+  //     url: '/categories'
+  //   });
+  // },
+}
+
 export const courseSuccessCodes = [
   1101, // 获取标签列表成功
   1110, // 获取课程列表信息成功
@@ -165,3 +198,27 @@ export const courseSuccessCodes = [
 export const categorySuccessCodes = [
   1100, // 获取分类列表成功
 ];
+
+export const searchCourseByMessage = (pageNum: number, pageSize: number, courseMessage?: string) => {
+  return request({
+    method: 'GET',
+    url: '/courses/search',
+    params: {
+      pageNum,
+      pageSize,
+      courseMessage
+    }
+  });
+};
+
+// 最新课程
+export const searchLatestCourse = (pageNum: number, pageSize: number) => {
+  return request({
+    method: 'GET',
+    url: '/courses/latest',
+    params: {
+      pageNum,
+      pageSize
+    }
+  });
+};

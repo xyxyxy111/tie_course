@@ -163,14 +163,14 @@ export default defineComponent({
 .privacy-container h1 {
   margin-bottom: 10px;
   color: #333;
-  font-size: 24px;
+  font-size: 2.2rem;
   text-align: center;
 }
 
 .privacy-note {
   text-align: center;
   color: #666;
-  font-size: 14px;
+  font-size: 1.4rem;
   margin-bottom: 30px;
   font-style: italic;
 }
@@ -191,13 +191,13 @@ export default defineComponent({
 }
 
 .privacy-option:hover {
-  border-color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.05);
+  border-color: #215496;
+  background-color: rgba(33, 84, 150, 0.05);
 }
 
 .option-text {
   margin-left: 10px;
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #333;
   flex: 1;
 }
@@ -217,8 +217,8 @@ export default defineComponent({
 }
 
 .privacy-checkbox[type="checkbox"]:checked {
-  background-color: rgb(22, 92, 145);
-  border-color: rgb(22, 92, 145);
+  background-color: #215496;
+  border-color: #215496;
   position: relative;
 }
 
@@ -229,12 +229,12 @@ export default defineComponent({
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: bold;
 }
 
 .privacy-checkbox[type="checkbox"]:focus {
-  box-shadow: 0 0 0 2px rgba(22, 92, 145, 0.2);
+  box-shadow: 0 0 0 2px rgba(33, 84, 150, 0.2);
 }
 
 button {
@@ -242,22 +242,22 @@ button {
   width: 100%;
   max-width: 200px;
   margin: 0 auto;
-  background-color: rgb(22, 92, 145);
+  background-color: #215496;
   color: white;
   border: none;
   padding: 12px 20px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  border: 2px solid rgb(22, 92, 145);
+  border: 2px solid #215496;
 }
 
 button:hover:not(:disabled) {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 8px rgba(33, 84, 150, 0.3);
 }
 
 button:disabled {
@@ -270,6 +270,6 @@ button:disabled {
 
 button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 2px 4px rgba(33, 84, 150, 0.3);
 }
 </style>

@@ -1,4 +1,3 @@
-// src/api-call-examples.ts
 import {
   authApi,
   userApi,
@@ -9,139 +8,315 @@ import type {
   LoginByPasswordParams,
   RegisterParams,
   UserProfile,
-  ChangePhoneParams,
-  ChangePasswordParams
 } from '@/api/user';
+import { ref, reactive } from 'vue';
+import { getValidToken } from '@/utils/request';
+import { successCodes } from '@/utils/request';
+import type { RefSymbol } from '@vue/reactivity';
+const loading = ref(false);
+const error = ref<string | null>(null);
+const success = ref<string | null>(null);
+const loginForm = reactive({
+  phone: '',
+  email: '',
+  password: '',
+  captcha: '',
+  rememberMe: false
+});
 
-// 1. 发送验证码
-const handleSendCaptcha = async () => {
-  try {
-    const response = await authApi.sendCaptcha('13800138000');
-    console.log('验证码发送成功', response.data);
-  } catch (error) {
-    console.error('发送验证码失败:', error);
-  }
-};
+const loginStatus = ref<{
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+}>({
+  loading: false,
+  error: null,
+  success: false
+});
 
-// 2. 手机号+验证码登录
-const handleLoginByCaptcha = async () => {
-  const params: LoginByCaptchaParams = {
-    phone: '13800138000',
-    captcha: '123456'
+const captchaBtn = ref({
+  text: '发送验证码',
+  disabled: false,
+  countdown: 60
+});
+
+const loginMethod = ref("captcha");
+
+interface wxQrCode {
+  state: string;
+  qrCodeUrl: string;
+}
+const qrCodeUrl = ref('')
+const state = ref('')
+
+const useLoginData = () => {
+  const validatePhone = (phone: string) => /^1[3-9]\d{9}$/.test(phone);
+  const validateCaptcha = (captcha: string) => /^\d{6}$/.test(captcha);
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password: string) => password.length >= 6;
+
+  const handleLogin = async () => {
+    loginStatus.value.error = null;
+    loginStatus.value.success = false;
+    // 前端校验
+    if (loginMethod.value === 'captcha') {
+      if (!validatePhone(loginForm.phone)) {
+        loginStatus.value.error = '请输入正确的手机号！';
+        return;
+      }
+      if (!validateCaptcha(loginForm.captcha)) {
+        loginStatus.value.error = '请输入正确的验证码！';
+        return;
+      }
+    } else if (loginMethod.value === 'password') {
+      if (!validatePhone(loginForm.phone)) {
+        loginStatus.value.error = '请输入正确的手机号！';
+        return;
+      }
+      if (!validatePassword(loginForm.password)) {
+        loginStatus.value.error = '请输入正确的密码！';
+        return;
+      }
+    } else if (loginMethod.value === 'email') {
+      if (!validateEmail(loginForm.phone)) {
+        loginStatus.value.error = '请输入正确的电子邮箱！';
+        return;
+      }
+      if (!validatePassword(loginForm.email)) {
+        loginStatus.value.error = '请输入正确的密码！';
+        return;
+      }
+    }
+    // 校验通过，开始登录
+    loginStatus.value.loading = true;
+    if (loginMethod.value === 'captcha') {
+      await handleCaptchaLogin();
+    } else if (loginMethod.value === 'password') {
+      await handlePasswordLogin();
+    } else if (loginMethod.value === 'email') {
+      // 邮箱登录逻辑（如有）
+    } else if (loginMethod.value === 'wechat') {
+      await getWxLoginStatus();
+    }
+  };
+  //验证码登录
+  const handleCaptchaLogin = async () => {
+    if (!loginForm.phone || !loginForm.captcha) {
+      error.value = '请填写电话号码和验证码';
+      return;
+    }
+    loading.value = true;
+    error.value = null;
+    success.value = null;
+    try {
+      // const response = await authApi.loginByCaptcha({
+      //   phone: loginForm.phone,
+      //   captcha: loginForm.captcha
+      // });
+      const response = await authApi.loginTest();//后门登陆 数据库要有电话为17727096201的user
+      if (response.data) {
+        localStorage.setItem('token', response.data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } else {
+        error.value = response.message || '登录失败';
+        alert('服务器繁忙，请稍后再试');
+      }
+    } catch (err: any) {
+
+      error.value = err.response?.data?.message || '登录失败，请检查网络连接';
+      alert('服务器繁忙，请稍后再试');
+      console.error('登录失败:', err);
+      loginStatus.value.loading = false;
+    } finally {
+      loading.value = false;
+      loginStatus.value.loading = false;
+    }
   };
 
-  try {
-    const response = await authApi.loginByCaptcha(params);
-    const token = response.data;
-    localStorage.setItem('token', token);
-    console.log('登录成功，token已保存');
-  } catch (error) {
-    console.error('登录失败:', error);
-  }
-};
-
-// 3. 手机号+密码登录
-const handleLoginByPassword = async () => {
-  const params: LoginByPasswordParams = {
-    phone: '13800138000',
-    password: 'yourPassword123'
+  // 密码登录
+  const handlePasswordLogin = async () => {
+    console.log(loginForm.phone, loginForm.password)
+    if (!loginForm.phone || !loginForm.password) {
+      error.value = '请填写电话号码和密码';
+      return;
+    }
+    loading.value = true;
+    error.value = null;
+    success.value = null;
+    try {
+      const response = await authApi.loginByPassword({
+        account: loginForm.phone,
+        password: loginForm.password
+      });
+      if (response.data) {
+        localStorage.setItem('token', response.data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } else {
+        error.value = response.message || '登录失败';
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '登录失败，请检查网络连接';
+      console.error('登录失败:', err);
+      loginStatus.value.loading = false;
+    } finally {
+      loading.value = false;
+    }
   };
 
-  try {
-    const response = await authApi.loginByPassword(params);
-    const token = response.data;
-    localStorage.setItem('token', token);
-    console.log('登录成功，token已保存');
-  } catch (error) {
-    console.error('登录失败:', error);
-  }
-};
-
-// 4. 手机号注册
-const handleRegister = async () => {
-  const params: RegisterParams = {
-    phone: '13800138000',
-    captcha: '123456'
+  // 微信登录
+  const handleWechatLogin = async () => {
+    try {
+      const res = await authApi.getWxLoginQrcode();
+      const data = res.data as wxQrCode;
+      if (res.data) {
+        qrCodeUrl.value = data.qrCodeUrl;
+        state.value = data.state;
+      }
+    } catch (err) {
+      console.error('获取微信登录二维码失败:', err);
+      error.value = '获取微信登录二维码失败';
+    }
   };
 
-  try {
-    const response = await authApi.register(params);
-    const token = response.data;
-    localStorage.setItem('token', token);
-    console.log('注册成功，token已保存');
-  } catch (error) {
-    console.error('注册失败:', error);
-  }
-};
+  const getWxLoginStatus = async () => {
+    try {
+      const res = await authApi.getWxLoginStatus(state.value);
 
-// 5. 检查手机号是否注册
-const checkPhoneAvailability = async () => {
-  try {
-    const response = await authApi.checkPhoneAvailable('13800138000');
-    console.log(response.data.exist ? '手机号已注册' : '手机号可用');
-  } catch (error) {
-    console.error('检查失败:', error);
+      const data = res.data as string;
+      if (res.data) {
+        localStorage.setItem('token', data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      }
+    } catch (err) {
+      console.error('获取微信登录二维码失败:', err);
+      error.value = '获取微信登录二维码失败';
+    }
   }
-};
 
-// 6. 修改手机号
-const handleChangePhone = async () => {
-  const params: ChangePhoneParams = {
-    phone: '13800138000',
-    newPhone: '13900139000',
-    captcha: '654321'
+  // 检查是否已登录
+  const isLoggedIn = () => {
+    const token = getValidToken();
+    return !!token;
   };
 
+  // 如果已登录，跳转到首页
+  const redirectIfLoggedIn = () => {
+    if (isLoggedIn()) {
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+      window.location.href = redirectUrl;
+    }
+  };
+
+  return {
+    loading,
+    error,
+    success,
+    loginForm,
+    handleLogin,
+    handleCaptchaLogin,
+    handlePasswordLogin,
+    handleWechatLogin,
+    getWxLoginStatus,
+    isLoggedIn,
+    redirectIfLoggedIn
+  };
+};
+const sendCaptcha = async () => {
+  if (!loginForm.phone) {
+    alert('请输入手机号');
+    return;
+  }
   try {
-    await userApi.changePhone(params);
-    console.log('手机号修改成功');
-  } catch (error) {
-    console.error('修改失败:', error);
+    captchaBtn.value.disabled = true;
+    const response = await authApi.sendCaptcha(loginForm.phone);
+    if (successCodes.includes(response.status)) {
+      const timer = setInterval(() => {
+        captchaBtn.value.countdown--;
+        captchaBtn.value.text = `${captchaBtn.value.countdown}s后重新获取`;
+        if (captchaBtn.value.countdown <= 0) {
+          clearInterval(timer);
+          captchaBtn.value = {
+            text: '发送验证码',
+            disabled: false,
+            countdown: 60
+          };
+        }
+      }, 1000);
+    } else {
+      alert(response.message || '发送验证码失败');
+      captchaBtn.value.disabled = false;
+    }
+  } catch (error: any) {
+    captchaBtn.value.disabled = false;
+    alert(error.message || '发送验证码失败，请重试');
   }
 };
 
-// 7. 修改密码
-const handleChangePassword = async () => {
-  // const params: ChangePasswordParams = {
-  //   oldPassword: 'oldPassword123',
-  //   newPassword: 'newPassword456'
-  // };
+const useFormValidation = () => {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-  // try {
-  //   await userApi.changePassword(params);
-  //   console.log('密码修改成功');
-  // } catch (error) {
-  //   console.error('修改失败:', error);
-  // }
+  const validatePassword = (password: string) => {
+    return password.length >= 6;
+  };
+
+  const validateUsername = (username: string) => {
+    return username.length >= 2 && username.length <= 20;
+  };
+
+  return {
+    validateEmail,
+    validatePassword,
+    validateUsername
+  };
 };
 
-// 8. 获取个人资料
-const fetchProfile = async () => {
-  try {
-    const response = await profileApi.getProfile();
-    console.log('个人资料:', response.data);
-  } catch (error) {
-    console.error('获取资料失败:', error);
+const switchLoginMethod = (i: number) => {
+  if (i === 0) {
+    loginMethod.value = 'captcha'
+  } else if (i === 1) {
+    loginMethod.value = 'password'
+  } else if (i === 2) {
+    loginMethod.value = 'email'
+  } else {
+    loginMethod.value = 'wechat'
   }
+  loginForm.email = '';
+  loginForm.password = '';
+  loginForm.captcha = '';
+  captchaBtn.value = {
+    text: '发送验证码',
+    disabled: false,
+    countdown: 60
+  };
 };
-
-// 9. 更新个人资料
-const updateUserProfile = async () => {
-  // const params: UserProfile = {
-  //   username: 'newUsername',
-  //   avatarUrl: 'https://example.com/avatar.jpg',
-  //   allowEmailNotify: true
-  // };
-
-  // try {
-  //   await profileApi.updateProfile(params);
-  //   console.log('资料更新成功');
-  // } catch (error) {
-  //   console.error('更新失败:', error);
-  // }
-};
-
 
 export {
-  authApi, userApi, profileApi
+  loginMethod, loginForm,
+  captchaBtn, loginStatus,
+  switchLoginMethod, qrCodeUrl, state,
+  useFormValidation, useLoginData, sendCaptcha
 }

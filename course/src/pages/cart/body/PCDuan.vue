@@ -3,14 +3,47 @@ import { ref, computed, onMounted } from 'vue'
 import { useWindowSize } from '@/useWindowSize';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import PCHeader from '@/components/common/PCHeader.vue';
-import { useCartLogic } from '../components/content';
+
+// 导入共享的数据和逻辑
+import { useCartLogic, useCartUtils } from '../components/content';
 import { wishlistApi } from '@/api/user';
 import '../cart.css';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { cartApi } from '@/api/cart';
+import {
+  goToIndex
+} from '@/components/common/header.ts';
 
+import {
+  createAliPayment,
+} from '@/pages/order/content';
 const { width, height } = useWindowSize();
-const { cart, totalPrice, goToCheckout, loading, error, removeCourseFromCart } = useCartLogic();
+
+// 使用共享的数据和逻辑
+const {
+  cart,
+  userId,
+  loading,
+  error,
+  totalPrice,
+  totalOriginalPrice,
+  savedAmount,
+  fetchCart,
+  addCourseToCart,
+  removeCourseFromCart,
+  clearCart,
+  goToCheckout
+} = useCartLogic();
+
+const {
+  formatPrice,
+  formatDiscount,
+  formatTime,
+  isCartEmpty,
+  getCartItemCount,
+  isUserLoggedIn,
+  goToLogin
+} = useCartUtils();
 
 const headerSpaceWidth = computed(() => Math.max(0, (width.value - 1200) / 2000));
 const headerSpaceStyle = computed(() => ({
@@ -21,9 +54,6 @@ const CourseInstructorStyle = () => ({});
 const CourseTitleStyle = () => ({});
 const CourseIncartStyle = () => ({});
 
-// 获取userId
-const userId = ref<string | null>(null);
-
 onMounted(() => {
   // 从token获取userId
   const token = getValidToken();
@@ -31,7 +61,6 @@ onMounted(() => {
     userId.value = getCurrentUserId();
   }
 });
-
 
 // 加入心愿单
 const addToWishlist = async (courseId: number) => {
@@ -72,16 +101,14 @@ const removeFromCart = async (courseId: number) => {
 
 // 清空购物车
 const clearing = ref(false);
-const clearCart = async () => {
+const handleClearCart = async () => {
   if (clearing.value) return;
-  if (!cart.value || !cart.value.cartItemList || cart.value.cartItemList.length === 0) return;
+  if (isCartEmpty(cart.value)) return;
   if (!confirm('确定要清空购物车吗？')) return;
   clearing.value = true;
   try {
-    await cartApi.clearCart();
+    await clearCart();
     alert('购物车已清空');
-    // 重新加载购物车数据
-    window.location.reload();
   } catch (error) {
     alert('清空购物车失败，请重试');
   } finally {
@@ -92,543 +119,122 @@ const clearCart = async () => {
 
 <template>
   <IconSprite />
-  <PCHeader :userId="userId" />
+  <PCHeader />
   <div class="cart-container">
-    <div class="content" :style="headerSpaceStyle">
-      <!-- 加载状态 -->
-      <div v-if="loading" class="loading">
-        <div class="loading-spinner"></div>
-        <p>加载中...</p>
+
+    <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
+    </div>
+
+    <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
+      <div class="empty-icon">🛒</div>
+      <h2>购物车为空</h2>
+      <p>您还没有添加任何课程到购物车</p>
+      <div @click="goToIndex()">
+        <a href="#">挑选你喜欢的课程</a>
       </div>
-
-      <!-- 空购物车状态 -->
-      <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
-        <div class="empty-icon">🛒</div>
-        <h2>购物车为空</h2>
-        <p>您还没有添加任何课程到购物车</p>
+    </div>
+    <div v-else class="cart-layout">
+      <div class="cart-title">
+        <h1>购物车</h1>
       </div>
+      <div class="cart-main-content">
 
-      <!-- 购物车内容 -->
-      <div v-else class="cart-layout">
-        <div class="cart-title">
-          <h1>购物车</h1>
+        <div class="cart-items-section">
+          <div class="cart-count">购物车中有{{ cart?.cartItemList?.length || 0 }}门课程</div>
 
+          <div class="cart-items">
+            <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
+              <img :src="item.courseImage" :alt="item.courseName" class="course-image">
+              <div class="course-info">
+                <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
+                <p class="course-instructor" :style="CourseInstructorStyle()">iClass</p>
+
+                <div class="course-rating">
+                  <span class="course-score">4.9</span>
+                  <span class="course-stars">
+                    <span v-for="i in 5" :key="i" class="star filled">★</span>
+                  </span>
+                  <span class="course-count">(1,025)</span>
+                </div>
+
+                <div class="course-tag">热门课程</div>
+              </div>
+              <div class="course-actions">
+                <button @click="addToWishlist(item.courseId)">
+                  移至心愿单
+                </button>
+                <button @click="removeFromCart(item.courseId)">删除</button>
+                <button>保存以供之后购买</button>
+              </div>
+              <div class="course-price">¥{{ item.currentPrice.toFixed(2) }}</div>
+
+            </div>
+          </div>
+          <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
+            v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
+            {{ clearing ? '清空中...' : '清空' }}
+          </button>
         </div>
 
-        <div class="cart-main-content">
-          <div class="cart-items-section" style="position:relative;">
-            <div class="cart-items">
-              <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
-                <img :src="item.courseImage" :alt="item.courseName" class="course-image">
-                <div class="course-info">
-                  <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
-                  <p class="course-instructor" :style="CourseInstructorStyle()">讲师信息</p>
-                  <div class="course-price">US${{ item.currentPrice.toFixed(2) }}</div>
-                </div>
-                <div class="course-actions">
-                  <button class="wishlist-btn" @click="addToWishlist(item.courseId)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path
-                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
-                  </button>
-                  <button class="remove-btn" @click="removeFromCart(item.courseId)">删除</button>
-                </div>
-              </div>
+        <div class="checkout-section">
+          <div class="checkout-summary">
+            <div>总计:</div>
+            <div class="summary-item total-row">
+
+              <div class="total-price">¥{{ totalPrice.toFixed(2) }}</div>
             </div>
-            <button class="clear-cart-btn" @click="clearCart" :disabled="clearing || loading"
-              v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
-              {{ clearing ? '清空中...' : '清空' }}
-            </button>
-          </div>
+            <div class="summary-item">
+              <span>课程数量:</span>
+              <span>{{ cart.cartItemList.length }} 门课程</span>
+            </div>
+            <div class="summary-item" v-if="savedAmount > 0">
+              <span>原价:</span>
+              <span class="original-price">¥{{ totalOriginalPrice.toFixed(2) }}</span>
+            </div>
+            <div class="summary-item" v-if="savedAmount > 0">
+              <span>节省:</span>
+              <span class="saved-amount">-¥{{ savedAmount.toFixed(2) }}</span>
+            </div>
 
-          <div class="checkout-section">
-            <div class="checkout-summary">
 
-              <div class="summary-item">
-                <span>课程数量:</span>
-                <span>{{ cart.cartItemList.length }} 门课程</span>
-              </div>
-              <div class="summary-item">
-                <span>小计:</span>
-                <span class="subtotal">US${{ totalPrice.toFixed(2) }}</span>
-              </div>
-              <div class="summary-item total-row">
-                <span>总计:</span>
-                <span class="total-price">US${{ totalPrice.toFixed(2) }}</span>
-              </div>
-              <button class="checkout-btn" @click="goToCheckout">去结算</button>
+            <div class="pay-btn-group">
+              <!-- <button class="pay-btn wechat" @click="">
+                <span class="icon">
+                  <svg width="29" height="28" viewBox="0 0 24 24" fill="#27b148">
+                    <use href="#ic--baseline-wechat" />
+                  </svg>
+                </span>
+                微信进行结算
+                <span class="arrow">→</span>
+                <span class="lightning"></span>
+              </button>
+              <div class="pay-divider"><span></span>或<span></span></div>
+              <button class="pay-btn alipay" @click="">
+                <span class="icon">
+                  <svg width="26" height="28" viewBox="0 0 24 24" fill="#27b148">
+                    <use href="#bi--alipay" />
+                  </svg>
+                </span>
+                支付宝进行结算
+                <span class="arrow">→</span>
+                <span class="lightning"></span>
+              </button> -->
+
+              <button class="pay-btn" @click="goToCheckout">去结算</button>
 
             </div>
+
+
           </div>
         </div>
       </div>
     </div>
   </div>
+
 </template>
 
 <style scoped>
-.cart-container {
-  min-height: 100vh;
-  padding: 20px 0;
-}
-
-.content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.cart-title h1 {
-  font-size: 3rem;
-  color: #333;
-  margin: 20px;
-}
-
-.cart-items {
-  padding: 20px;
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.cart-item:last-child {
-  border-bottom: none;
-}
-
-.course-image {
-  width: 180px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-right: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.course-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.course-title {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  font-weight: 600;
-}
-
-.course-instructor {
-  color: #666;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-}
-
-.course-price {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #165c91;
-}
-
-.course-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-start;
-  margin-left: 20px;
-}
-
-.wishlist-btn,
-.remove-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  border-radius: 60px;
-  cursor: pointer;
-  font-size: 1rem;
-  color: #666;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  width: 50px;
-}
-
-.wishlist-btn {
-  background-color: none;
-  color: rgb(22, 92, 145);
-}
-
-.wishlist-btn:hover {
-  color: red;
-}
-
-.wishlist-btn svg {
-  width: 24px;
-  height: 24px;
-  transition: transform 0.3s ease;
-}
-
-.wishlist-btn:hover svg {
-  transform: scale(1.1);
-}
-
-.remove-btn {
-  background-color: rgb(22, 92, 145);
-  color: white;
-  font-size: 1.2rem;
-  white-space: nowrap;
-}
-
-.remove-btn:hover {
-  transform: translateY(-2px);
-  font-size: 1.3rem;
-  background-color: white;
-  color: rgb(22, 92, 145);
-}
-
-.remove-btn:active {
-  transform: translateY(0);
-}
-
-.cart-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.cart-main-content {
-  display: flex;
-  gap: 20px;
-  min-height: 500px;
-}
-
-.cart-items-section {
-  flex: 0 0 70%;
-  padding-bottom: 60px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.checkout-section {
-  flex: 0 0 30%;
-  position: sticky;
-  top: 20px;
-  height: fit-content;
-}
-
-.checkout-summary {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e1e1e1;
-}
-
-.checkout-summary h3 {
-  font-size: 1.4rem;
-  color: #333;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.summary-item:last-of-type {
-  border-bottom: none;
-}
-
-.summary-item span {
-  font-size: 1rem;
-  color: #666;
-}
-
-.summary-item .subtotal {
-  font-weight: 600;
-  color: #333;
-}
-
-.summary-item.total-row {
-  border-top: 2px solid #eee;
-  border-bottom: none;
-  margin-top: 10px;
-  padding-top: 15px;
-}
-
-.summary-item.total-row span {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #333;
-}
-
-.total-price {
-  font-weight: bold;
-  color: #165c91;
-  font-size: 1.4rem;
-}
-
-.checkout-btn {
-  width: 100%;
-  background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 20px;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
-}
-
-.checkout-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
-  background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
-}
-
-.checkout-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(22, 92, 145, 0.3);
-}
-
-/* 加载状态样式 */
-.loading {
-  text-align: center;
-  padding: 60px;
-  color: #666;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #165c91;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* 错误状态样式 */
-.error {
-  text-align: center;
-  padding: 40px;
-  color: #dc3545;
-}
-
-.error button {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.error button:hover {
-  background: #c82333;
-}
-
-/* 空购物车样式 */
-.empty-cart {
-  text-align: center;
-  padding: 80px 20px;
-  color: #666;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-}
-
-.empty-cart h2 {
-  margin-bottom: 10px;
-  color: #333;
-  font-size: 24px;
-}
-
-.empty-cart p {
-  margin-bottom: 30px;
-  font-size: 16px;
-}
-
-.browse-btn {
-  background: linear-gradient(135deg, #165c91 0%, #134a7a 100%);
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
-}
-
-.browse-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
-  background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
-}
-
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .cart-main-content {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .cart-items-section {
-    flex: none;
-    width: 100%;
-  }
-
-  .checkout-section {
-    flex: none;
-    width: 100%;
-    position: static;
-  }
-
-  .content {
-    max-width: 100%;
-    padding: 0 15px;
-  }
-}
-
-@media (max-width: 768px) {
-  .cart-container {
-    padding: 10px 0;
-  }
-
-  .cart-main-content {
-    gap: 15px;
-  }
-
-  .cart-items-section {
-    border-radius: 6px;
-  }
-
-  .checkout-summary {
-    padding: 20px;
-  }
-
-  .summary-item {
-    padding: 10px 0;
-  }
-
-  .course-image {
-    width: 100px;
-    height: 70px;
-  }
-
-  .course-title {
-    font-size: 1.1rem;
-  }
-
-  .course-actions {
-    gap: 6px;
-  }
-
-  .wishlist-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    width: 70px;
-  }
-
-  .remove-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    width: 70px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .course-image {
-    width: 100%;
-    height: 120px;
-    margin-right: 0;
-  }
-
-  .course-actions {
-    align-self: flex-end;
-    margin-left: 0;
-    gap: 6px;
-    flex-direction: column;
-  }
-
-  .wishlist-btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    width: 60px;
-  }
-
-  .remove-btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    width: 60px;
-  }
-}
-
-.clear-cart-btn {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  margin: 0;
-  width: fit-content;
-  white-space: nowrap;
-  padding: 8px 18px;
-  background: #fff;
-  color: #dc3545;
-  border: none ;
-  height: 30px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.clear-cart-btn:hover:not(:disabled) {
-  background: #dc35467d;
-  color: #fff;
-}
-
-.clear-cart-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+@import "/src/assets/rem.css";
 </style>

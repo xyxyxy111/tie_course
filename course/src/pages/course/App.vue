@@ -3,7 +3,6 @@ import { RouterView, RouterLink} from 'vue-router';
 import { toRef,ref,onMounted } from 'vue';
 import { defineComponent } from 'vue'
 import PCduan from './body/PCDuan.vue';
-import MobileDuan from './body/MobileDuan.vue';
 import { useWindowSize } from '@/useWindowSize'
 
 const { width, height } = useWindowSize()
@@ -12,16 +11,7 @@ const { width, height } = useWindowSize()
 <!-- html -->
 <template>
 <main>
-
-<div v-if="width>1000" class="app">
-  <!-- PC -->
  <PCduan/>
-  </div>
-
-<div v-if="width<=1000" class="app">
-<!-- phone -->
- <MobileDuan />
-</div>
 </main>
  
 </template>

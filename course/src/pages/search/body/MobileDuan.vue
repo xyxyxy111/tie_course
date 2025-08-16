@@ -4,45 +4,55 @@ import { toRef, ref, onMounted, watch, defineComponent, computed } from 'vue';
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
 import Filter from '../components/Filter.vue';
-import { useFilterStore } from '../../../stores/filter'
+import { useFilterStore } from '../components/filterStore'
 import MobileHeader from '@/components/common/MoblieHeader.vue';
 import '../search.css'
 import { useWindowSize } from '@/useWindowSize';
-import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { cartApi } from '@/api/cart';
+import { useSearchData, searchSortOptions, priceRanges } from '../components/content';
+
 const filterStore = useFilterStore()
-const showFilter = ref(true)
-const searchQuery = ref('')
+const showFilter = ref(false)
 const { width, height } = useWindowSize()
 
-// 获取userId - 从token中获取而不是URL
-const userId = ref<string | null>(null);
+const {
+  searchResults,
+  categories,
+  tags,
+  userId,
+  loading,
+  totalPages,
+  currentPage,
+  pageSize,
+  total,
+  searchKeyword,
+  selectedCategoryId,
+  selectedTagIds,
+  priceRange,
+  sortBy,
+  initializeData,
+  performSearch,
+  handleCategoryChange,
+  handleTagChange,
+  handlePriceRangeChange,
+  handleSortChange,
+  handlePageChange,
+  clearFilters,
+  formatPrice,
+  formatDuration
+} = useSearchData();
 
-const courses = ref([
-  {
-    id: 1,
-    image: '/src/images/image1.png',
-    title: 'Ultimate AWS Certified Solutions Architect Associate 2025',
-    instructor: 'Shizhane Muresi',
-    price: 109.99
-  },
-  {
-    id: 2,
-    image: '/src/images/image2.png',
-    title: 'The Complete AI Guide: Learn ChatGPT, Generative AI & More',
-    instructor: 'Julian Melancon',
-    price: 79.99
+onMounted(async () => {
+  await initializeData();
+});
+
+watch(
+  () => filterStore.selectedTag,
+  () => {
+    performSearch();
   }
-])
-onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  searchQuery.value = urlParams.get('q') || '';
-  // 从token获取userId
-  const token = getValidToken();
-  if (token) {
-    userId.value = getCurrentUserId();
-  }
-  // 如果没有token，userId保持为null，用户仍然可以搜索课程
-});// 监听筛选条件变化
+);
+
 watch(
   () => [
     filterStore.sortBy,
@@ -52,18 +62,31 @@ watch(
     filterStore.selectedPrice
   ],
   () => {
-    console.log('筛选条件变化:', {
-      sortBy: filterStore.sortBy,
-      themes: filterStore.selectedThemes,
-      languages: filterStore.selectedLanguage,
-      level: filterStore.selectedLevel,
-      price: filterStore.selectedPrice
-    })
+    performSearch();
   },
   { deep: true }
 )
 
-// 侧边栏控制逻辑
+const addToCart = async (courseId: number) => {
+  try {
+    const response = await cartApi.addCourseToCart(courseId);
+    if (response.status === 1302) {
+      alert('添加至购物车成功！');
+    } else if (response.status === 2301) {
+      alert('该课程已在购物车中');
+    } else {
+      alert('添加至购物车失败，请重试');
+    }
+  } catch (error) {
+    console.error('添加至购物车失败:', error);
+    alert('添加至购物车失败，请重试');
+  }
+};
+
+const handleCurrentChange = (page: number) => {
+  handlePageChange(page);
+};
+
 const emit = defineEmits(['update:isOpen', 'open', 'close', 'filter-change'])
 const props = defineProps({
   isOpen: Boolean,
@@ -93,40 +116,42 @@ const handleBackdropClick = () => {
 }
 </script>
 
-<!-- html -->
 <template>
   <IconSprite />
   <main>
     <MobileHeader :userId="userId" />
     <div class="search-result-container">
-      <div class="title">“{{ searchQuery }}”的1000个结果
-        <button @click="showFilter = true">Filter</button>
+      <div class="title">“{{ searchKeyword }}”的{{ searchResults.length }}个结果
+        <button @click="showFilter = true">筛选</button>
       </div>
-
       <div class="content">
-
         <div class="search-result">
-          <div v-for="course in courses" :key="course.id" class="course-item">
+          <div v-for="course in searchResults" :key="course.courseId" class="course-item">
             <div class="image-container">
-              <img :src="course.image" alt="">
-
+              <img :src="course.coverImgUrl" alt="">
             </div>
             <div class="course-details">
               <div class="course-title">{{ course.title }}</div>
-              <div class="course-instruction">By {{ course.instructor }}</div>
-              <p class="price">${{ course.price }}</p>
-              <button class="arrToCartBtn">Add to Cart</button>
+              <div class="course-instruction"> {{ course.categoryName }}</div>
+            </div>
+            <div class="course-price">
+              <div class="price"> {{ formatPrice(course.originalPrice) }}</div>
+              <button class="arrToCartBtn" @click="addToCart(course.courseId)">添加至购物车</button>
             </div>
           </div>
+          <div v-if="total > 0" class="pagination-container">
+            <el-pagination :current-page="currentPage" :page-size="pageSize" :total="total" layout="prev, pager, next"
+              @current-change="handleCurrentChange" />
+            <div class="page-info">共 {{ totalPages }} 页</div>
+          </div>
+          <div v-else-if="!loading" style="text-align:center;color:#888;">暂无课程</div>
         </div>
-
       </div>
     </div>
     <div class="sidebar-system">
       <transition name="fade">
         <div v-if="showFilter" class="sidebar-backdrop" @click.self="handleBackdropClick" />
       </transition>
-
       <transition name="slide-right">
         <aside v-if="showFilter" class="sidebar-panel" :style="{ width: '180px' }">
           <Filter @close="showFilter = false" />
@@ -134,11 +159,11 @@ const handleBackdropClick = () => {
       </transition>
     </div>
   </main>
-
 </template>
 <style scoped>
 .search-result-container {
   margin: 0 auto;
+  width: 100%;
 }
 
 .search-result-container .title {
@@ -146,8 +171,12 @@ const handleBackdropClick = () => {
   white-space: nowrap;
 }
 
-
 .search-result-container .content {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.search-result-container .content .search-result {
   width: 100%;
   max-width: 1000px;
 }
@@ -159,8 +188,8 @@ const handleBackdropClick = () => {
 }
 
 .search-result-container .image-container img {
-  width: 240px;
-  height: 140px;
+  width: 180px;
+  height: 100px;
 }
 
 .search-result-container .course-details {
@@ -169,24 +198,34 @@ const handleBackdropClick = () => {
   justify-content: space-between;
 }
 
-.search-result-container button {
-  width: fit-content;
-  margin-top: 10px;
-  padding: 10px;
-  border: none;
-  height: 42px;
-  font-size: 20px;
-  font-weight: 700;
-  white-space: nowrap;
-  color: rgb(22, 92, 145);
-  background-color: white;
-  border-radius: 8px;
-  align-self: flex-start;
-  transition: all 0.2s;
+.course-price {
+  position: absolute;
+  top: 20px;
+  right: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.search-result-container button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+.search-result-container .price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #215496;
+  text-align: right;
+  display: block;
+}
+
+.search-result-container .arrToCartBtn {
+  position: absolute;
+  top: 55px;
+  right: 0px;
+}
+
+.search-result-container button {
+  margin-top: 10px;
+  padding: 10px;
+  height: 42px;
+  align-self: flex-start;
 }
 
 .slide-right-enter-active,
@@ -219,7 +258,22 @@ const handleBackdropClick = () => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  /* 在侧边栏下方 */
   pointer-events: auto;
+}
+
+.pagination-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  padding: 20px 0;
+}
+
+.page-info {
+  margin-top: 10px;
+  color: #666;
+  font-size: 1.4rem;
 }
 </style>

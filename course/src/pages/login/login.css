@@ -1,3 +1,23 @@
+@import "/src/assets/rem.css";
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.login-container .login-image {
+  z-index: 100;
+  flex: 1;
+  place-items: center;
+}
+
+.login-container .login-image img {
+  width: 100%;
+  height: fit-content;
+}
+
 .login-container .content {
   display: flex;
   margin: 0 auto;
@@ -7,93 +27,85 @@
   margin-bottom: 100px;
 }
 
-.login-container h1 {
-  font-weight: 500;
-  margin-bottom: 40px;
-}
-
-.login-container h2 {
-  margin: 5px 0px 10px 20px;
-  white-space: nowrap;
-  font-weight: 400;
-}
-
 .login-container .login-form {
-  flex: 1;
-  width: 50%;
-  max-width: 600px;
-  min-width: 360px;
-  padding: 20px;
-  margin: 0 auto;
+  z-index: 200;
+  width: 600px;
+  padding: 30px 20px;
 }
 
-.login-container input {
-  margin: 10px 0px;
-  width: 100%;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  height: 50px;
-}
-
-
-.login-container .captcha {
-  width: calc(100% - 130px);
-  border-radius: 10px 0px 0px 10px;
-}
-
-
-.login-container button {
-  width: 100%;
-  padding: 10px;
+.login-container h1 {
+  font-family: "PingFang SC", -apple-system, sans-serif;
+  font-weight: bold;
+  font-style: normal;
+  color: #101010;
+  font-size: 2.8rem;
+  letter-spacing: normal;
+  line-height: 45px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 15px 0;
+}
+
+
+.login-container .login-button {
+  width: 100%;
+  font-size: 1.8rem;
+  padding: 5px;
+  margin: 3rem 0 0px;
   border: none;
   line-height: 20px;
-  height: 50px;
+  height: 5rem;
   border-radius: 10px;
   cursor: pointer;
-  background-color: rgb(22, 92, 145);
+  background-color: var(--primary-color);
   color: white;
 }
 
-.login-container .send-msg {
-  width: 130px;
-  margin-top: 20px;
-  border-radius: 0px 10px 10px 0px;
+.login-container button:hover {
+  background-color: var(--secondary-color);
 }
 
-.login-container .signup-link {
+
+.login-form input {
+  width: 100%;
+  height: 5rem;
+  margin: 3rem 0px 0px;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.login-form input:focus {
+  border-color: #165c91;
+}
+
+
+.captcha-input-group {
   display: flex;
-  width: 360px;
   align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  color: rgb(4, 35, 59);
-  background-color: rgba(22, 92, 145, 0.1);
-  height: 50px;
-  border-radius: 10px;
+  gap: 0;
 }
 
-.login-container .signup-link a:hover {
-  color: rgb(22, 92, 145);
+.captcha-input-group .captcha {
+  width: calc(100% - 13rem);
+  border-radius: 8px 0px 0px 8px;
 }
 
-.login-container button .icon {
-  display: flex;
-  height: 100%;
-}
-
-.login-container svg {
-  margin: 0px 10px;
-}
-
-
-.error-message {
-  color: #ff4d4f;
-  margin-bottom: 16px;
-  padding: 8px;
-  background: #fff2f0;
-  border-radius: 4px;
+.captcha-input-group .send-msg {
+  width: 13rem;
+  margin-top: 3rem;
+  border: none;
+  font-size: 1.6rem;
+  border-radius: 0px 8px 8px 0px;
+  background-color: #215496;
+  color: white;
+  height: 5rem;
+  cursor: pointer;
 }
 
 .success-message {
@@ -104,7 +116,183 @@
   border-radius: 4px;
 }
 
-.login-btn:disabled {
-  background: #d9d9d9;
-  cursor: not-allowed;
+.error-message {
+  color: red;
+  font-size: 1.2rem;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 32px 0 24px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 2px;
+  background: #e0e0e0;
+  margin: 0 18px;
+}
+
+.divider-text {
+  color: #7a8a99;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.login-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.login-container .login-icons .login-icon-btn {
+  width: 5rem;
+  height: 5rem;
+  background: #fff;
+  border: 1.5px solid #225B87;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  cursor: pointer;
+  padding: 0;
+}
+
+.login-container .login-icons .login-icon-btn:hover {
+  background-color: #e3f0fa;
+  box-shadow: 0 4px 16px rgba(137, 182, 217, 0.1);
+}
+
+.wx-icon-btn,
+.wx-icon-btn:hover {
+  color: #27b148;
+}
+
+.wx-login-body {
+  padding: 30px;
+  text-align: center;
+}
+
+.success-icon {
+  width: 40px;
+  height: 40px;
+  background: #07C160;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 16px;
+}
+
+.error-icon {
+  width: 40px;
+  height: 40px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 16px;
+}
+
+.retry-btn {
+  background: #07C160;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #06AD56;
+}
+
+.wechat-qrcode-box {
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafbfc;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  position: relative;
+}
+
+.qrcode-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.qrcode-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #215496;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+
+.qrcode-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+  color: #e53e3e;
+  font-size: 1.5rem;
+}
+
+.retry-btn {
+  margin-top: 12px;
+  padding: 6px 18px;
+  background: #215496;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #1742a0;
+}
+
+@media (max-width: 2400px) {
+  .login-container .login-form {
+    width: 500px;
+  }
+}
+
+@media (max-width: 2000px) {
+  .login-container .login-form {
+    width: 460px;
+  }
 }

@@ -25,7 +25,6 @@ onMounted(() => {
   if (token) {
     userId.value = getCurrentUserId();
   } else {
-    // 如果没有token，重定向到登录页面
     window.location.href = '/login.html';
   }
 });
@@ -44,14 +43,11 @@ const handleLogout = async () => {
 <template>
   <IconSprite />
   <div class="my-info-container">
-    <!-- 侧边栏直接写在父组件中 -->
     <div class="my-info-sidebar">
-      <!-- Logo - 跳转到首页 -->
       <div class="sidebar-icon" active-class="active" exact @click="goToIndex()">
         T
       </div>
 
-      <!-- User - 跳转到个人信息 -->
       <router-link to="/my-info/profile" class="sidebar-icon" active-class="active">
         <i class="icon-user">
           <svg width="30" height="30" viewBox="0 0 16 16" fill="#35495e">
@@ -78,21 +74,19 @@ const handleLogout = async () => {
       </router-link>
 
       <button @click="handleLogout"
-        style="display: flex; align-items: center; gap: 8px; color: white; background: none; border: none; cursor: pointer; font-size: 16px;">
+        style="display: flex; align-items: center; gap: 8px; color: white; background: none; border: none; cursor: pointer; font-size: 1.6rem;">
         <svg width="80" height="36" viewBox="0 0 16 16" fill="#35495e">
           <use href="#material-symbols--logout" />
         </svg>
       </button>
     </div>
 
-    <!-- 主要内容区 -->
     <div class="my-info-content">
       <router-view />
     </div>
   </div>
 </template>
 
-<!-- css -->
 <style scoped>
 .my-info-container {
   display: flex;
@@ -116,11 +110,11 @@ const handleLogout = async () => {
 }
 
 .sidebar-icon:hover {
-  background: rgba(22, 92, 145, 0.6);
+  background: rgba(33, 84, 150, 0.6);
 }
 
 .sidebar-icon.active {
-  background: rgb(22, 92, 145);
+  background: #215496;
 }
 
 .sidebar-icon img {
@@ -129,7 +123,7 @@ const handleLogout = async () => {
 }
 
 .sidebar-icon i {
-  font-size: 24px;
+  font-size: 2.2rem;
 }
 
 .my-info-sidebar button {

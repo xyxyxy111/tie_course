@@ -1,4 +1,17 @@
-.course-item img{
+@import "/src/assets/rem.css";
+;
+
+.course-item img {
   width: 200px;
   height: 120px;
+}
+
+.discount {
+  color: #dc3545;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9em;
 }

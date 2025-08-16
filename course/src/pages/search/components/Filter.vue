@@ -25,23 +25,22 @@
       </li>
     </ul>
 
-    <!-- 语言选择 -->
-    <ul class="sidebar-content">
-      <li class="sidebar-title">语言</li>
-      <li v-for="lang in filterStore.languages" :key="lang.value">
-        <button :class="{ active: lang.isSelected }" @click="filterStore.selectLanguage(lang)">
-          {{ lang.label }}
-        </button>
-      </li>
-    </ul>
 
-    <!-- 主题选择 -->
+    <!-- 分类选择 -->
     <ul class="sidebar-content">
-      <li class="sidebar-title">主题</li>
-      <li v-for="theme in filterStore.themes" :key="theme.value">
-        <button :class="{ active: theme.isSelected }" @click="filterStore.selectTheme(theme)">
-          {{ theme.label }}
+      <li class="sidebar-title">分类</li>
+      <li v-for="category in filterStore.categories" :key="category.value">
+        <button :class="{ active: category.isSelected }" @click="filterStore.selectCategory(category)">
+          {{ category.label }}
         </button>
+        <!-- 展开tags -->
+        <ul v-if="category.isSelected && filterStore.tags.length" class="tag-list">
+          <li v-for="tag in filterStore.tags" :key="tag.value">
+            <button :class="{ active: tag.isSelected }" @click.stop="filterStore.selectTag(tag)">
+              {{ tag.label }}
+            </button>
+          </li>
+        </ul>
       </li>
     </ul>
 
@@ -70,11 +69,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useFilterStore } from '../../../stores/filter';
+import { ref, watch, onMounted } from 'vue'
+import { useFilterStore } from './filterStore';
 
 const filterStore = useFilterStore()
 
+onMounted(async () => {
+  await filterStore.fetchCategories();
+
+  // 从URL参数初始化选中的category和tag
+  const searchParams = new URLSearchParams(window.location.search);
+  const categoryId = searchParams.get('categoryId');
+  const tagId = searchParams.get('tagId');
+
+  if (categoryId) {
+    await filterStore.initializeFromURL(parseInt(categoryId), tagId ? parseInt(tagId) : undefined);
+  }
+});
 
 // 控制页面滚动
 </script>
@@ -93,27 +104,27 @@ const filterStore = useFilterStore()
   align-items: center;
   padding: 10px 0;
   margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .sidebar-header div {
   margin: 0 auto;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 2rem;
 }
 
 .sidebar-content {
   list-style: none;
   padding: 0;
   margin: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .sidebar-title {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.8rem;
   padding: 15px 0 0px 20px;
-  color: #35495e;
+  color: var(--text-primary);
 }
 
 .sidebar-body button {
@@ -124,17 +135,44 @@ const filterStore = useFilterStore()
   background: none;
   text-align: left;
   cursor: pointer;
-  color: #35495e;
+  color: var(--text-primary);
   transition: all 0.2s linear;
 }
 
 .sidebar-body button:hover {
-  background-color: rgba(22, 92, 145, 0.1);
+  background-color: var(--primary-color-light);
 }
 
 .sidebar-body button.active {
   font-weight: 600;
-  color: rgb(22, 92, 145);
-  background-color: rgba(22, 92, 145, 0.1);
+  color: var(--primary-color);
+  background-color: var(--primary-color-light);
+}
+
+.tag-list {
+  padding-left: 16px;
+  margin-bottom: 8px;
+}
+
+.tag-list li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-list button {
+  width: 100%;
+  margin: 0px 0;
+  font-size: 1.4rem;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  border: none;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.tag-list button.active {
+  background: var(--primary-color);
+  color: var(--text-white);
 }
 </style>

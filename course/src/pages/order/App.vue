@@ -3,7 +3,6 @@ import { RouterView, RouterLink, useRouter } from 'vue-router';
 import { toRef, ref, onMounted, computed } from 'vue';
 import { defineComponent } from 'vue';
 import PCDuan from '@/pages/order/body/PCDuan.vue';
-import MobileDuan from '@/pages/order/body/MobileDuan.vue';
 import { useWindowSize } from '@/useWindowSize'
 import IconSprite from '@/components/Icon/IconSprite.vue';
 
@@ -20,10 +19,11 @@ const headerSpaceStyle = computed(() => ({
 
   <IconSprite />
 
-  <div class="header">
-    <div class=""></div>
-    <div :style="headerSpaceStyle"></div>
-    <div id="logo" @click="goToIndex">Course</div>
+  <div class="order-header">
+
+    <div id="logo" @click="goToIndex()">
+      <img src="/src/images/iclass.png" alt="">
+    </div>
     <div :style="headerSpaceStyle"></div>
     <button class="close-order-btn" @click="goToCart">
       <div class="icon">
@@ -35,15 +35,14 @@ const headerSpaceStyle = computed(() => ({
   </div>
 
   <div class="app">
-    <PCDuan v-if="width > 800" />
-    <MobileDuan v-else />
+    <PCDuan />
   </div>
 
 </template>
 
-<!-- css -->
+<!-- css -->order-
 <style scoped>
-.header {
+.order-header {
   overflow: hidden;
   margin-bottom: 30px;
   height: 80px;
@@ -58,22 +57,27 @@ const headerSpaceStyle = computed(() => ({
 }
 
 #logo {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 700;
-  color: rgb(22, 92, 145);
+  color: #215496;
   cursor: pointer;
   font-family: 'Times New Roman', Times, serif;
   margin-inline: 20px;
   align-items: center;
 }
 
+#logo img {
+  height: 50px;
+  width: fit-content;
+}
+
 .icon {
-  color: rgb(22, 92, 145);
+  color: #215496;
   background-color: transparent;
   border-radius: 25px;
 }
 
-.close-order-btn{
+.close-order-btn {
   border: none;
   margin-left: auto;
   background-color: white;
@@ -82,8 +86,7 @@ const headerSpaceStyle = computed(() => ({
   border-radius: 8px;
 }
 
-.close-order-btn:hover{
-  background-color: rgb(22, 92, 145,0.1);
+.close-order-btn:hover {
+  background-color: rgb(22, 92, 145, 0.1);
 }
-
 </style>

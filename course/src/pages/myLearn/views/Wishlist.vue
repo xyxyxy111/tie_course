@@ -1,65 +1,116 @@
 <template>
-  <div class="learning-content">
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading">
-      <div class="loading-spinner"></div>
-      <p>加载中...</p>
-    </div>
-
-    <!-- 空状态 -->
-    <div v-else-if="courses.length === 0" class="empty-state">
-      <div class="empty-icon">💝</div>
-      <h3>心愿单为空</h3>
-      <p>您还没有添加任何课程到心愿单</p>
-      <button class="browse-btn" @click="goToCourse">浏览课程</button>
-    </div>
-
-    <!-- 课程列表 -->
-    <div v-else class="wishlist-container">
-      <div class="wishlist-header">
-        <h2 style="display: flex; align-items: center; gap: 16px;">
-          我的心愿单
-          <span class="course-count">{{ courses.length }} 门课程</span>
-        </h2>
-        <button class="clear-btn" @click="clearWishlist">清空心愿单</button>
-      </div>
-
-      <div class="courses-grid">
-        <div class="course-card" v-for="(course, index) in courses" :key="course.courseId || course.courseId || index">
-          <div class="course-image">
-            <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
-          </div>
-
-          <div class="course-content">
-            <h3 class="course-title">{{ course.title }}</h3>
-            <div class="course-meta">
-              <div class="course-rating">
-                <span class="stars">★★★★★</span>
-                <span class="rating-text">4.8 (2,187)</span>
-              </div>
-              <button class="remove-btn" @click="removeFromWishlist(course.courseId)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 13H5v-2h14v2z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- 加载状态 -->
+  <div v-if="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <p>加载中...</p>
   </div>
+
+  <!-- 空状态 -->
+  <div v-else-if="wishlist.length === 0" class="empty-state">
+    <div class="empty-icon">💝</div>
+    <h3>心愿单为空</h3>
+    <p>您还没有添加任何课程到心愿单</p>
+    <button class="browse-btn" @click="goToCourse">浏览课程</button>
+  </div>
+
+  <!-- 课程列表 -->
+  <div v-else class="wishlist-container">
+    <div class="wishlist-header">
+      <!-- <h2 style="display: flex; align-items: center; gap: 16px;">
+          我的心愿单
+          <span class="course-count">{{ wishlist.length }} 门课程</span>
+        </h2> -->
+      <input v-model="searchText" class="search-input" placeholder="搜索心愿单课程" style="margin-right: 16px;" />
+
+      <button class="search-button">
+        <div class="icon" @click="searchWishlist">
+          <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 16 16" fill="#35495e">
+            <use href="#material-symbols--search" />
+          </svg>
+        </div>
+      </button>
+
+    </div>
+
+    <div class="wishlist-grid">
+      <div class="course-card" v-for="(course, index) in (searchResult !== null ? searchResult : wishlist)"
+        :key="course.courseId || index">
+
+        <div class="course-image">
+          <img :src="course.coverImgUrl || course.coverImgUrl" :alt="course.title">
+          <span class="card-heart" @click="removeFromWishlist(course.courseId)">
+            <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="2">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </span>
+        </div>
+
+        <div class="course-content">
+          <h3 class="course-title">{{ course.title }}</h3>
+          <div class="course-meta">iClass</div>
+
+          <div class="course-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-text">4.8 (2,187)</span>
+          </div>
+          <div class="course-duration">
+            总共 {{ formatTime(course.totalMinutes) }} · 44个讲座
+          </div>
+
+          <div class="current-price">￥{{ course.currentPrice.toFixed(2) }}</div>
+        </div>
+
+      </div>
+    </div>
+
+    <button class="clear-btn" @click="clearWishlist">清空心愿单</button>
+  </div>
+
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { wishlistApi } from '@/api/user';
 import type { WishListVO } from '@/api/user';
+import '../myLearn.css'
+import { useWindowSize } from '@/useWindowSize';
+
 
 export default defineComponent({
   name: 'Wishlist',
   setup() {
-    const courses = ref<WishListVO[]>([]);
+
+    const { width } = useWindowSize();
+
+    let iconWidth = ref(24 + (width.value - 1920) / 100);
+    iconWidth.value = (iconWidth.value > 24) ? iconWidth.value : 26;
+
+    const wishlist = ref<WishListVO[]>([]);
     const loading = ref(true);
+    const searchText = ref('');
+    const searchResult = ref<WishListVO[] | null>(null);
+
+    const formatTime = (totalMinutes: number) => {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      let result = '';
+      if (hours > 0) result += `${hours}小时`;
+      if (minutes > 0) result += `${minutes}分钟`;
+      if (!result) result = '0分钟';
+      return result;
+    };
+
+    const searchWishlist = () => {
+      const keyword = searchText.value.trim().toLowerCase();
+      if (!keyword) {
+        searchResult.value = null; // 搜索框为空，显示全部
+        return;
+      }
+      searchResult.value = wishlist.value.filter(course =>
+        course.title && course.title.toLowerCase().includes(keyword)
+      );
+    };
 
     // 获取愿望单列表
     const fetchWishlist = async () => {
@@ -68,23 +119,23 @@ export default defineComponent({
         const response = await wishlistApi.getWishlist();
         console.log('愿望单API响应:', response);
 
-        // 根据API返回的数据更新courses
+        // 根据API返回的数据更新wishlist
         if (response && response.data && Array.isArray(response.data)) {
           console.log('愿望单数据:', response.data);
-          courses.value = response.data as WishListVO[];
+          wishlist.value = response.data as WishListVO[];
 
           // 检查每个课程的ID字段
-          courses.value.forEach((course, index) => {
+          wishlist.value.forEach((course, index) => {
             console.log(`课程 ${index} 完整数据:`, course);
             console.log(`课程 ${index} 所有属性:`, Object.keys(course));
           });
         } else {
           console.log('愿望单数据为空或格式不正确');
-          courses.value = [];
+          wishlist.value = [];
         }
       } catch (error) {
         console.error('获取愿望单失败:', error);
-        courses.value = [];
+        wishlist.value = [];
       } finally {
         loading.value = false;
       }
@@ -148,7 +199,7 @@ export default defineComponent({
         await wishlistApi.clearWishlist();
         console.log('愿望单已清空');
         alert('愿望单已清空');
-        courses.value = [];
+        wishlist.value = [];
       } catch (error) {
         console.error('清空愿望单失败:', error);
         alert('清空失败，请重试');
@@ -178,24 +229,23 @@ export default defineComponent({
     });
 
     return {
-      courses,
+      iconWidth,
+      wishlist,
       loading,
+      formatTime,
       removeFromWishlist,
       clearWishlist,
       goToCourse,
-      debugCourse
+      debugCourse,
+      searchText,
+      searchWishlist,
+      searchResult
     };
   }
 });
 </script>
 
 <style scoped>
-.learning-content {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .loading {
   text-align: center;
   padding: 60px;
@@ -210,16 +260,6 @@ export default defineComponent({
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .empty-state {
@@ -239,12 +279,12 @@ export default defineComponent({
 .empty-state h3 {
   margin-bottom: 10px;
   color: #333;
-  font-size: 24px;
+  font-size: 2.2rem;
 }
 
 .empty-state p {
   margin-bottom: 30px;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .browse-btn {
@@ -253,11 +293,11 @@ export default defineComponent({
   border: none;
   padding: 14px 28px;
   border-radius: 30px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 84, 150, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -275,7 +315,7 @@ export default defineComponent({
 
 .browse-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(22, 92, 145, 0.4);
+  box-shadow: 0 6px 20px rgba(33, 84, 150, 0.4);
   background: linear-gradient(135deg, #134a7a 0%, #0d3a5f 100%);
 }
 
@@ -284,28 +324,28 @@ export default defineComponent({
 }
 
 .browse-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(22, 92, 145, 0.3);
+  box-shadow: 0 2px 8px rgba(33, 84, 150, 0.3);
 }
 
 .wishlist-container {
-  background-color: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 110rem;
+  min-width: 900px;
+  padding: 2rem;
 }
 
 .wishlist-header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 54px;
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #eee;
 }
 
 .wishlist-header h2 {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 600;
   color: #333;
   display: flex;
@@ -315,7 +355,7 @@ export default defineComponent({
 }
 
 .course-count {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #666;
   background: #f8f9fa;
   padding: 8px 16px;
@@ -323,195 +363,59 @@ export default defineComponent({
   margin-left: 0;
 }
 
-.courses-grid {
+.search-input,
+.search-button {
+  position: absolute;
+  height: 3.4rem;
+  border: .1px solid #215496;
+  border-radius: 4px;
+  padding: 0 1rem;
+  font-size: 1.6rem;
+  margin-left: 16px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.search-input {
+  right: 3.7rem;
+  width: 17rem;
+}
+
+.search-input:focus {
+  border-color: #215496;
+}
+
+.search-button {
+  padding: 0.3rem;
+  margin-top: 0.1rem;
+  width: 3.4rem;
+  background-color: #215496;
+  color: white;
+  right: 1.7rem;
+}
+
+.wishlist-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
 
-.course-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
+
+.course-card .course-title,
+.course-card .course-meta {
+  margin: 0px;
 }
 
-.course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.course-image {
-  position: relative;
-  height: 160px;
-  overflow: hidden;
-}
-
-.course-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.course-card:hover .course-image img {
-  transform: scale(1.05);
-}
-
-.course-content {
-  padding: 20px;
-}
-
-.course-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.course-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.course-rating {
-  display: flex;
-  align-items: center;
-}
-
-.stars {
-  color: #ffd700;
-  font-size: 14px;
-}
-
-.rating-text {
-  margin-left: 6px;
-  font-size: 12px;
+.course-duration {
   color: #666;
+  font-size: 1.2rem;
 }
 
-.course-price {
-  text-align: right;
-}
 
-.current-price {
-  font-size: 18px;
-  font-weight: 600;
-  color: #165c91;
-  display: block;
-}
 
-.original-price {
-  font-size: 12px;
-  color: #999;
-  text-decoration: line-through;
-}
-
-.course-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.remove-btn {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
-  color: white;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
-  position: relative;
-  overflow: hidden;
-  padding: 0;
-}
-
-.remove-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.remove-btn:hover {
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
-  background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);
-}
-
-.remove-btn:hover::before {
-  left: 100%;
-}
-
-.remove-btn:active {
-  transform: translateY(0) scale(0.95);
-  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
-}
-
-.remove-btn svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.3s ease;
-}
-
-.remove-btn:hover svg {
-  transform: scale(1.1);
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .courses-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-  }
-
-  .wishlist-header {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .course-content {
-    padding: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .courses-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .learning-content {
-    padding: 10px;
-  }
-
-  .wishlist-container {
-    padding: 20px;
-  }
-}
 
 .clear-btn {
-  margin-left: 20px;
+  margin: 30px 0px 0px 1030px;
   background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
   color: white;
   border: none;
@@ -519,7 +423,7 @@ export default defineComponent({
   padding: 0px 12px;
   height: 42px;
   border-radius: 20px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -531,6 +435,5 @@ export default defineComponent({
 
 button {
   white-space: nowrap;
-  width: fit-content;
 }
 </style>

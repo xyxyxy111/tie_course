@@ -1,13 +1,19 @@
 <template>
   <div class="floating-box" :style="floatingBoxStyle()">
     <div class="price-section">
-      <span class="video-pictrue">
+      <span class="video-pictrue" @mouseover="hovered = true" @mouseleave="hovered = false"
+        :class="{ hovered: hovered }" @click="goToVideoPage" title="点击播放">
         <img :src="courseVideo" alt="">
+        <div class="overlay">
+          <svg width="50" height="50" viewBox="0 0 16 16" fill="#eee">
+            <use href="#solar--play-broken" />
+          </svg>
+        </div>
       </span>
-      <span class="current-price">{{ currentPrice }}</span>
-      <span class="original-price">{{ originalPrice }}</span>
-      <span class="discount">{{ discount }}</span>
-      <div class="time-left" v-if="timeLeft">{{ timeLeft }}</div>
+
+      <span class="current-price">¥{{ currentPrice }}</span>
+      <span class="original-price">¥{{ originalPrice }}</span>
+      <span class="time-left" v-if="timeLeft">{{ timeLeft }}</span>
     </div>
     <div class="action-buttons">
       <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
@@ -35,12 +41,25 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue';
-import { goToCart } from '@/components/common/header';
+import { ref, onMounted } from 'vue';
+import { goToVideo } from '@/components/common/header';
 import { useWindowSize } from '@/useWindowSize'
 
 const { width, height } = useWindowSize()
 
+// 从URL中读取 courseId 以便跳转视频页
+const getCourseIdFromQuery = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(searchParams.get('courseId') || '');
+  return Number.isFinite(courseId) ? courseId : null;
+};
+
+const goToVideoPage = () => {
+  const courseId = getCourseIdFromQuery();
+  if (courseId) {
+    goToVideo(courseId);
+  }
+};
 
 const scrollY = ref(0); // 存储滚动距离
 
@@ -55,19 +74,19 @@ onMounted(() => {
 const props = defineProps({
   courseVideo: {
     type: String,
-    default:'/src/images/image1.png'
+    default: '/src/images/image1.png'
   },
   currentPrice: {
-    type: String,
-    default: 'US$13.99'
+    type: Number,
+    default: 13.99
   },
   originalPrice: {
-    type: String,
-    default: 'US$94.99'
+    type: Number,
+    default: 94.99
   },
   discount: {
-    type: String,
-    default: '85% 折扣'
+    type: Number,
+    default: 85
   },
   timeLeft: {
     type: String,
@@ -102,11 +121,15 @@ const props = defineProps({
 
 const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon', 'couponApplied']);
 const floatingBoxStyle = () => ({
-  top:(scrollY.value>120)?'10px':`${120-scrollY.value}`+"px"
+  // top: (scrollY.value > 120) ? '10px' : `${120 - scrollY.value}` + "px"
 })
+
+const hovered = ref(false);  // 控制hover状态
 </script>
 
 <style scoped>
+@import "/src/assets/rem.css";
+
 .floating-box {
   position: fixed;
   left: 65%;
@@ -120,9 +143,49 @@ const floatingBoxStyle = () => ({
   z-index: 100;
 }
 
-.floating-box img{
+.floating-box img {
   width: 100%;
   height: 140px;
+}
+
+.video-pictrue {
+  display: block;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-pictrue:hover img {
+  transform: scale(1.03);
+  transition: transform 0.2s ease-in-out;
+}
+
+.video-pictrue {
+  position: relative;
+}
+
+.video-pictrue .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.2s;
+}
+
+.video-pictrue.hovered .overlay {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .price-section {
@@ -130,27 +193,27 @@ const floatingBoxStyle = () => ({
 }
 
 .current-price {
-  font-size: 24px;
+  font-size: 2.2rem;
   font-weight: bold;
   color: #333;
   margin-right: 10px;
 }
 
 .original-price {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #999;
   text-decoration: line-through;
   margin-right: 10px;
 }
 
 .discount {
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #d83b3b;
   font-weight: bold;
 }
 
 .time-left {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #d83b3b;
   margin-top: 5px;
 }
@@ -167,28 +230,28 @@ const floatingBoxStyle = () => ({
   font-weight: bold;
   cursor: pointer;
   border: none;
-   width: 100%;
+  width: 100%;
   margin: 0 auto;
   transition: all 0.3s;
 }
 
 .add-to-cart {
   background-color: #fff;
-  color: rgb(22,92,145);
-  border: 1px solid rgb(22,92,145);
+  color: #215496;
+  border: 1px solid #215496;
 }
 
-.add-to-cart:hover{
-  background-color: rgba(22,92,145,0.1);
+.add-to-cart:hover {
+  background-color: rgba(33, 84, 150, 0.1);
 }
 
 .buy-now {
-  background-color: rgb(22,92,145);
+  background-color: #215496;
   color: white;
 }
-.buy-now:hover{
-  background-color: rgba(22, 92, 145, 0.8);
 
+.buy-now:hover {
+  background-color: rgba(33, 84, 150, 0.8);
 }
 
 .divider {
@@ -198,7 +261,7 @@ const floatingBoxStyle = () => ({
 }
 
 .features h3 {
-  font-size: 16px;
+  font-size: 1.6rem;
   margin-bottom: 10px;
 }
 
@@ -225,9 +288,9 @@ const floatingBoxStyle = () => ({
 }
 
 .action-links a {
-  color: rgb(22,92,145);
+  color: #215496;
   text-decoration: underline;
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
 }
 </style>

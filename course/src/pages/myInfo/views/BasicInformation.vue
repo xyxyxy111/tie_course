@@ -31,7 +31,7 @@
 
       <!-- 提交按钮 -->
       <div class="form-group">
-        <button  :disabled="isSubmitting" @click="submitForm">
+        <button :disabled="isSubmitting" @click="submitForm">
           {{ isSubmitting ? '提交中...' : '保存信息' }}
         </button>
       </div>
@@ -48,13 +48,13 @@ export default defineComponent({
   setup() {
     const isSubmitting = ref(false);
     const form = reactive({
-      username:'',
+      username: '',
       firstName: '',
       lastName: '',
       major: '',
       avatarUrl: '',
       allowEmailNotify: false,
-      allowSMSNotify:false
+      allowSMSNotify: false
     })
     // 获取个人信息
     const fetchProfile = async () => {
@@ -103,6 +103,7 @@ export default defineComponent({
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
+
 h1 {
   color: #333;
   border-bottom: 1px solid #eee;
@@ -133,11 +134,12 @@ textarea {
   height: 100px;
   resize: vertical;
 }
+
 button {
   position: relative;
   left: 80%;
   width: fit-content;
-  background-color: rgb(22, 92, 145);
+  background-color: #215496;
   color: white;
   border: none;
   margin: 5px 20px;
@@ -145,12 +147,12 @@ button {
   border-radius: 4px;
   cursor: pointer;
   height: 30px;
-  font-size: 12px;
+  font-size: 1.2rem;
   transition: all 0.3s;
-  border: 1px rgb(22, 92, 145) solid;
+  border: 1px #215496 solid;
 }
 
 button:hover {
-  background-color: rgba(22, 92, 145, 0.8);
+  background-color: rgba(33, 84, 150, 0.8);
 }
 </style>

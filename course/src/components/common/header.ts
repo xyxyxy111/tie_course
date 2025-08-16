@@ -1,15 +1,16 @@
 import { ref } from 'vue';
-// import { useRouter } from 'vue-router';
+import type { CategoryList } from '@/api/course';
+import { categoryApi } from '@/api/course';
 import { getCurrentUserId } from '@/utils/request';
+import { authApi } from '@/api/user';
 
-export let searchQuery = ref('');
-// const router = useRouter();
+export const searchQuery = ref('');
 
 export function Search() {
   if (searchQuery.value.trim()) {
     console.log("搜索词:", searchQuery.value);
     const url = new URL('/search.html', window.location.origin);
-    url.searchParams.set('q', encodeURIComponent(searchQuery.value));
+    url.searchParams.set('keyword', encodeURIComponent(searchQuery.value));
     window.location.href = url.toString();
   }
 }
@@ -19,26 +20,10 @@ export const goToCart = () => {
   window.location.href = url.toString();
 };
 
-//molidis
-//before
-// export const goToIndex = () => {
-//   const url = new URL('/index.html', window.location.origin);
-
-//   if (userId !== undefined && userId !== null && userId !== '') {
-//     url.searchParams.set('userId', encodeURIComponent(userId.toString()));
-//   }
-
-//   window.location.href = url.toString();
-// };
-
 export const goToIndex = () => {
   // e.preventDefault(); // 可选：阻止默认行为
   // const userId = 1;
   const url = new URL('/index.html', window.location.origin);
-  // const currentUserId = userId || getCurrentUserId();
-  // if (currentUserId) {
-  //   url.searchParams.set('userId', encodeURIComponent(currentUserId));
-  // }
   window.location.href = url.toString();
 };
 
@@ -52,6 +37,12 @@ export const goToCourse = (courseId: number) => {
   window.location.href = url.toString();
 };
 
+export const goToVideo = (courseId: number) => {
+  const url = new URL('/video.html', window.location.origin);
+  url.searchParams.set('courseId', courseId.toString());
+  window.location.href = url.toString();
+};
+
 export const goToLearning = () => {
   const url = new URL('/learning.html', window.location.origin);
   url.hash = '#/learning/all-courses';
@@ -60,15 +51,59 @@ export const goToLearning = () => {
 
 export const goToMyInfo = () => {
   const url = new URL('/my-info.html', window.location.origin);
-  // 添加hash路由支持，重定向到profile页面
   url.hash = '#/my-info/profile';
   window.location.href = url.toString();
 };
 
-//molidis
-//add
-export const goToSignup = (e: MouseEvent) => {
-    e.preventDefault(); // 可选：阻止默认行为
-}
+export const categoryList = ref<CategoryList[]>([]);
+export const expandedCategory = ref<number | null>(null);
+export const fetchCategories = async () => {
+  try {
+    const categoriesResponse = await categoryApi.getAllCategories();
+    categoryList.value = categoriesResponse.data;
+    for (const category of categoryList.value) {
+      if (category.categoryId) {
+        const tagsResponse = await categoryApi.getTagListByCategoryId(category.categoryId);
+        category.tags = tagsResponse.data;
+      }
+    }
+  } catch (error) {
+    console.error('获取categories失败:', error);
+  }
+};
+
+export const toggleCategory = (categoryId: number) => {
+  if (expandedCategory.value === categoryId) {
+    expandedCategory.value = null;
+  } else {
+    expandedCategory.value = categoryId;
+  }
+};
+
+export const goToCategory = (categoryId: number, tagId?: number) => {
+  const params = new URLSearchParams();
+  if (categoryId) {
+    params.set('categoryId', categoryId.toString());
+  }
+  if (tagId) {
+    params.set('tagId', tagId.toString());
+  }
+  const url = `/search.html?${params.toString()}`;
+  window.location.href = url;
+};
+
+export const goToWishlist = () => {
+  window.location.href = "/learning.html#/learning/wishlist";
+};
 
 
+export const handleLogout = async () => {
+  try {
+    await authApi.logout();
+    console.log('登出成功');
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  } catch (error) {
+    alert('登出失败，请重试');
+  }
+};

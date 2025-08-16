@@ -13,7 +13,7 @@
           <!-- 添加成功提示 -->
           <h2>已添加至购物车</h2>
           <div class="added-notification">
-            <img :src="courseInfo?.courseImage || '/src/images/image6.png'" alt="">
+            <img :src="courseInfo?.courseImage" alt="">
             <div class="product-info">
               {{ courseInfo?.courseName || courseName }}
             </div>
@@ -24,21 +24,19 @@
             <h2>常见购买搭配</h2>
 
             <div class="recommendation-list">
-              <div v-for="product in recommendedProducts" :key="product.id" class="product-card">
+              <div v-for="product in recommendedProducts" :key="product.courseId" class="product-card">
                 <img :src="product.coverImgUrl" alt="">
                 <div class="recommendationItem-detail">
-                  <h3>{{ product.name }}</h3>
+                  <h3>{{ product.title }}</h3>
                   <div class="rating">
                     <span class="stars">★★★★</span>
-                    <span class="rating-score">{{ product.rating }}</span>
-                    <span class="review-count">({{ product.reviewCount }})</span>
                   </div>
-                  <p class="price">{{ product.price }}</p>
+                  <p class="price">¥{{ Number(product.currentPrice).toFixed(2) }}</p>
                 </div>
               </div>
             </div>
-            <div class="total-section">
-              <p class="total-price">总计： US${{ totalPrice }}</p>
+            <div class="total-section" v-if="recommendedProducts.length > 0">
+              <p class="total-price">总计： ¥{{ totalPrice }}</p>
               <button class="add-all-btn" @click="addAllToCart">全部添加至购物车</button>
             </div>
           </div>
@@ -59,12 +57,14 @@
 <script lang="ts">
 import { defineComponent, ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { cartApi } from '@/api/cart';
+import { courseApi } from '@/api/course';
 // 定义课程信息接口
 interface CourseInfo {
   courseName: string;
   courseImage: string;
   courseId: number | undefined;
-  price: string;
+  price: number;
+  originalPrice?: number;
 }
 
 export default defineComponent({
@@ -98,65 +98,63 @@ export default defineComponent({
     const loading = ref(false);
     const error = ref<string | null>(null);
 
-    // 推荐产品数据（可以根据courseName动态获取）
-    const recommendedProducts = ref([
-      {
-        id: 1,
-        name: 'JavaScript 完整指南',
-        coverImgUrl: '/src/images/image1.png',
-        rating: 4.8,
-        reviewCount: 1250,
-        price: 'US$49.99',
-        courseId: 101
-      },
-      {
-        id: 2,
-        name: 'React 实战开发',
-        coverImgUrl: '/src/images/image2.png',
-        rating: 4.7,
-        reviewCount: 890,
-        price: 'US$39.99',
-        courseId: 102
-      },
-      {
-        id: 3,
-        name: 'Vue.js 从入门到精通',
-        coverImgUrl: '/src/images/image3.png',
-        rating: 4.9,
-        reviewCount: 1100,
-        price: 'US$44.99',
-        courseId: 103
-      }
-    ]);
+    // 推荐产品数据（将由接口返回填充）
+    const recommendedProducts = ref<any[]>([]);
 
-    // 相关主题（可以根据courseName动态获取）
+    // 相关主题（可根据课程返回填充，先保留静态）
     const relatedTopics = ref(['JavaScript', '前端开发', 'Web开发', '编程基础']);
 
-    // 计算总价
+    // 计算总价（使用当前价）
     const totalPrice = computed(() => {
-      return recommendedProducts.value.reduce((sum, product) => {
-        const price = parseFloat(product.price.replace('US$', ''));
-        return sum + price;
-      }, 0).toFixed(2);
+      const sum = recommendedProducts.value.reduce((sum, product) => {
+        const price = Number(product.currentPrice || 0);
+        return sum + (isNaN(price) ? 0 : price);
+      }, 0);
+      return sum.toFixed(2);
     });
 
-    // 根据courseName获取课程信息
-    const fetchCourseInfo = async () => {
-      if (!props.courseName) return;
-
+    // 拉取课程信息与配套课程
+    const fetchCourseAndBundles = async () => {
+      if (!props.courseId && !props.courseName) return;
       loading.value = true;
+      error.value = null;
       try {
-        // 这里可以根据courseName调用API获取课程详细信息
-        // 暂时使用模拟数据
-        courseInfo.value = {
-          courseName: props.courseName,
-          courseImage: '/src/images/image6.png',
-          courseId: props.courseId,
-          price: 'US$99.99'
-        };
-      } catch (err) {
-        error.value = '获取课程信息失败';
-        console.error('获取课程信息失败:', err);
+        // 优先根据 courseId 获取详情
+        if (props.courseId) {
+          const detailResp = await courseApi.getSingleCourseDetail(props.courseId);
+          const c = detailResp.data;
+          courseInfo.value = {
+            courseName: c.title,
+            courseImage: c.coverImgUrl,
+            courseId: c.courseId,
+            price: c.currentPrice,
+            originalPrice: c.originalPrice
+          };
+          // 基于 tagId 与 courseId 获取配套课程（接口返回单个或列表均做兼容）
+          const togetherResp = await courseApi.getCourseTogetherBuy(String(c.tagId), String(c.courseId));
+          const data: any = togetherResp.data as any;
+          const list = Array.isArray(data) ? data : [data];
+          recommendedProducts.value = list.map((item: any) => ({
+            courseId: item.courseId,
+            title: item.title,
+            coverImgUrl: item.coverImgUrl,
+            currentPrice: item.currentPrice,
+            originalPrice: item.originalPrice
+          }));
+        } else {
+          // 仅有名称时，先展示基本信息占位
+          courseInfo.value = {
+            courseName: props.courseName,
+            courseImage: '/src/images/image6.png',
+            courseId: props.courseId,
+            price: 0
+          };
+          recommendedProducts.value = [];
+        }
+      } catch (err: any) {
+        console.error('获取课程或配套课程失败:', err);
+        error.value = '获取课程或配套课程失败';
+        recommendedProducts.value = [];
       } finally {
         loading.value = false;
       }
@@ -165,7 +163,6 @@ export default defineComponent({
     // 添加课程到购物车
     const addCourseToCart = async (courseId: number) => {
       if (!courseId) return;
-
       try {
         const response = await cartApi.addCourseToCart(courseId);
         console.log('添加课程成功:', response);
@@ -179,15 +176,11 @@ export default defineComponent({
     // 添加所有推荐课程到购物车
     const addAllToCart = async () => {
       try {
-        const promises = recommendedProducts.value.map(product =>
-          addCourseToCart(product.courseId)
-        );
+        const promises = recommendedProducts.value.map(product => addCourseToCart(product.courseId));
         await Promise.all(promises);
         console.log('所有推荐课程已添加到购物车');
-        // 可以显示成功提示
       } catch (err) {
         console.error('批量添加课程失败:', err);
-        // 可以显示错误提示
       }
     };
 
@@ -196,18 +189,16 @@ export default defineComponent({
       window.location.href = '/cart.html';
     };
 
-    // 监听 prop 变化
-    watch(() => props.modelValue, (newVal) => {
+    // 监听显示与课程变更
+    watch(() => props.modelValue, async (newVal) => {
       isVisible.value = newVal;
-      if (newVal && props.courseName) {
-        fetchCourseInfo();
+      if (newVal) {
+        await fetchCourseAndBundles();
       }
     });
-
-    // 监听courseName变化
-    watch(() => props.courseName, (newVal) => {
-      if (newVal && isVisible.value) {
-        fetchCourseInfo();
+    watch(() => props.courseId, async (newVal) => {
+      if (isVisible.value && newVal) {
+        await fetchCourseAndBundles();
       }
     });
 
@@ -216,10 +207,10 @@ export default defineComponent({
       emit('update:modelValue', false);
     };
 
-    // 组件挂载时获取课程信息
-    onMounted(() => {
-      if (props.courseName && isVisible.value) {
-        fetchCourseInfo();
+    // 初次挂载若已显示则获取
+    onMounted(async () => {
+      if (props.modelValue) {
+        await fetchCourseAndBundles();
       }
     });
 
@@ -277,7 +268,7 @@ export default defineComponent({
   right: 10px;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 2.2rem;
   cursor: pointer;
   color: #666;
   transition: color 0.2s;
@@ -310,21 +301,21 @@ export default defineComponent({
 .shopping-cart-container button,
 .topic-tag {
   width: fit-content;
-  background-color: rgb(22, 92, 145);
+  background-color: #215496;
   color: white;
   border: none;
   padding: 2px 5px;
   border-radius: 4px;
   cursor: pointer;
   height: 30px;
-  font-size: 12px;
+  font-size: 1.2rem;
   transition: all 0.3s;
 }
 
 .shopping-cart-container button:hover,
 .topic-tag:hover {
   background-color: white;
-  color: rgb(22, 92, 145);
+  color: #215496;
 }
 
 .recommendations {
@@ -343,7 +334,7 @@ export default defineComponent({
 }
 
 .shopping-cart-container h2 {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
@@ -355,7 +346,7 @@ export default defineComponent({
 
 .product-info {
   width: 45%;
-  font-size: 12px;
+  font-size: 1.2rem;
   text-align: left;
   margin: 5px;
 }
@@ -375,7 +366,7 @@ export default defineComponent({
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   height: 45px;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 .rating {
@@ -388,7 +379,7 @@ export default defineComponent({
 
 .price {
   font-weight: bold;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: #dc3545;
 }
 
@@ -399,7 +390,7 @@ export default defineComponent({
 
 .total-price {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 
 .add-all-btn {

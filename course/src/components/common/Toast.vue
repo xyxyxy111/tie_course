@@ -99,12 +99,10 @@ const removeToast = (id: string) => {
   }
 }
 
-// 清空所有Toast
 const clearAll = () => {
   toasts.value = []
 }
 
-// 便捷方法
 const success = (title: string, message?: string, options?: Partial<ToastOptions>) => {
   return addToast({ type: 'success', title, message, ...options })
 }
@@ -121,7 +119,6 @@ const info = (title: string, message?: string, options?: Partial<ToastOptions>) 
   return addToast({ type: 'info', title, message, ...options })
 }
 
-// 暴露方法给全局使用
 const toastService = {
   add: addToast,
   remove: removeToast,
@@ -135,7 +132,7 @@ const toastService = {
 // 全局挂载
 declare global {
   interface Window {
-    $toast: typeof toastService
+    $toast?: typeof toastService
   }
 }
 
@@ -231,13 +228,13 @@ defineExpose({
 
 .toast__title {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 1.4;
   margin-bottom: 4px;
 }
 
 .toast__message {
-  font-size: 13px;
+  font-size: 1.3rem;
   line-height: 1.4;
   opacity: 0.8;
   word-break: break-word;

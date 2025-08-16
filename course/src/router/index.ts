@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import MyLearning from '@/pages/myLearn/App.vue';
 import AllCourse from '@/pages/myLearn/views/AllCourse.vue';
-import MyList from '@/pages/myLearn/views/MyList.vue';
+import MyOrderList from '@/pages/myLearn/views/MyOrderList.vue';
 import Wishlist from '@/pages/myLearn/views/Wishlist.vue';
 import Log from '@/pages/myLearn/views/Log.vue';
 import BasicInformation from '@/pages/myInfo/views/BasicInformation.vue';
@@ -63,8 +63,8 @@ const router = createRouter({
     },
     {
       path: '/learning/my-list',
-      name: 'MyList',
-      component: MyList
+      name: 'MyOrderList',
+      component: MyOrderList
     },
     {
       path: '/learning/wishlist',

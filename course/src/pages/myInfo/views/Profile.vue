@@ -3,7 +3,7 @@
     <div class="profile-title">
       个人资料与设置
     </div>
-    <div v-if="$route.path.includes('/profile')" class="profile-sub-nav">
+    <div v-if="route.path.includes('/profile')" class="profile-sub-nav">
       <router-link to="/my-info/profile/basic-infomation" class="nav-link" active-class="active" exact>
         基本信息
       </router-link>
@@ -21,22 +21,21 @@
 
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { useRoute } from 'vue-router';
 
-export default defineComponent({
-  name: 'Profile',
-});
+const route = useRoute();
 </script>
 
 <style scoped>
-.profile-container{
+.profile-container {
   margin: 0 auto;
   width: 70%;
+  min-width: 600px;
 }
 
-.profile-title{
-  font-size: 36px;
+.profile-title {
+  font-size: 3.6rem;
   margin: 20px 50px;
 }
 
@@ -47,7 +46,8 @@ export default defineComponent({
 }
 
 .nav-link {
-  font-size: 20px;
+  font-size: 2rem;
+  white-space: nowrap;
   padding: 20px 20px 5px;
   color: rgb(4, 35, 58);
   text-decoration: none;
@@ -58,9 +58,10 @@ export default defineComponent({
 }
 
 .nav-link.active {
-  padding: 20px 50px 5px;;
+  padding: 20px 50px 5px;
+  ;
   font-weight: bolder;
-  color: rgb(22,92,145);
-  border-bottom: 8px solid rgb(22,92,145);
+  color: #215496;
+  border-bottom: 8px solid #215496;
 }
 </style>

@@ -1,0 +1,184 @@
+@import "/src/assets/rem.css";
+;
+
+.course-card {
+  background: white;
+  border-radius: 12px;
+  height: 28rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.course-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+  background-color: rgba(33, 84, 150, 0.02);
+  box-shadow: 0 6px 24px rgba(33, 84, 150, 0.13);
+}
+
+.course-card h5 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0rem 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-card .iclass {
+  margin: 0rem 1rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.course-card .watchProgress {
+  font-weight: 700;
+  padding-left: 1rem;
+}
+
+.card-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2000;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 统一卡片图片容器高度与样式（AllCourse 的 .img-wrapper、Wishlist/MyOrderList 的 .course-image）*/
+.course-card .course-image,
+.course-card .img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 14rem;
+  overflow: hidden;
+  z-index: 10;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+/* 统一图片填充方式 */
+.course-card .course-image img,
+.course-card .img-wrapper img,
+.course-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 统一内容区域的最小高度与内边距 */
+.course-card .course-content {
+  width: 100%;
+  min-height: fit-content;
+  padding: 12px;
+  margin-top: 0px;
+}
+
+/* 统一标题最多两行显示（Wishlist/MyOrderList 使用 .course-title，AllCourse 使用 h5）*/
+.course-card .course-title,
+.course-card h5 {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 统一评分/元信息区域的高度与布局 */
+.course-card .course-meta,
+.course-card .course-rating {
+  display: flex;
+  align-items: center;
+}
+
+.stars {
+  color: #ffd700;
+  font-size: 1.4rem;
+}
+
+.rating-text {
+  margin-left: 6px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.course-price {
+  text-align: right;
+}
+
+.current-price {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #165c91;
+  display: block;
+}
+
+.original-price {
+  font-size: 1.2rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.course-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.remove-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+
+.remove-btn:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
+  background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);
+}
+
+.remove-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.remove-btn:hover svg {
+  transform: scale(1.1);
+}
