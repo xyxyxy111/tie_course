@@ -525,7 +525,9 @@ const handleMyLearnPopupLeave = () => {
 }
 
 
-
+defineExpose({
+  fetchCart
+});
 </script>
 
 
