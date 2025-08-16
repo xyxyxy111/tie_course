@@ -74,6 +74,7 @@ export function useCartLogic() {
     error.value = null;
     try {
       const response = await cartApi.clearCart();
+      console.log(response);
       cart.value = response.data;
     } catch (err) {
       error.value = '清空购物车失败';

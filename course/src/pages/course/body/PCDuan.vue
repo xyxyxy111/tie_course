@@ -32,6 +32,9 @@ const userId = ref<string | null>(null);
 // 展开章节的id集合
 const expandedChapters = ref<number[]>([]);
 
+// 调用头部组件的引用
+const headerRef = ref<InstanceType<typeof PCHeader> | null>(null);
+
 onMounted(async () => {
   const token = getValidToken();
   if (token) {
@@ -129,15 +132,21 @@ const handleAddToCart = async () => {
     console.log(response)
 
     console.log(response);
-    if (response.status === 1300) {
+    if (response.status === 1302) {
       alert('添加至购物车成功！');
       // Element
+      if (headerRef.value && typeof headerRef.value.fetchCart === 'function') {
+        headerRef.value.fetchCart();
+        console.log('成功调用了 PCHeader 的 fetchCart 方法');
+      } else {
+        console.error('无法找到 PCHeader 组件的引用');
+      }
+
       showCart.value = true;
     } else {
       alert('添加至购物车失败，请重试');
     }
   } catch (error: any) {
-    console.log("添加错误")
     alert('该课程已在购物车中');
   }
 };
@@ -172,7 +181,7 @@ const handleBuyNow = async () => {
   <IconSprite />
   <CartPopup :style="`width:${width};height:${height}`" v-model="showCart" :courseName="courseVo?.title || ''"
     :courseId="courseVo?.courseId" />
-  <PCHeader :userId="userId" />
+  <PCHeader ref="headerRef" :userId="userId" />
   <FloatingBox v-if="courseVo" :courseVideo="courseVo?.coverImgUrl" :currentPrice="courseVo?.currentPrice"
     :originalPrice="courseVo?.originalPrice" :discount="courseVo?.discountValue" @addToCart="handleAddToCart"
     @buyNow="handleBuyNow" />
