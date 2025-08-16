@@ -57,6 +57,9 @@
 
 
     <div class="mycourses-container">
+      <div v-if="!mylist?.length">
+        <p>您还没有任何课程，去探索课程开始学习吧！</p>
+      </div>
       <div class="course-card" v-for="(course, index) in mylist" :key="index" @mouseenter="hoverIndex = index"
         @mouseleave="hoverIndex = -1" @click="goToVideo(course.courseId)">
         <div class="img-wrapper" :class="{ 'hovered': hoverIndex === index }" @click.stop="goToVideo(course.courseId)">
@@ -135,6 +138,12 @@ export default defineComponent({
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
+}
+
+.mycourses-container p {
+  font-size: 1.6rem;
+  color: #666;
+  margin: 20px 0;
 }
 
 .study-summary-card {

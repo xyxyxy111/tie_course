@@ -10,8 +10,13 @@ export interface LoginByPasswordParams {
   password: string;
 }
 
-export interface RegisterParams {
+export interface RegisterByPhoneParams {
   phone: string;
+  captcha: string;
+}
+
+export interface RegisterByEmailParams {
+  email: string;
   captcha: string;
 }
 
@@ -130,6 +135,23 @@ export const authApi = {
       data
     });
   },
+
+  registerbyphone: (data: RegisterByPhoneParams) => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/registrations/by-phone',
+      data
+    });
+  },
+
+  registerbyemail: (data: RegisterByEmailParams) => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/registrations/by-email',
+      data
+    });
+  },
+
 
   // 检查手机号是否注册
   checkPhoneAvailable: (phone: string) => {

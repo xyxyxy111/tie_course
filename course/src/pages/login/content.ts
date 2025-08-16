@@ -6,14 +6,14 @@ import {
 import type {
   LoginByCaptchaParams,
   LoginByPasswordParams,
-  RegisterParams,
+  RegisterByPhoneParams,
+  RegisterByEmailParams,
   UserProfile,
 } from '@/api/user';
 import { ref, reactive } from 'vue';
 import { getValidToken } from '@/utils/request';
 import { successCodes } from '@/utils/request';
-import type { RefSymbol } from '@vue/reactivity';
-const loading = ref(false);
+import type { RefSymbol } from '@vue/reactivity'; const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
 const loginForm = reactive({
@@ -22,6 +22,26 @@ const loginForm = reactive({
   password: '',
   captcha: '',
   rememberMe: false
+});
+
+// Registration form state
+const registerForm = reactive({
+  phone: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  captcha: '',
+  agreeTerms: false
+});
+
+const registerStatus = ref<{
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+}>({
+  loading: false,
+  error: null,
+  success: false
 });
 
 const loginStatus = ref<{
@@ -40,7 +60,14 @@ const captchaBtn = ref({
   countdown: 60
 });
 
+const registerCaptchaBtn = ref({
+  text: '发送验证码',
+  disabled: false,
+  countdown: 60
+});
+
 const loginMethod = ref("captcha");
+const registerMethod = ref("phone"); // 'phone' or 'email'
 
 interface wxQrCode {
   state: string;
@@ -99,6 +126,7 @@ const useLoginData = () => {
       await getWxLoginStatus();
     }
   };
+
   //验证码登录
   const handleCaptchaLogin = async () => {
     if (!loginForm.phone || !loginForm.captcha) {
@@ -129,7 +157,6 @@ const useLoginData = () => {
         alert('服务器繁忙，请稍后再试');
       }
     } catch (err: any) {
-
       error.value = err.response?.data?.message || '登录失败，请检查网络连接';
       alert('服务器繁忙，请稍后再试');
       console.error('登录失败:', err);
@@ -242,6 +269,120 @@ const useLoginData = () => {
     redirectIfLoggedIn
   };
 };
+
+const handleRegister = async () => {
+  registerStatus.value.error = null;
+  registerStatus.value.success = false;
+  console.log("register by " + registerMethod.value)
+  if (registerMethod.value === 'phone') {
+    if (!registerForm.phone || !registerForm.captcha || !registerForm.password || !registerForm.confirmPassword) {
+      registerStatus.value.error = '请填写所有必填字段';
+      return;
+    }
+    await registerByPhone();
+  } else if (registerMethod.value === 'email') {
+    if (!registerForm.email || !registerForm.captcha || !registerForm.password || !registerForm.confirmPassword) {
+      registerStatus.value.error = '请填写所有必填字段';
+      return;
+    }
+    await registerByEmail();
+  }
+};
+
+const registerByPhone = async () => {
+  registerStatus.value.loading = true;
+  try {
+    const response = await authApi.registerbyphone({
+      phone: registerForm.phone,
+      captcha: registerForm.captcha
+    });
+
+    if (response.data) {
+      registerStatus.value.success = true;
+      success.value = '注册成功！';
+      // Auto login after registration
+      localStorage.setItem('token', response.data);
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1000);
+    } else {
+      registerStatus.value.error = response.message || '注册失败';
+    }
+  } catch (err: any) {
+    registerStatus.value.error = err.response?.data?.message || '注册失败，请检查网络连接';
+    console.error('注册失败:', err);
+  } finally {
+    registerStatus.value.loading = false;
+  }
+};
+
+const registerByEmail = async () => {
+  registerStatus.value.loading = true;
+  try {
+    const response = await authApi.registerbyemail({
+      email: registerForm.email,
+      captcha: registerForm.captcha
+    });
+
+    if (response.data) {
+      registerStatus.value.success = true;
+      success.value = '注册成功！';
+      // Auto login after registration
+      localStorage.setItem('token', response.data);
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1000);
+    } else {
+      registerStatus.value.error = response.message || '注册失败';
+    }
+  } catch (err: any) {
+    registerStatus.value.error = err.response?.data?.message || '注册失败，请检查网络连接';
+    console.error('注册失败:', err);
+  } finally {
+    registerStatus.value.loading = false;
+  }
+};
+
+const sendRegisterCaptcha = async () => {
+  if (registerMethod.value === 'phone' && !registerForm.phone) {
+    alert('请输入手机号');
+    return;
+  }
+  if (registerMethod.value === 'email' && !registerForm.email) {
+    alert('请输入邮箱');
+    return;
+  }
+
+  try {
+    registerCaptchaBtn.value.disabled = true;
+    const target = registerMethod.value === 'phone' ? registerForm.phone : registerForm.email;
+    const response = await authApi.sendCaptcha(target);
+
+    if (successCodes.includes(response.status)) {
+      const timer = setInterval(() => {
+        registerCaptchaBtn.value.countdown--;
+        registerCaptchaBtn.value.text = `${registerCaptchaBtn.value.countdown}s后重新获取`;
+        if (registerCaptchaBtn.value.countdown <= 0) {
+          clearInterval(timer);
+          registerCaptchaBtn.value = {
+            text: '发送验证码',
+            disabled: false,
+            countdown: 60
+          };
+        }
+      }, 1000);
+    } else {
+      alert(response.message || '发送验证码失败');
+      registerCaptchaBtn.value.disabled = false;
+    }
+  } catch (error: any) {
+    registerCaptchaBtn.value.disabled = false;
+    alert(error.message || '发送验证码失败，请重试');
+  }
+};
+
 const sendCaptcha = async () => {
   if (!loginForm.phone) {
     alert('请输入手机号');
@@ -314,9 +455,28 @@ const switchLoginMethod = (i: number) => {
   };
 };
 
+const switchRegisterMethod = (method: 'phone' | 'email') => {
+  registerMethod.value = method;
+  registerForm.phone = '';
+  registerForm.email = '';
+  registerForm.captcha = '';
+  registerForm.password = '';
+  registerForm.confirmPassword = '';
+  registerCaptchaBtn.value = {
+    text: '发送验证码',
+    disabled: false,
+    countdown: 60
+  };
+};
+
 export {
   loginMethod, loginForm,
-  captchaBtn, loginStatus,
-  switchLoginMethod, qrCodeUrl, state,
-  useFormValidation, useLoginData, sendCaptcha
+  registerMethod, registerForm,
+  captchaBtn, registerCaptchaBtn,
+  loginStatus, registerStatus,
+  switchLoginMethod, switchRegisterMethod,
+  qrCodeUrl, state,
+  useFormValidation, useLoginData,
+  sendCaptcha, sendRegisterCaptcha,
+  handleRegister, registerByPhone, registerByEmail
 }

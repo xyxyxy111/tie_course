@@ -293,9 +293,9 @@ export default defineComponent({
 }
 
 .added-notification img {
-  width: 30%;
+  width: 200px;
   margin-top: 3px;
-  height: fit-content;
+  height: 120px;
 }
 
 .shopping-cart-container button,
