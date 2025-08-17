@@ -22,6 +22,7 @@ const { width, height } = useWindowSize();
 // 使用共享的数据和逻辑
 const {
   cart,
+  cartList,
   userId,
   loading,
   error,
@@ -126,8 +127,7 @@ const handleClearCart = async () => {
       <div class="loading-spinner"></div>
       <p>加载中...</p>
     </div>
-
-    <div v-else-if="!cart?.cartItemList || cart.cartItemList.length === 0" class="empty-cart">
+    <div v-else-if="cart?.cartItemList?.length == 0" class="empty-cart">
       <div class="empty-icon">🛒</div>
       <h2>购物车为空</h2>
       <p>您还没有添加任何课程到购物车</p>
@@ -137,15 +137,16 @@ const handleClearCart = async () => {
     </div>
     <div v-else class="cart-layout">
       <div class="cart-title">
-        <h1>购物车</h1>
+        <h1>购物车
+        </h1>
       </div>
       <div class="cart-main-content">
 
         <div class="cart-items-section">
-          <div class="cart-count">购物车中有{{ cart?.cartItemList?.length || 0 }}门课程</div>
+          <div class="cart-count">购物车中有{{ cart?.cartItemList?.length }}门课程</div>
 
           <div class="cart-items">
-            <div v-for="item in cart.cartItemList" :key="item.id" class="cart-item">
+            <div v-for="item in cartList" :key="item.id" class="cart-item">
               <img :src="item.courseImage" :alt="item.courseName" class="course-image">
               <div class="course-info">
                 <h3 class="course-title" :style="CourseTitleStyle()">{{ item.courseName }}</h3>
@@ -173,7 +174,7 @@ const handleClearCart = async () => {
             </div>
           </div>
           <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
-            v-if="cart && cart.cartItemList && cart.cartItemList.length > 0">
+            v-if="cart && cartList && cartList.length > 0">
             {{ clearing ? '清空中...' : '清空' }}
           </button>
         </div>
@@ -187,7 +188,7 @@ const handleClearCart = async () => {
             </div>
             <div class="summary-item">
               <span>课程数量:</span>
-              <span>{{ cart.cartItemList.length }} 门课程</span>
+              <span>{{ cartList?.length }} 门课程</span>
             </div>
             <div class="summary-item" v-if="savedAmount > 0">
               <span>原价:</span>

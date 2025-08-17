@@ -22,16 +22,17 @@ onMounted(() => {
 
 export function useCartLogic() {
   const cart = ref<Cart | null>(null);
+  const cartList = ref(cart.value?.cartItemList);
   const loading = ref(false);
   const error = ref<string | null>(null);
-
   const fetchCart = async () => {
     loading.value = true;
     error.value = null;
     try {
       const response = await cartApi.getMyCart();
       cart.value = response.data;
-      console.log(cart.value);
+      cartList.value = cart.value.cartItemList;
+      console.log(cartList.value);
     } catch (err) {
       error.value = '获取购物车数据失败';
       console.error('获取购物车失败:', err);
@@ -61,6 +62,7 @@ export function useCartLogic() {
     try {
       const response = await cartApi.removeCourseFromCart(courseId);
       cart.value = response.data;
+      fetchCart();
     } catch (err) {
       error.value = '从购物车移除课程失败';
       console.error('移除课程失败:', err);
@@ -129,7 +131,7 @@ export function useCartLogic() {
   });
 
   return {
-    cart,
+    cart, cartList,
     userId,
     loading,
     error,
@@ -192,6 +194,7 @@ export const useCartUtils = () => {
   };
 
   return {
+
     formatPrice,
     formatDiscount,
     formatTime,

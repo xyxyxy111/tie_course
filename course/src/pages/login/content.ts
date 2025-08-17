@@ -275,21 +275,14 @@ const handleRegister = async () => {
   registerStatus.value.success = false;
   console.log("register by " + registerMethod.value)
   if (registerMethod.value === 'phone') {
-    if (!registerForm.phone || !registerForm.captcha || !registerForm.password || !registerForm.confirmPassword) {
-      registerStatus.value.error = '请填写所有必填字段';
-      return;
-    }
     await registerByPhone();
   } else if (registerMethod.value === 'email') {
-    if (!registerForm.email || !registerForm.captcha || !registerForm.password || !registerForm.confirmPassword) {
-      registerStatus.value.error = '请填写所有必填字段';
-      return;
-    }
     await registerByEmail();
   }
 };
 
 const registerByPhone = async () => {
+  console.log(registerMethod.value)
   registerStatus.value.loading = true;
   try {
     const response = await authApi.registerbyphone({
@@ -318,6 +311,8 @@ const registerByPhone = async () => {
 };
 
 const registerByEmail = async () => {
+
+  console.log(registerMethod.value)
   registerStatus.value.loading = true;
   try {
     const response = await authApi.registerbyemail({
@@ -358,8 +353,7 @@ const sendRegisterCaptcha = async () => {
   try {
     registerCaptchaBtn.value.disabled = true;
     const target = registerMethod.value === 'phone' ? registerForm.phone : registerForm.email;
-    const response = await authApi.sendCaptcha(target);
-
+    const response = await authApi.sendSmsCaptcha(target);
     if (successCodes.includes(response.status)) {
       const timer = setInterval(() => {
         registerCaptchaBtn.value.countdown--;
@@ -383,14 +377,45 @@ const sendRegisterCaptcha = async () => {
   }
 };
 
-const sendCaptcha = async () => {
-  if (!loginForm.phone) {
+const sendSmsCaptcha = async () => {
+  if (!registerForm.phone && !loginForm.phone) {
     alert('请输入手机号');
     return;
   }
   try {
     captchaBtn.value.disabled = true;
-    const response = await authApi.sendCaptcha(loginForm.phone);
+    const response = await authApi.sendSmsCaptcha(registerForm.phone ? registerForm.phone : loginForm.phone);
+    if (successCodes.includes(response.status)) {
+      const timer = setInterval(() => {
+        captchaBtn.value.countdown--;
+        captchaBtn.value.text = `${captchaBtn.value.countdown}s后重新获取`;
+        if (captchaBtn.value.countdown <= 0) {
+          clearInterval(timer);
+          captchaBtn.value = {
+            text: '发送验证码',
+            disabled: false,
+            countdown: 60
+          };
+        }
+      }, 1000);
+    } else {
+      alert(response.message || '发送验证码失败');
+      captchaBtn.value.disabled = false;
+    }
+  } catch (error: any) {
+    captchaBtn.value.disabled = false;
+    alert(error.message || '发送验证码失败，请重试');
+  }
+};
+
+const sendEmailCaptcha = async () => {
+  if (!registerForm.email && !loginForm.email) {
+    alert('请输入邮箱');
+    return;
+  }
+  try {
+    captchaBtn.value.disabled = true;
+    const response = await authApi.sendEmailCaptcha(registerForm.email ? registerForm.email : loginForm.email);
     if (successCodes.includes(response.status)) {
       const timer = setInterval(() => {
         captchaBtn.value.countdown--;
@@ -477,6 +502,6 @@ export {
   switchLoginMethod, switchRegisterMethod,
   qrCodeUrl, state,
   useFormValidation, useLoginData,
-  sendCaptcha, sendRegisterCaptcha,
+  sendSmsCaptcha, sendEmailCaptcha,
   handleRegister, registerByPhone, registerByEmail
 }

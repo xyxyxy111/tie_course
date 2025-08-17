@@ -19,7 +19,7 @@ import {
   switchLoginMethod, switchRegisterMethod,
   qrCodeUrl, state,
   useFormValidation, useLoginData,
-  sendCaptcha, sendRegisterCaptcha,
+  sendSmsCaptcha, sendEmailCaptcha,
   handleRegister, registerByPhone, registerByEmail
 } from '../content';
 
@@ -155,7 +155,7 @@ onMounted(() => {
 
                 <div class="captcha-input-group">
                   <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
-                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendSmsCaptcha">
                     {{ captchaBtn.text }}
                   </button>
                 </div>
@@ -243,8 +243,8 @@ onMounted(() => {
                 <div class="captcha-input-group">
                   <input v-model="registerForm.captcha" type="text" placeholder="验证码" class="captcha" />
                   <button type="button" class="send-msg" :disabled="registerCaptchaBtn.disabled"
-                    @click="sendRegisterCaptcha">
-                    {{ registerCaptchaBtn.text }}
+                    @click="sendSmsCaptcha">
+                    {{ captchaBtn.text }}
                   </button>
                 </div>
                 <div v-if="registerStatus.error && registerStatus.error.includes('验证码')" class="error-message">
@@ -266,8 +266,8 @@ onMounted(() => {
                 <div class="captcha-input-group">
                   <input v-model="registerForm.captcha" type="text" placeholder="验证码" class="captcha" />
                   <button type="button" class="send-msg" :disabled="registerCaptchaBtn.disabled"
-                    @click="sendRegisterCaptcha">
-                    {{ registerCaptchaBtn.text }}
+                    @click="sendEmailCaptcha">
+                    {{ captchaBtn.text }}
                   </button>
                 </div>
                 <div v-if="registerStatus.error && registerStatus.error.includes('验证码')" class="error-message">
@@ -289,7 +289,7 @@ onMounted(() => {
         </form>
         <div class="login-divider">
           <span class="divider-line"></span>
-          <span v-if="signFlag" class="divider-text">其它登录选项</span>
+          <span v-if="!signFlag" class="divider-text">其它登录选项</span>
           <span v-else class="divider-text">其它注册选项</span>
 
           <span class="divider-line"></span>

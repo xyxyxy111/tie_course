@@ -4,6 +4,7 @@
       <span class="video-pictrue" @mouseover="hovered = true" @mouseleave="hovered = false"
         :class="{ hovered: hovered }" @click="goToVideoPage" title="点击播放">
         <img :src="courseVideo" alt="">
+
         <div class="overlay">
           <svg width="50" height="50" viewBox="0 0 16 16" fill="#eee">
             <use href="#solar--play-broken" />
@@ -14,6 +15,12 @@
       <span class="current-price">¥{{ currentPrice }}</span>
       <span class="original-price">¥{{ originalPrice }}</span>
       <span class="time-left" v-if="timeLeft">{{ timeLeft }}</span>
+      <span class="card-heart" @click="emit('addToWishlist')">
+        <svg :width="30" :height="30" viewBox="0 0 24 24" fill="#ff5252" stroke="#fff" stroke-width="2">
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+      </span>
     </div>
     <div class="action-buttons">
       <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
@@ -21,7 +28,7 @@
     </div>
 
     <div class="divider"></div>
-
+    <!-- 
     <div class="features" v-if="features.length > 0">
       <h3>{{ featuresTitle }}</h3>
       <ul>
@@ -30,7 +37,7 @@
           {{ feature.text }}
         </li>
       </ul>
-    </div>
+    </div> -->
 
     <div class="action-links">
       <a href="#" @click.prevent="emit('share')">{{ shareText }}</a>
@@ -40,7 +47,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { goToVideo } from '@/components/common/header';
 import { useWindowSize } from '@/useWindowSize'
@@ -75,6 +82,10 @@ const props = defineProps({
   courseVideo: {
     type: String,
     default: '/src/images/image1.png'
+  },
+  courseId: {
+    type: Number,
+    default: 85
   },
   currentPrice: {
     type: Number,
@@ -119,7 +130,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['addToCart', 'buyNow', 'share', 'gift', 'applyCoupon', 'couponApplied']);
+const emit = defineEmits(['addToCart', 'buyNow', 'addToWishlist', 'share', 'gift', 'applyCoupon', 'couponApplied']);
 const floatingBoxStyle = () => ({
   // top: (scrollY.value > 120) ? '10px' : `${120 - scrollY.value}` + "px"
 })
@@ -292,5 +303,18 @@ const hovered = ref(false);  // 控制hover状态
   text-decoration: underline;
   font-size: 1.4rem;
   cursor: pointer;
+}
+
+
+.card-heart {
+  position: absolute;
+  top: 170px;
+  right: 20px;
+  width: 30px;
+  z-index: 9999;
+}
+
+.card-heart:hover {
+  color: #d83b3b;
 }
 </style>

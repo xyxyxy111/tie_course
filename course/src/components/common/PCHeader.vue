@@ -337,7 +337,7 @@ const headerSpaceStyle = computed(() => ({
 }));
 
 const headerSearchInputStyle = computed(() => ({
-  width: `clamp(450px, calc(40vw + 10vw * ${headerSearchInputWidth.value}), 70vw)`,
+  width: `clamp(450px, calc(80% + 10vw * ${headerSearchInputWidth.value}), 90vw)`,
   transition: 'none'
 }));
 
@@ -532,6 +532,7 @@ const handleMyLearnPopupLeave = () => {
   margin-bottom: 1rem;
   height: 7.2rem;
   width: 100vw;
+  min-width: 1400px;
 }
 
 
@@ -585,5 +586,12 @@ button .header-icon {
   width: 40px;
   border-radius: 50%;
   cursor: pointer;
+}
+
+.cart-empty {
+  text-align: center;
+  margin: 20px auto;
+  color: #215496;
+  font-weight: bolder;
 }
 </style>

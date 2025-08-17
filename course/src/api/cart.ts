@@ -58,7 +58,7 @@ export const cartApi = {
   removeCourseFromCart: (courseId: number) => {
     return request<Cart>({
       method: 'DELETE',
-      url: `/cart/courses/${courseId}`
+      url: `/cart/courses/remove/${courseId}`
     });
   },
 

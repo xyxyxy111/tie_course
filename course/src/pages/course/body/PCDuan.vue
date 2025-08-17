@@ -12,7 +12,7 @@ import FloatingBox from '../components/FloatingBox.vue';
 import { goToCart, goToLogin } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription, useCart } from '../components/content';
-
+import { wishlistApi } from '@/api/user';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
@@ -111,6 +111,35 @@ const CourseDescriptionStyle = computed(() => ({
   height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
 }));
 
+
+// 加入心愿单
+const handleAddToWishlist = async (courseId: number) => {
+  try {
+    const searchParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(searchParams.get('courseId') || '0');
+
+    console.log('正在添加课程到心愿单，courseId:', courseId);
+    const response = await wishlistApi.addToWishlist(courseId);
+    console.log('添加心愿单成功:', response);
+    alert('课程已添加到心愿单');
+  } catch (error: any) {
+    console.error('添加心愿单失败:', error);
+    let errorMessage = '添加失败，请重试';
+    if (error.response) {
+      const { status, data } = error.response;
+      if (status === 401) {
+        errorMessage = '请先登录';
+      } else if (status === 409) {
+        errorMessage = '课程已在心愿单中';
+      } else if (data && data.message) {
+        errorMessage = data.message;
+      }
+    }
+    alert(errorMessage);
+  }
+};
+
+
 const handleAddToCart = async () => {
   try {
     // 从URL获取courseId
@@ -173,9 +202,9 @@ const handleBuyNow = async () => {
   <CartPopup :style="`width:${width};height:${height}`" v-model="showCart" :courseName="courseVo?.title || ''"
     :courseId="courseVo?.courseId" />
   <PCHeader :userId="userId" />
-  <FloatingBox v-if="courseVo" :courseVideo="courseVo?.coverImgUrl" :currentPrice="courseVo?.currentPrice"
-    :originalPrice="courseVo?.originalPrice" :discount="courseVo?.discountValue" @addToCart="handleAddToCart"
-    @buyNow="handleBuyNow" />
+  <FloatingBox v-if="courseVo" :courseId="courseVo.courseId" :courseVideo="courseVo?.coverImgUrl"
+    :currentPrice="courseVo?.currentPrice" :originalPrice="courseVo?.originalPrice" :discount="courseVo?.discountValue"
+    @addToWishlist="handleAddToWishlist" @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
 
   <div id="top-container">
     <div class="content">

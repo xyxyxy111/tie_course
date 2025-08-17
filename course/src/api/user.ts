@@ -100,12 +100,22 @@ export interface ChangePasswordParams {
 
 export const authApi = {
   // 发送验证码
-  sendCaptcha: (phone: string) => {
+  sendSmsCaptcha: (phone: string) => {
     return request({
       method: 'POST',
-      url: '/auth/captcha',
+      url: '/auth/sms-captcha',
       params: {
         phone: phone.trim()
+      }
+    });
+  },
+
+  sendEmailCaptcha: (email: string) => {
+    return request({
+      method: 'POST',
+      url: '/auth/email-captcha',
+      params: {
+        email: email.trim()
       }
     });
   },
