@@ -14,7 +14,7 @@ import { goToIndex } from '@/components/common/header.ts';
 import {
   captchaBtn,
   loginMethod,
-  sendCaptcha,
+  sendSmsCaptcha,
   switchLoginMethod,
   wechatPollingInterval, useFormValidation, useLoginData, loginStatus
 } from '../content';
@@ -97,7 +97,7 @@ onMounted(() => {
               <input v-model="loginForm.phone" placeholder="手机号" class="phone">
               <div class="captcha-input-group">
                 <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha">
-                <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+                <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendSmsCaptcha">
                   {{ captchaBtn.text }}
                 </button>
               </div>

@@ -12,10 +12,15 @@ import { successCodes } from '@/utils/request';
 import { goToIndex } from '@/components/common/header.ts';
 
 import {
-  captchaBtn, qrCodeUrl,
   loginMethod,
-  sendCaptcha,
-  switchLoginMethod, useLoginData, loginStatus
+  registerMethod, registerForm,
+  captchaBtn, registerCaptchaBtn,
+  loginStatus, registerStatus,
+  switchLoginMethod, switchRegisterMethod,
+  qrCodeUrl, state,
+  useFormValidation, useLoginData,
+  sendSmsCaptcha, sendEmailCaptcha,
+  handleRegister, registerByPhone, registerByEmail
 } from '../content';
 
 const {
@@ -47,7 +52,7 @@ const passwordError = ref("");
 
 let iconWidth = ref(26 + (width.value - 1920) / 100)
 iconWidth.value = (iconWidth.value > 26) ? iconWidth.value : 26;
-
+const signFlag = ref(false);
 
 function validatePhone() {
   if (!loginForm.phone) {
@@ -132,9 +137,11 @@ onMounted(() => {
       </div>
 
       <div class="login-form">
-        <h1 v-if="loginMethod !== 'wechat'">登录以继续您的学习之旅</h1>
-        <h1 v-if="loginMethod === 'wechat'">请打开微信扫描以下二维码</h1>
-        <form @submit.prevent="handleLogin()">
+        <h1 v-if="loginMethod !== 'wechat' &&
+          !signFlag">登录以继续您的学习之旅</h1>
+        <h1 v-if="signFlag">注册以开启您的学习之旅</h1>
+        <h1 v-if="loginMethod === 'wechat' && !signFlag">请打开微信扫描以下二维码</h1>
+        <form @submit.prevent="handleLogin()" v-if="!signFlag">
           <div class="input-group">
 
             <!-- 验证码登录方式 -->
@@ -148,7 +155,7 @@ onMounted(() => {
 
                 <div class="captcha-input-group">
                   <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
-                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendSmsCaptcha">
                     {{ captchaBtn.text }}
                   </button>
                 </div>
@@ -219,35 +226,106 @@ onMounted(() => {
             登录成功，正在跳转...
           </div>
         </form>
+        <form @submit.prevent="handleRegister()" v-else>
+          <div class="input-group">
+
+            <div v-if="registerMethod === 'phone'" class="captcha-wrapper">
+              <div
+                :class="['form-item', { 'has-error': registerStatus.error && registerStatus.error.includes('手机号') }]">
+                <input v-model="registerForm.phone" placeholder="手机号" class="phone" />
+                <div v-if="registerStatus.error && registerStatus.error.includes('手机号')" class="error-message">
+                  {{ registerStatus.error }}
+                </div>
+              </div>
+
+              <div
+                :class="['form-item', { 'has-error': registerStatus.error && registerStatus.error.includes('验证码') }]">
+                <div class="captcha-input-group">
+                  <input v-model="registerForm.captcha" type="text" placeholder="验证码" class="captcha" />
+                  <button type="button" class="send-msg" :disabled="registerCaptchaBtn.disabled"
+                    @click="sendSmsCaptcha">
+                    {{ captchaBtn.text }}
+                  </button>
+                </div>
+                <div v-if="registerStatus.error && registerStatus.error.includes('验证码')" class="error-message">
+                  {{ registerStatus.error }}
+                </div>
+              </div>
+            </div>
+
+            <div v-if="registerMethod === 'email'" class="email-wrapper">
+              <div :class="['form-item', { 'has-error': registerStatus.error && registerStatus.error.includes('邮箱') }]">
+                <input v-model="registerForm.email" placeholder="邮箱" class="email" />
+                <div v-if="registerStatus.error && registerStatus.error.includes('邮箱')" class="error-message">
+                  {{ registerStatus.error }}
+                </div>
+              </div>
+
+              <div
+                :class="['form-item', { 'has-error': registerStatus.error && registerStatus.error.includes('验证码') }]">
+                <div class="captcha-input-group">
+                  <input v-model="registerForm.captcha" type="text" placeholder="验证码" class="captcha" />
+                  <button type="button" class="send-msg" :disabled="registerCaptchaBtn.disabled"
+                    @click="sendEmailCaptcha">
+                    {{ captchaBtn.text }}
+                  </button>
+                </div>
+                <div v-if="registerStatus.error && registerStatus.error.includes('验证码')" class="error-message">
+                  {{ registerStatus.error }}
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+
+          <button type="submit" class="login-button" :disabled="registerStatus.loading">
+            {{ registerStatus.loading ? '注册中...' : '注册' }}
+          </button>
+
+          <div v-if="registerStatus.success" class="success-message">
+            注册成功，正在跳转...
+          </div>
+        </form>
         <div class="login-divider">
           <span class="divider-line"></span>
-          <span class="divider-text">其它登录选项</span>
+          <span v-if="!signFlag" class="divider-text">其它登录选项</span>
+          <span v-else class="divider-text">其它注册选项</span>
+
           <span class="divider-line"></span>
         </div>
 
         <div class="login-icons">
-          <button v-if="loginMethod !== 'captcha'" class="login-icon-btn" @click="switchLoginMethod(0)">
+          <button v-if="(loginMethod !== 'captcha' && !signFlag) || (registerMethod == 'email' && signFlag)"
+            class="login-icon-btn" @click="signFlag ? switchRegisterMethod('phone') : switchLoginMethod(0)">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#gridicons--phone" />
             </svg>
           </button>
-          <button v-if="loginMethod !== 'password'" class=" login-icon-btn" @click="switchLoginMethod(1)">
+          <button v-if="loginMethod !== 'password' && !signFlag" class=" login-icon-btn" @click="switchLoginMethod(1)">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#solar--key-bold" />
             </svg>
           </button>
-          <button v-if="loginMethod !== 'email'" class="login-icon-btn" @click="switchLoginMethod(2)">
+          <button v-if="(loginMethod !== 'email' && !signFlag) || (registerMethod == 'phone' && signFlag)"
+            class="login-icon-btn" @click="signFlag ? switchRegisterMethod('email') : switchLoginMethod(2)">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#ic--outline-email" />
             </svg>
           </button>
-          <button v-if="loginMethod !== 'wechat'" class="login-icon-btn wx-icon-btn"
+          <button v-if="loginMethod !== 'wechat' && !signFlag" class="login-icon-btn wx-icon-btn"
             @click="switchLoginMethod(3); handleWechatLogin()">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="#27b148">
               <use href="#ic--baseline-wechat" />
             </svg>
           </button>
         </div>
+        <button @click="signFlag = !signFlag" class="sign-button">
+          <div v-if="!signFlag">尚无账户?<p>注册</p>
+          </div>
+          <div v-else> 登录到其它账户</div>
+
+        </button>
       </div>
     </div>
 

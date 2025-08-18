@@ -36,7 +36,7 @@ const payLoading = ref(false);
 const payStatusMsg = ref('');
 const payStatusType = ref('loading');
 const payOrderInfo = ref<any>(null);
-const currentOrderId = ref<string | null>(null);
+const currentOrderId = ref<string>('');
 
 const apiBase = 'https://itie.sumixer.com/api';
 const qrCodeImage = ref('');
@@ -391,21 +391,36 @@ function extractPayUrl(formHtml: string): string | null {
   return form?.getAttribute('action') || null;
 }
 
-async function confirmPayment() {
-  isConfirmingPayment.value = true;
-  try {
-    // 模拟支付确认过程，实际项目中应该查询订单状态
-    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // 支付成功后跳转到购物车
+// 查询订单状态
+async function queryOrderStatus() {
+  if (!currentOrderId) {
+    alert('请先创建订单');
+    return;
+  }
+  try {
+    const response = await orderApi.queryWechatOrderStatus(currentOrderId.value);
+    return response;
+  } catch (error) {
+
+  }
+}
+// 确认支付
+async function confirmPayment() {
+  if (isConfirmingPayment.value) return;
+  try {
+    // 先查询订单状态
+    const response = await queryOrderStatus(); console.log(response);
+    if (response?.status === 1)
+      isConfirmingPayment.value = true;
     goToCart();
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '未知错误';
     console.error('确认支付失败:', error);
   } finally {
     isConfirmingPayment.value = false;
-    showWechatModal.value = false;
   }
-}
+};
 
 async function createAliPayment() {
 

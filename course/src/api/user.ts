@@ -10,8 +10,13 @@ export interface LoginByPasswordParams {
   password: string;
 }
 
-export interface RegisterParams {
+export interface RegisterByPhoneParams {
   phone: string;
+  captcha: string;
+}
+
+export interface RegisterByEmailParams {
+  email: string;
   captcha: string;
 }
 
@@ -95,12 +100,22 @@ export interface ChangePasswordParams {
 
 export const authApi = {
   // 发送验证码
-  sendCaptcha: (phone: string) => {
+  sendSmsCaptcha: (phone: string) => {
     return request({
       method: 'POST',
-      url: '/auth/captcha',
+      url: '/auth/sms-captcha',
       params: {
         phone: phone.trim()
+      }
+    });
+  },
+
+  sendEmailCaptcha: (email: string) => {
+    return request({
+      method: 'POST',
+      url: '/auth/email-captcha',
+      params: {
+        email: email.trim()
       }
     });
   },
@@ -130,6 +145,23 @@ export const authApi = {
       data
     });
   },
+
+  registerbyphone: (data: RegisterByPhoneParams) => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/registrations/by-phone',
+      data
+    });
+  },
+
+  registerbyemail: (data: RegisterByEmailParams) => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/registrations/by-email',
+      data
+    });
+  },
+
 
   // 检查手机号是否注册
   checkPhoneAvailable: (phone: string) => {

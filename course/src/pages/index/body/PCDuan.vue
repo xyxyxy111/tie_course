@@ -142,8 +142,9 @@ const courseSliderStyle = computed(() => ({
                       <div class="course-rating">
                         {{ course.score }} ★★★★★ (2,187)
                       </div>
-                      <div class="course-price">
-                        ¥{{ course.originalPrice }}
+                      <div class="course-price-container">
+                        <span class="current-price">¥{{ course.currentPrice }}</span>
+                        <span class="original-price">¥{{ course.originalPrice }}</span>
                       </div>
                       <div class="cart-tag">热门课程</div>
                     </div>
@@ -161,9 +162,6 @@ const courseSliderStyle = computed(() => ({
           </button>
         </div>
         <button class="show-all-btn">显示所有 {{ selectedCategoryTitle }} 课程</button>
-
-
-
       </div>
       <!-- 已登录 -->
       <div v-if="userId" class="start-section">
@@ -172,6 +170,9 @@ const courseSliderStyle = computed(() => ({
           <h3>我的学习</h3>
         </div>
         <div class="mylearn-course-item-container">
+          <div v-if="!mylist?.length">
+            <p>您还没有任何课程，去探索课程开始学习吧！</p>
+          </div>
           <div v-for="course in mylist" :key="course.courseId" class="mylearn-course-item">
             <div class="mylearn-course-cover">
               <img :src="course.coverImgUrl" />
@@ -189,6 +190,7 @@ const courseSliderStyle = computed(() => ({
           </div>
         </div>
       </div>
+
       <!-- 
       <div v-if="userId" class="next-section">
         <h2 class="next-title">下一步要学习什么</h2>
@@ -213,6 +215,7 @@ const courseSliderStyle = computed(() => ({
           </div>
         </div>
       </div> -->
+
 
       <div v-if="userId" class="recommend-section">
         <h2 class="recommend-title">为您精心挑选的课程</h2>
@@ -241,7 +244,12 @@ const courseSliderStyle = computed(() => ({
               <span class="recommend-card-count">(1,025)</span>
               <span class="recommend-card-tag">热门课程</span>
             </div>
-            <div class="recommend-card-price">￥{{ hottestCourseList[0]?.currentPrice }}</div>
+            <div class="recommend-card-price">
+              <div class="course-price-container">
+                <span class="current-price">¥{{ hottestCourseList[0]?.currentPrice }}</span>
+                <span class="original-price">¥{{ hottestCourseList[0]?.originalPrice }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -270,26 +278,22 @@ const courseSliderStyle = computed(() => ({
                       </span>
                       <span class="watching-card-count">(1,025)</span>
                     </div>
-                    <div class="watching-card-price">￥{{ course.originalPrice }}</div>
+                    <div class="course-price-container">
+                      <span class="current-price">¥{{ course.currentPrice }}</span>
+                      <span class="original-price">¥{{ course.originalPrice }}</span>
+                    </div>
                     <div class="cart-tag">热门课程</div>
                   </div>
                 </div>
               </template>
             </HoverPopup>
           </div>
-          <!-- 
-          //右侧箭头按钮 
-          <button class="watching-arrow-btn right"><span>›</span></button> -->
         </div>
-
       </div>
-
     </div>
     <Footer />
   </main>
-
 </template>
-
 <style scoped>
 @import "@/assets/rem.css";
 
@@ -491,7 +495,6 @@ const courseSliderStyle = computed(() => ({
   border: 1px solid #a3c7fd52;
 }
 
-
 .course-card img,
 .watching-card .watching-card-cover img {
   width: 100%;
@@ -523,12 +526,38 @@ const courseSliderStyle = computed(() => ({
   margin: 5px 20px;
 }
 
-.course-card .course-price,
-.watching-card .watching-card-price {
-  font-size: 1.6rem;
+/* Price styling for all price displays */
+.course-price-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 20px;
+}
+
+.current-price {
+  font-size: 1.8rem;
   font-weight: bold;
-  margin: 0px 20px;
-  color: red;
+  color: #ff0000;
+}
+
+.original-price {
+  font-size: 1.4rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* For watching card prices */
+.watching-card .course-price-container {
+  margin: 0 20px;
+}
+
+/* For recommend card price */
+.recommend-card-price .course-price-container {
+  margin: 0;
+}
+
+.recommend-card-price .current-price {
+  font-size: 2rem;
 }
 
 .button-next,
@@ -595,7 +624,6 @@ const courseSliderStyle = computed(() => ({
   background: #235e8f12;
 }
 
-
 /* 已登录 */
 .start-section,
 .watching-section,
@@ -631,6 +659,13 @@ const courseSliderStyle = computed(() => ({
 .start-section .mylearn-course-item-container {
   display: flex;
 }
+
+.start-section .mylearn-course-item-container p {
+  font-size: 1.6rem;
+  color: #666;
+  margin: 20px 0;
+}
+
 
 .start-section .mylearn-course-item-container .mylearn-course-item {
   display: flex;
@@ -811,50 +846,6 @@ const courseSliderStyle = computed(() => ({
   font-size: 1.3rem;
 }
 
-.next-card-price {
-  font-size: 1.6rem;
-  color: #1742a0;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.next-card-tag {
-  display: inline-block;
-  background: #e5e7eb;
-  color: rgb(22, 92, 125);
-  font-size: 1.3rem;
-  font-weight: 600;
-  border-radius: 6px;
-  padding: 2px 10px;
-  margin-top: 2px;
-}
-
-.next-arrow-btn {
-  position: absolute;
-  right: -36px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #fff;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 2.2rem;
-  color: rgb(22, 92, 125);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  transition: all 0.18s;
-}
-
-.next-arrow-btn:hover {
-  background: rgb(22, 92, 125);
-  color: #fff;
-}
-
 .recommend-title {
   font-size: 2.2rem;
   font-weight: 700;
@@ -985,13 +976,6 @@ const courseSliderStyle = computed(() => ({
   margin-left: 8px;
 }
 
-.recommend-card-price {
-  position: relative;
-  bottom: 0px;
-  font-size: 2rem;
-  font-weight: 700;
-}
-
 .watching-section {
   margin: 32px 0 0 32px;
 }
@@ -1002,112 +986,6 @@ const courseSliderStyle = computed(() => ({
   color: #111;
   margin-bottom: 50px;
 }
-
-/* 
-.watching-cards-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  position: relative;
-} */
-
-/* 
-.watching-card {
-  width: 220px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1.5px solid #f3f4f6;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: box-shadow 0.2s;
-  position: relative;
-} */
-/* 
-.watching-card:hover {
-  box-shadow: 0 6px 24px rgba(33,84,150, 0.13);
-} */
-/* 
-.watching-card-cover {
-  width: 100%;
-  height: 110px;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.watching-card-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-} */
-
-/* .watching-card-content {
-  padding: 14px 16px 12px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.watching-card-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #222;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.watching-card-author {
-  font-size: 1.3rem;
-  color: #888;
-  margin-bottom: 8px;
-} */
-/* 
-.watching-card-rating {
-  display: flex;
-  align-items: center;
-  font-size: 1.4rem;
-  margin-bottom: 8px;
-}
-
-.watching-card-score {
-  color: #f59e42;
-  font-weight: 700;
-  margin-right: 4px;
-}
-
-.watching-card-stars {
-  color: #f59e42;
-  margin-right: 4px;
-  font-size: 1.5rem;
-} */
-/* 
-.watching-card-stars .star {
-  margin-right: 1px;
-  color: #f59e42;
-}
-
-.watching-card-stars .star.filled {
-  color: #f59e42;
-} */
-/* 
-.watching-card-count {
-  color: #888;
-  font-size: 1.3rem;
-} */
-
-/* .watching-card-price {
-  font-size: 1.6rem;
-  color: #1742a0;
-  font-weight: 700;
-  margin-bottom: 8px;
-} */
 
 .cart-tag {
   display: inline-block;

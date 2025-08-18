@@ -32,6 +32,7 @@ export class CourseQuickView {
   coverImgUrl: string;
   title: string;
   score: number;
+  currentPrice: number;
   originalPrice: number;
   updateTime: Date;
   totalMinutes: number;
@@ -43,6 +44,7 @@ export class CourseQuickView {
     coverImgUrl: string,
     title: string,
     score: number,
+    currentPrice: number,
     originalPrice: number,
     updateTime: Date,
     totalMinutes: number,
@@ -53,6 +55,7 @@ export class CourseQuickView {
     this.coverImgUrl = coverImgUrl;
     this.title = title;
     this.score = score;
+    this.currentPrice = currentPrice;
     this.originalPrice = originalPrice;
     this.updateTime = updateTime;
     this.totalMinutes = totalMinutes;
@@ -99,7 +102,6 @@ export const useIndexData = () => {
       await fetchProfile();
     }
     await fetchHottestCourse();
-    console.log('热门')
     console.log(hottestCourseList.value)
     await fetchCategories();
     selectedCategoryId.value = 1;
@@ -117,6 +119,7 @@ export const useIndexData = () => {
         course.coverImgUrl,
         course.title,
         course.score,
+        course.currentPrice,
         course.originalPrice,
         new Date(course.updateTime || new Date()),
         course.totalMinutes,
@@ -170,7 +173,7 @@ const fetchHottestCourse = async () => {
     const response = await courseApi.getHottestCourse();
     if (response && response.data && Array.isArray(response.data)) {
       hottestCourseList.value = response.data as CourseListVO[];
-          console.log('热门A')
+      console.log('热门A')
       console.log(hottestCourseList.value);
       hottestCourseQuickViews.value = hottestCourseList.value.map(
         course => {
@@ -179,6 +182,8 @@ const fetchHottestCourse = async () => {
             course.coverImgUrl,
             course.title,
             course.score,
+
+            course.currentPrice,
             course.originalPrice,
             new Date(course.updateTime || new Date()),
             course.totalMinutes,
@@ -265,6 +270,8 @@ const changeTag = async (i: NavigationButton) => {
       course.coverImgUrl,
       course.title,
       course.score,
+
+      course.currentPrice,
       course.originalPrice,
       new Date(course.updateTime || new Date()),
       course.totalMinutes,
@@ -283,6 +290,8 @@ const getCourseListByTagId = async (tagId: number) => {
       course.coverImgUrl,
       course.title,
       course.score,
+
+      course.currentPrice,
       course.originalPrice,
       new Date(course.updateTime || new Date()),
       course.totalMinutes,

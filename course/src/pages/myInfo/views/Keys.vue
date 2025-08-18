@@ -36,7 +36,7 @@
       <div class="form-group">
         <label for="phone">验证码</label>
         <input v-model="changePhoneform.captcha" type="text" placeholder="验证码" class="captcha">
-        <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendCaptcha">
+        <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendSmsCaptcha">
           {{ captchaBtn.text }}
         </button>
       </div>
@@ -101,12 +101,12 @@ export default defineComponent({
     }
 
 
-    const sendCaptcha = async () => {
+    const sendSmsCaptcha = async () => {
       captchaBtn.value.disabled = true;
       try {
         let res;
-        if (changePhoneform.newPhone) { res = await authApi.sendCaptcha(changePhoneform.newPhone); }
-        else { res = await authApi.sendCaptcha(changePhoneform.newPhone); }
+        if (changePhoneform.newPhone) { res = await authApi.sendSmsCaptcha(changePhoneform.newPhone); }
+        else { res = await authApi.sendSmsCaptcha(changePhoneform.newPhone?changePhoneform.newPhone:form.phone); }
         if (!successCodes.includes(res.status)) {  // 改成 status
           console.log(res.status)
           alert(res.message || '发送验证码失败');
@@ -172,7 +172,7 @@ export default defineComponent({
     return {
       form,
       captchaBtn,
-      sendCaptcha,
+      sendSmsCaptcha,
       changePhoneform,
       changePasswordForm,
       changePhone,
@@ -236,9 +236,9 @@ textarea {
 button {
   display: inline-block;
   position: relative;
-  top: 3px;
+  top: 1px;
   width: 130px;
-  height: 50px;
+  height: 36px;
   background-color: #215496;
   color: white;
   border: none;

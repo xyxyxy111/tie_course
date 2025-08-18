@@ -293,9 +293,9 @@ export default defineComponent({
 }
 
 .added-notification img {
-  width: 30%;
+  width: 135px;
   margin-top: 3px;
-  height: fit-content;
+  height: 90px;
 }
 
 .shopping-cart-container button,
@@ -310,6 +310,7 @@ export default defineComponent({
   height: 30px;
   font-size: 1.2rem;
   transition: all 0.3s;
+  white-space: nowrap;
 }
 
 .shopping-cart-container button:hover,
@@ -331,6 +332,7 @@ export default defineComponent({
 
 .recommendationItem-detail {
   margin-left: 10px;
+  width: 55%;
 }
 
 .shopping-cart-container h2 {
