@@ -13,7 +13,7 @@
 <script>
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
-import localVideo from './test.mp4'; 
+import localVideo from './10001.mp4'; 
 import { videoApi } from '@/api/course';
 
 export default {
@@ -27,9 +27,9 @@ export default {
   },
   methods:{
     async getVideo() {
-        const response = await videoApi.getLessonVideoOssSignatureUrl('test');
+        const response = await videoApi.getLessonVideoOssSignatureUrl('10001.mp4');
         console.log(response);
-
+        this.videoUrl = response.data;
 
 
         this.initVideoPlayer(); // 成功获取URL后，初始化播放器
@@ -51,6 +51,7 @@ export default {
     },
     initVideoPlayer() {
       console.log('yes')
+      console.log(this.videoUrl)
       if (!this.videoUrl) {
         return;
       }
@@ -62,7 +63,8 @@ export default {
         fluid: true,
         sources: [
           {
-            src: localVideo,
+            src: this.videoUrl,
+            // src: localVideo,
             type: 'video/mp4'
           }
         ],

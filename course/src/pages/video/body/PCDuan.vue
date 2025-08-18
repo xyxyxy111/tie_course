@@ -107,7 +107,7 @@ import 'video.js/dist/video-js.min.css'
 import 'videojs-contrib-quality-levels';
 
 
-import VideoPlayer from './VideoPlayer.vue';
+import VideoPlayer from '../components/VideoPlayer.vue';
 export default {
   name: 'CoursePage',
   components: {
@@ -175,7 +175,7 @@ export default {
 .course-page {
   display: flex;
   width: 2200px;
-  height: 1080px;
+  height: 700px;
   margin: 0 auto;
   overflow: hidden;
 }
@@ -201,8 +201,10 @@ export default {
   position: relative;
   background: #000;
   max-width: 1200px;
+  max-height:700px;
   margin: 0 auto;
   padding: 20px;
+  /* padding-top: calc(9 / 16 * 100%); */
 }
 
 .video-player {
