@@ -1,4 +1,5 @@
 <template>
+  <Header />
   <div class="course-page">
 
     <div class="video-container">
@@ -8,23 +9,31 @@
     <div class="course-sidebar">
       <div class="course-container">
         <h1 class="course-title">课程内容</h1>
-        
-        <div class="chapter" v-for="(chapter, index) in chapters" :key="index">
+
+        <div v-for="(chapter, index) in chapters" :key="index">
           <div class="chapter-header" @click="toggleChapter(index)">
-            <h2 class="chapter-title">{{ chapter.title }}</h2>
-            <span class="chapter-progress">{{ chapter.completed }}/{{ chapter.lessons.length }} | {{ chapter.duration
-            }}</span>
-            <span class="toggle-icon">{{ isChapterOpen(index) ? '−' : '+' }}</span>
+            <div class="chapter">
+              <h2 class="chapter-title">{{ chapter.title }}</h2>
+              <div class="chapter-progress">{{ chapter.completed }}/{{ chapter.lessons.length }} | {{ chapter.duration
+              }}</div>
+            </div>
+            <span class="arrow" :class="{ open: openChapters.includes(index) }"></span>
           </div>
 
-          <div class="lessons-container" v-show="isChapterOpen(index)">
+          <div class="lessons-container" v-show="isChapterOpen(index)" :class="{ open: isChapterOpen(index) }">
             <div class="lesson" v-for="(lesson, lessonIndex) in chapter.lessons" :key="lessonIndex"
               @click="selectLesson(chapter, lesson)">
-              <input type="checkbox" :id="`lesson-${index}-${lessonIndex}`" v-model="lesson.completed"
-                class="lesson-checkbox" @click.stop>
+              <!-- <input type="checkbox" :id="`lesson-${index}-${lessonIndex}`" v-model="lesson.completed"
+                class="lesson-checkbox" @click.stop> -->
               <label :for="`lesson-${index}-${lessonIndex}`" class="lesson-label">
-                <span class="lesson-name">{{ lesson.name }}</span>
-                <span class="lesson-duration">{{ lesson.duration }}</span>
+                <div class="lesson-title">{{ lesson.title }}</div>
+                <svg width="24" height="24" viewBox="0 -7 24 30" fill="#222">
+                  <use href="#ph--video-fill" />
+                </svg>
+                <span class="lesson-duration">
+
+
+                  {{ lesson.duration }}</span>
               </label>
             </div>
           </div>
@@ -37,58 +46,96 @@
       <div class="course-title">
         <h1>不光教您怎么用，更重要的是教您为什么·平台最好的Git中文课</h1>
       </div>
-
       <div class="course-meta">
         <div class="rating">
-          <span class="stars">★★★★☆</span>
-          <span class="rating-value">4.5</span>
-          <span class="reviews">(1,030 个评分)</span>
+          <span class="stars">4.5★</span>
+          <span class="rating-value"></span>
+          <span class="reviews">1,030 个评分</span>
         </div>
-        <div class="stats">
-          <span class="students">7,551 名学生</span>
-          <span class="duration">14.5小时</span>
+        <div class="column">
+          <h3>7,551</h3>
+          <h4>学生</h4>
         </div>
-        <div class="update-info">
-          <span>上次更新 2024年4月</span>
-        </div>
-        <div class="total-hour">
-          视频:总共 {{ 14.5 }}小时
+        <div class="column">
+          <h3>14.5</h3>
+          <h4>小时</h4>
         </div>
 
 
       </div>
+      <div class="update-info">
+        <span>上次更新 2024年4月</span>
+      </div>
+      <div class="total-hour">
+        视频:总共 {{ 14.5 }}小时
+      </div>
+
+
     </div>
 
-    <!-- 课程描述 -->
     <div class="course-description">
-      <h2>课程描述</h2>
-      <div class="description-content">
-        <p>Git是一个开源的分布式版本控制系统，可以有效、高速的处理从很小到非常大的项目版本管理。Git 是Linux之父 Linus Torvalds 为了帮助管理 Linux 内核开发而开发的一个开放源码的版本控制软件。
-        </p>
 
-        <h3>本课程主要分为两大部分：</h3>
-        <ol>
-          <li>Git的基础知识，还有底层原理，包括本地和远程的Git操作，包括初始化代码仓库，提交，push，分支，merge等</li>
-          <li>GitHub，GitLab的使用，通过详细的讲解两款产品的特性，达到熟悉和对比的效果，让每一个人都能从中选择一个适合自己的。</li>
-        </ol>
 
-        <h3>您将会学到什么</h3>
-        <ul>
-          <li>熟练掌握Git/Github/GitLab的使用</li>
-          <li>多人协作下基于Git的开发流程</li>
-          <li>Git的Best Practice</li>
-          <li>Git的基本原理</li>
-        </ul>
+      <div class="study-plan-card-container">
+        <div class="study-plan-card">
+          <svg width="60" height="60" fill="#222" style="vertical-align: middle;">
+            <use href="#lets-icons--clock" />
+          </svg>
+          <div class="plan-header">
+            <div class="plan-title">安排学习时间</div>
+            <div class="plan-desc">
+              学习需要日积月累。研究表明，养成良好学习习惯的学生更有可能实现目标。请留出时间向学习计划提醒接收提醒。
+            </div>
+          </div>
+        </div>
+        <div class="plan-actions">
+          <button class="plan-btn">开始</button>
+          <button class="cancel-btn">取消</button>
+        </div>
+      </div>
+      <div class="course-info-card">
+        <h3 class="section-title">基本信息</h3>
+        <div class="info-section">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">技能水平:</span>
+              <span class="info-value">初级</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">学生:</span>
+              <span class="info-value">3796</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">语言:</span>
+              <span class="info-value">简体中文</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">字幕:</span>
+              <span class="info-value">否</span>
+            </div>
+          </div>
 
-        <h3>有哪些课程要求或基本要求？</h3>
-        <p>Basic computer knowledge基本的计算机知识</p>
-
-        <h3>此课程面向哪些人：</h3>
-        <ul>
-          <li>想学习如何使用Git</li>
-          <li>想学习如何使用GitHub</li>
-          <li>想学习如何使用GitLab</li>
-        </ul>
+        </div>
+        <div class="info-section">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">练习测试:</span>
+              <span class="info-value">2</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">问题:</span>
+              <span class="info-value">2</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">讲授:</span>
+              <span class="info-value">114</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">视频:</span>
+              <span class="info-value">总共 45.5 小时</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -98,69 +145,184 @@
 
 <script lang="ts">
 import { useWindowSize } from '@/useWindowSize'
-import { ref, onMounted } from 'vue'
-import PCHeader from '@/components/common/PCHeader.vue'
+import { ref, onMounted, computed } from 'vue'
 import { getCurrentUserId, getValidToken } from '@/utils/request'
-
 import videojs from 'video.js';
 import 'video.js/dist/video-js.min.css'
 import 'videojs-contrib-quality-levels';
-
-
+import Header from '../components/Header.vue';
 import VideoPlayer from '../components/VideoPlayer.vue';
+const { width, height } = useWindowSize()
+
+
+interface Lesson {
+  title: string;
+  duration: number;
+  completed: boolean;
+}
+
+interface Chapter {
+  title: string;
+  completed: number;
+  lessons: Lesson[];
+}
+
+
+// 获取userId - 从token中获取而不是URL
+const userId = ref<string | null>(null)
+
+// 当前选中的课程
+const currentLesson = ref<Lesson | null>(null)
+
+// 打开的章节索引数组
+const openChapters = ref<number[]>([])
+
+// 响应式数据
+const chapters = ref<Chapter[]>([
+  {
+    title: 'Chapter 0 - Python简介',
+    completed: 0,
+    lessons: [
+      { title: '什么是Python?', duration: 10, completed: false },
+      { title: '为什么学习Python?', duration: 15, completed: false },
+      { title: '课程内容概述', duration: 8, completed: false },
+      { title: '如何做笔记?', duration: 12, completed: false }
+    ]
+  },
+  {
+    title: 'Chapter 1 - Python数据类型',
+    completed: 0,
+    lessons: [
+      { title: '数字类型', duration: 18, completed: false },
+      { title: '字符串', duration: 22, completed: false },
+      { title: '列表', duration: 25, completed: false },
+      { title: '元组', duration: 15, completed: false },
+      { title: '字典', duration: 20, completed: false }
+    ]
+  },
+  {
+    title: 'Chapter 2 - 控制流程',
+    completed: 0,
+    lessons: [
+      { title: '条件语句', duration: 20, completed: false },
+      { title: '循环语句', duration: 25, completed: false },
+      { title: '函数定义', duration: 30, completed: false },
+      { title: '异常处理', duration: 25, completed: false }
+    ]
+  },
+  {
+    title: 'Chapter 2 - 控制流程',
+    completed: 0,
+    lessons: [
+      { title: '条件语句', duration: 20, completed: false },
+      { title: '循环语句', duration: 25, completed: false },
+      { title: '函数定义', duration: 30, completed: false },
+      { title: '异常处理', duration: 25, completed: false }
+    ]
+  },
+  {
+    title: 'Chapter 2 - 控制流程',
+    completed: 0,
+    lessons: [
+      { title: '条件语句', duration: 20, completed: false },
+      { title: '循环语句', duration: 25, completed: false },
+      { title: '函数定义', duration: 30, completed: false },
+      { title: '异常处理', duration: 25, completed: false }
+    ]
+  },
+  {
+    title: 'Chapter 2 - 控制流程',
+    completed: 0,
+    lessons: [
+      { title: '条件语句', duration: 20, completed: false },
+      { title: '循环语句', duration: 25, completed: false },
+      { title: '函数定义', duration: 30, completed: false },
+      { title: '异常处理', duration: 25, completed: false }
+    ]
+  }
+])
+
+// 使用 computed 计算总进度
+const totalProgress = computed(() => {
+  let totalLessons = 0;
+  let completedLessons = 0;
+
+  chapters.value.forEach(chapter => {
+    totalLessons += chapter.lessons.length;
+    completedLessons += chapter.completed;
+  });
+
+  return totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+});
+
+// 使用计算属性创建章节的完成状态（替代watch的方案）
+const computedChapters = computed(() => {
+  return chapters.value.map(chapter => {
+    return {
+      ...chapter,
+      completed: chapter.lessons.filter(lesson => lesson.completed).length
+    };
+  });
+});
+
+// 切换章节展开/折叠状态
+function toggleChapter(index: number) {
+  const chapterIndex = openChapters.value.indexOf(index);
+  if (chapterIndex > -1) {
+    openChapters.value.splice(chapterIndex, 1);
+  } else {
+    openChapters.value.push(index);
+  }
+}
+
+// 检查章节是否打开
+function isChapterOpen(index: number) {
+  return openChapters.value.includes(index);
+}
+
+// 选择课程
+function selectLesson(chapter: Chapter, lesson: Lesson) {
+  currentLesson.value = lesson;
+  // 这里可以添加视频播放逻辑
+  console.log('播放课程:', lesson.title);
+}
+
+// 组件挂载时执行
+onMounted(() => {
+  // 从token获取userId
+  const token = getValidToken()
+  if (token) {
+    userId.value = getCurrentUserId()
+  }
+  // 如果没有token，userId保持为null，用户仍然可以观看视频
+
+  // 初始化章节完成状态
+  chapters.value = computedChapters.value;
+
+  // 默认打开第一个章节
+  if (chapters.value.length > 0) {
+    openChapters.value.push(0);
+  }
+})
+
+// 导出变量和函数供模板使用
 export default {
-  name: 'CoursePage',
   components: {
-    PCHeader,
+    Header,
     VideoPlayer
   },
   setup() {
-    const { width, height } = useWindowSize()
-    // 获取userId - 从token中获取而不是URL
-    const userId = ref<string | null>(null)
-    onMounted(() => {
-      // 从token获取userId
-      const token = getValidToken()
-      if (token) {
-        userId.value = getCurrentUserId()
-      }
-      // 如果没有token，userId保持为null，用户仍然可以观看视频
-    })
     return {
-      userId
-    }
-  },
-  data() {
-    return {
-      currentLesson: null
-    }
-  },
-  methods: {
-    toggleChapter(index: number) {
-      const chapterIndex = this.openChapters.indexOf(index);
-      if (chapterIndex > -1) {
-        this.openChapters.splice(chapterIndex, 1);
-      } else {
-        this.openChapters.push(index);
-      }
-    },
-    isChapterOpen(index: number) {
-      return this.openChapters.includes(index);
-    },
-    selectLesson(chapter: any, lesson: any) {
-      this.currentLesson = lesson;
-      // 这里可以添加视频播放逻辑
-      console.log('播放课程:', lesson.name);
-    }
-  },
-  watch: {
-    chapters: {
-      deep: true,
-      handler(newVal: any[]) {
-        newVal.forEach((chapter: any) => {
-          chapter.completed = chapter.lessons.filter((lesson: any) => lesson.completed).length;
-        });
-      }
+      width,
+      height,
+      userId,
+      currentLesson,
+      openChapters,
+      chapters: computedChapters,
+      totalProgress,
+      toggleChapter,
+      isChapterOpen,
+      selectLesson
     }
   }
 }
@@ -173,24 +335,26 @@ export default {
 
 .course-page {
   display: flex;
-  width: 2200px;
+  width: 1920px;
   height: 700px;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: visible;
+  background-color: #000;
 }
 
 .course-sidebar {
-  width: 280px;
-  height: 100%;
+  width: 480px;
   overflow-y: auto;
-  border-right: 1px solid #eaeaea;
-  background: #fff;
+  height: 100vw;
+  background-color: #fff;
+
+  z-index: 2000;
 }
 
 .course-container {
   font-family: Arial, sans-serif;
   color: #333;
-  padding: 15px;
+  background-color: #fff;
 }
 
 .video-container {
@@ -200,7 +364,7 @@ export default {
   position: relative;
   background: #000;
   max-width: 1200px;
-  max-height:700px;
+  max-height: 700px;
   margin: 0 auto;
   padding: 20px;
   /* padding-top: calc(9 / 16 * 100%); */
@@ -238,120 +402,77 @@ export default {
 }
 
 .course-title {
-  text-align: center;
-  margin-bottom: 20px;
+  text-align: left;
+  margin: 8px 20px;
   color: #2c3e50;
-  font-size: 1.2em;
-}
-
-.chapter {
-  border: 1px solid #eaeaea;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  overflow: hidden;
+  font-size: 1.1em;
+  font-weight: bolder;
 }
 
 .chapter-header {
+  background-color: #fff;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  background-color: #f9f9f9;
-  cursor: pointer;
-  user-select: none;
+  padding: 10px;
+  box-shadow: 0 0 0 0.5px #aaa;
 }
 
-.chapter-header:hover {
-  background-color: #f0f0f0;
+.chapter {
+  display: flex;
+  flex-direction: column;
 }
 
-.chapter-title {
-  flex-grow: 1;
-  margin: 0;
-  font-size: 0.9em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.chapter-title,
+.lesson-title {
+  font-size: 1.4rem;
+  font-weight: bolder;
+  color: #111;
 }
 
+.lesson-duration,
 .chapter-progress {
-  margin: 0 10px;
-  color: #666;
-  font-size: 0.8em;
-  white-space: nowrap;
-}
-
-.toggle-icon {
-  width: 16px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 0.9em;
+  font-size: 1.1rem;
+  font-weight: normal;
+  color: #888;
 }
 
 .lessons-container {
-  padding: 8px;
+  max-height: 0;
+  transition: all 0.3s ease;
+}
+
+.lessons-container.open {
+  max-height: fit-content;
+  transition: max-height 0.5s ease-in;
 }
 
 .lesson {
   display: flex;
   align-items: center;
-  padding: 6px 3px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
+  padding: 8px 15px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 0.5px #aaa;
 }
 
 .lesson:hover {
-  background-color: #f8f8f8;
+  background: #e8f4fc;
 }
 
-.lesson:last-child {
-  border-bottom: none;
+.lesson input {
+  margin-right: 15px;
+  transform: scale(1.3);
 }
 
-.lesson-checkbox {
-  margin-right: 8px;
-}
-
-.lesson-label {
-  flex-grow: 1;
-  display: flex;
-  justify-content: space-between;
-}
-
-.lesson-name {
-  color: #333;
-  font-size: 0.85em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-grow: 1;
-}
-
-.lesson-duration {
-  color: #888;
-  font-size: 0.8em;
-  margin-left: 10px;
-  white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-  .course-page {
-    flex-direction: column;
-  }
-
-  .course-sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 40vh;
-  }
-
-  .video-container {
-    height: 60vh;
-  }
+.lesson-label svg {
+  padding-top: 5px;
 }
 
 .course-info {
-  margin: 0 auto;
-  width: 2200px;
+  margin: 0 600px 0 0;
+  width: 1460px;
+  z-index: 1;
 }
 
 .course-platform {
@@ -371,44 +492,75 @@ export default {
 }
 
 .course-title h1 {
-  text-align: left;
-  font-size: 2.8rem;
-  margin-bottom: 10px;
-  color: #2c3e50;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.3;
 }
 
+.course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  gap: 25px;
+  align-items: center;
+}
 
 .rating {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
 }
 
 .stars {
-  color: #f8d64e;
-  font-size: 1.8rem;
+  color: #FFD700;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  font-weight: bolder;
 }
 
-.rating-value {
-  font-weight: bold;
-  font-size: 1.8rem;
-}
 
 .reviews {
-  color: #666;
+  font-size: 0.95rem;
+  opacity: 0.9;
 }
 
-.stats {
+.column {
   display: flex;
-  gap: 15px;
+  flex-direction: column;
+}
+
+.column h3 {
+  margin: 0 auto;
+  font-weight: bolder;
+}
+
+.students,
+.duration {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
 }
 
 
-.course-description {
-  margin-bottom: 30px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
+.update-info::before {
+  content: "⏱️";
+  font-size: 1.1rem;
+}
+
+.update-info,
+.total-hour {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+
+.total-hour::before {
+  content: "🎬";
+  font-size: 1.1rem;
 }
 
 .course-description h2 {
@@ -545,29 +697,142 @@ export default {
   font-size: 1.2rem;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .video-container {
-    padding: 10px;
-  }
+.arrow {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  transition: transform 0.2s;
+  position: relative;
+}
 
-  .video-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
+.arrow::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid #888;
+  border-bottom: 2px solid #888;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transform: rotate(-45deg);
+  transition: transform 0.2s;
+}
 
-  .video-stats {
-    gap: 15px;
-  }
+.arrow.open::before {
+  transform: rotate(135deg);
+  top: 5px;
+}
 
-  .video-item {
-    flex-direction: column;
-  }
+.study-plan-card-container {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #f3f4f6;
+  padding: 28px 36px 24px 36px;
+  margin-bottom: 24px;
+  min-height: 80px;
+}
 
-  .video-thumbnail {
-    width: 100%;
-    height: 150px;
-  }
+.study-plan-card {
+  display: flex;
+}
+
+.plan-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 36px;
+  margin-bottom: 8px;
+}
+
+.plan-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.plan-desc {
+  font-size: 1.5rem;
+  color: #666;
+  margin-bottom: 18px;
+
+}
+
+.plan-actions {
+  display: flex;
+  gap: 16px;
+  margin-left: 36px;
+}
+
+.plan-btn,
+.cancel-btn {
+  padding: 8px 40px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid #215496;
+}
+
+.plan-btn {
+  background: #215496;
+  color: #fff;
+}
+
+.plan-btn:hover {
+  background: #fff;
+  color: #215496;
+}
+
+.cancel-btn {
+  background: #fff;
+  color: #215496;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(33, 84, 150, 0.1);
+}
+
+.course-info-card {
+  display: flex;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.info-section {
+  flex: 1;
+  margin-bottom: 12px;
+  margin-right: 260px;
+}
+
+.section-title {
+  flex: 1;
+  font-size: 1.25rem;
+  font-weight: bolder;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2);
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
 }
 </style>

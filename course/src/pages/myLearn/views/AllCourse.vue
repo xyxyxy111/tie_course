@@ -47,7 +47,6 @@
             学习需要日积月累。研究表明，养成良好学习习惯的学生更有可能实现目标。请留出时间向学习计划提醒接收提醒。
           </div>
         </div>
-
       </div>
       <div class="plan-actions">
         <button class="plan-btn">开始</button>
