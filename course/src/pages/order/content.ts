@@ -371,7 +371,7 @@ async function createWechatPayment() {
       qrCodeImage.value = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payUrl)}`;
       showWechatModal.value = true;
       payStatusMsg.value = "✅ 请扫码完成支付";
-
+      checkOrderStatus();
     } else {
       throw new Error(res?.message || "创建订单失败");
     }
@@ -402,9 +402,55 @@ async function queryOrderStatus() {
     const response = await orderApi.queryWechatOrderStatus(currentOrderId.value);
     return response;
   } catch (error) {
-
   }
 }
+
+// 自动查询订单状态
+let isChecking = false;
+let maxRetries = 15;
+let retryInterval = 2000;
+
+async function checkOrderStatus() {
+  if (!currentOrderId) {
+    alert('请先创建订单');
+    return;
+  }
+  if (isChecking) {
+    return;
+  }
+  isChecking = true;
+  let retryCount = 0
+  try {
+    while (retryCount < maxRetries) {
+      const response = await queryOrderStatus();
+      console.log(response)
+      if (response && response.status) {
+        switch (response.status) {
+          case 1:
+            alert('支付成功！');
+            isChecking = false;
+            confirmPayment();
+            return; // 成功状态退出函数
+          case 2:
+            alert('支付失败！');
+            isChecking = false;
+            return; // 失败状态退出函数
+        }
+      }
+      // 非最终状态则继续轮询
+      retryCount++;
+      await new Promise(resolve => setTimeout(resolve, retryInterval));
+    }
+    // 轮询超时处理
+    alert('订单状态查询超时，请手动刷新页面查看最新状态');
+  } catch (error) {
+    console.error('自动查询失败:', error);
+    alert('查询过程中发生错误');
+  } finally {
+    isChecking = false;
+  }
+}
+
 // 确认支付
 async function confirmPayment() {
   if (isConfirmingPayment.value) return;
@@ -423,7 +469,6 @@ async function confirmPayment() {
 };
 
 async function createAliPayment() {
-
   try {
     const orderItemList = cartCourses.value.map(course => ({
       courseId: course.courseId,
