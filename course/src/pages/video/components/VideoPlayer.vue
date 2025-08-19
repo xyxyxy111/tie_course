@@ -35,8 +35,6 @@ export default {
         this.initVideoPlayer(); // 成功获取URL后，初始化播放器
 
       // try {
-
-
       //   // 检查请求是否成功
       //   // if (data && data.code === 1150 && data.data) {
       //   //   this.videoUrl = data.data;
@@ -63,8 +61,8 @@ export default {
         fluid: true,
         sources: [
           {
-            src: this.videoUrl,
-            // src: localVideo,
+            // src: this.videoUrl,
+            src: localVideo,
             type: 'video/mp4'
           }
         ],
