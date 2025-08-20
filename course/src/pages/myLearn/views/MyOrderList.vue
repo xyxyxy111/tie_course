@@ -38,17 +38,15 @@ import '../myLearn.css'
 export default defineComponent({
   name: 'MyOrderList',
   setup() {
-
     const orders = ref<any[]>([]);
     const expandedIndex = ref<number | null>(null);
-
     const toggleOrder = (idx: number) => {
       expandedIndex.value = expandedIndex.value === idx ? null : idx;
     };
-
     onMounted(async () => {
       const res = await orderApi.getMyOrders();
       orders.value = res.data || [];
+      console.log("orders:" + orders.value);
     });
     return {
       orders,

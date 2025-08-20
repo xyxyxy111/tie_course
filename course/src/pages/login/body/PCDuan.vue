@@ -198,7 +198,7 @@ onMounted(() => {
           </div>
 
           <!-- 微信登录方式 -->
-          <div v-if="loginMethod === 'wechat'" class="wechat-wrapper">
+          <!-- <div v-if="loginMethod === 'wechat'" class="wechat-wrapper">
             <div v-if="qrCodeUrl">
               <img :src="qrCodeUrl" alt="微信登录二维码" />
 
@@ -216,7 +216,7 @@ onMounted(() => {
               <p>登录失败，请重试</p>
               <button class="retry-btn" @click="openWxLogin">重新获取二维码</button>
             </div>
-          </div>
+          </div> -->
 
           <button type="submit" class="login-button" :disabled="loginStatus.loading">
             {{ loginStatus.loading ? '登录中...' : '登录' }}
@@ -313,12 +313,12 @@ onMounted(() => {
               <use href="#ic--outline-email" />
             </svg>
           </button>
-          <button v-if="loginMethod !== 'wechat' && !signFlag" class="login-icon-btn wx-icon-btn"
+          <!-- <button v-if="loginMethod !== 'wechat' && !signFlag" class="login-icon-btn wx-icon-btn"
             @click="switchLoginMethod(3); handleWechatLogin()">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="#27b148">
               <use href="#ic--baseline-wechat" />
             </svg>
-          </button>
+          </button> -->
         </div>
         <button @click="signFlag = !signFlag" class="sign-button">
           <div v-if="!signFlag">尚无账户?<p>注册</p>

@@ -470,8 +470,9 @@ export default {
 }
 
 .course-info {
-  margin: 0 600px 0 0;
-  width: 1460px;
+  margin: 0 auto;
+  padding: 0 480px 0 0;
+  width: 1920px;
   z-index: 1;
 }
 

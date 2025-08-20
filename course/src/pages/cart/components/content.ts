@@ -4,7 +4,7 @@ import { cartApi } from '@/api/cart';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
 export const userId = ref<string | null>(null)
-
+const showCart = ref(false)
 // 获取当前URL的查询参数
 onMounted(() => {
   const searchParams = new URLSearchParams(window.location.search)
@@ -25,6 +25,7 @@ export function useCartLogic() {
   const cartList = ref(cart.value?.cartItemList);
   const loading = ref(false);
   const error = ref<string | null>(null);
+
   const fetchCart = async () => {
     loading.value = true;
     error.value = null;
@@ -41,19 +42,7 @@ export function useCartLogic() {
     }
   };
 
-  const addCourseToCart = async (courseId: number) => {
-    loading.value = true;
-    error.value = null;
-    try {
-      const response = await cartApi.addCourseToCart(courseId);
-      cart.value = response.data;
-    } catch (err) {
-      error.value = '添加课程到购物车失败';
-      console.error('添加课程失败:', err);
-    } finally {
-      loading.value = false;
-    }
-  };
+
 
   // 从购物车移除课程
   const removeCourseFromCart = async (courseId: number) => {
@@ -140,7 +129,6 @@ export function useCartLogic() {
     totalOriginalPrice,
     savedAmount,
     fetchCart,
-    addCourseToCart,
     removeCourseFromCart,
     clearCart,
     goToCheckout
@@ -195,7 +183,7 @@ export const useCartUtils = () => {
   };
 
   return {
-
+    showCart,
     formatPrice,
     formatDiscount,
     formatTime,

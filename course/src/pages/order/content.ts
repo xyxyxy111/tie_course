@@ -22,14 +22,6 @@ const finalPrice = ref(0);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const userId = ref<string | null>(null);
-// 分页相关
-// const currentPage = ref(1);
-// const pageSize = ref(10);
-// const totalPages = ref(1);
-// const totalOrders = ref(0);
-// 筛选相关
-// const selectedStatus = ref<string>('all'); // all, pending, paid, completed, cancelled
-// const selectedTimeRange = ref<string>('all'); // all, week, month, year
 
 const payAmount = ref(0.01);
 const payLoading = ref(false);

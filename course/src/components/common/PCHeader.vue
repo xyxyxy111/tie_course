@@ -262,13 +262,10 @@ const fetchMylist = async () => {
     const response = await myListApi.getMyList();
     if (response && response.data && Array.isArray(response.data)) {
       mylist.value = response.data as MyListVO[];
-      console.log("!!!!!!!!" + mylist.value)
     } else {
-      console.log('数据为空或格式不正确');
       mylist.value = [];
     }
   } catch (error) {
-    console.error('获取失败:', error);
     mylist.value = [];
   }
 };
@@ -282,7 +279,6 @@ const fetchWishlist = async () => {
       wishlist.value = [];
     }
   } catch (error) {
-    console.error('获取愿望单失败:', error);
     wishlist.value = [];
   }
 };
@@ -291,10 +287,8 @@ const fetchCart = async () => {
   try {
     const response = await cartApi.getMyCart();
     cart.value = response.data;
-    console.log(cart.value);
   } catch (err) {
     error.value = '获取购物车数据失败';
-    console.error('获取购物车失败:', err);
   }
 };
 const fetchProfile = async () => {
@@ -304,7 +298,6 @@ const fetchProfile = async () => {
     profile.value = response.data;
   } catch (err) {
     error.value = '获取个人信息数据失败';
-    console.error('获取个人信息失败:', err);
   }
 }
 

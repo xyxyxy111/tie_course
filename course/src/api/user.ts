@@ -1,5 +1,4 @@
 import { request } from '@/utils/request';
-// 登录/注册相关
 export interface LoginByCaptchaParams {
   phone: string;
   captcha: string;
@@ -90,6 +89,7 @@ export interface ChangePhoneParams {
   phone: string;
   newPhone: string;
   captcha: string;
+  newCaptcha: string;
 }
 
 export interface ChangePasswordParams {
@@ -211,13 +211,22 @@ export const userApi = {
   },
 
   // 修改密码
-  changePassword: (data: ChangePasswordParams) => {
+  changePasswordByPhone: (data: ChangePasswordParams) => {
     return request({
       method: 'PUT',
-      url: '/account/user/password',
+      url: '/account/user/password/by-phone',
       data
     });
   },
+
+  changePasswordByEmail: (data: ChangePasswordParams) => {
+    return request({
+      method: 'PUT',
+      url: '/account/user/password/by-email',
+      data
+    });
+  },
+
   getAccountInfo: () => {
     return request({
       method: 'GET',

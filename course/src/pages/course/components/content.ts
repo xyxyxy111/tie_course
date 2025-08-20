@@ -1,15 +1,18 @@
 // src/composables/content.ts
 import { ref, computed } from 'vue';
 import { getValidToken } from '@/utils/request';
+import { useCart } from '@/composables/useCart'
 
-
+const searchParams = new URLSearchParams(window.location.search);
+const courseId = parseInt(searchParams.get('courseId') || '0');
+export const showCart = ref(false);
+export const { addToCart, goToCheckout } = useCart();
 // 课程描述相关逻辑
 function useCourseDescription() {
   const CourseDescriptionFlag = ref(false);
   const CourseDescription = computed(() =>
     CourseDescriptionFlag.value ? "收起" : "显示更多"
   );
-
 
   return {
     CourseDescriptionFlag,
@@ -18,68 +21,55 @@ function useCourseDescription() {
 }
 
 // 购物车相关逻辑
-function useCart() {
-  const showCart = ref(false);
-  const cartTitle = ref('');
+// function useCart() {
 
-  const addToCart = async (course: string) => {
-    try {
-      // 从URL获取courseId
-      const searchParams = new URLSearchParams(window.location.search);
-      const courseId = parseInt(searchParams.get('courseId') || '0');
+//   const addToCart = async (course: string) => {
+//     try {
+//       // 调用购物车API
+//       const { cartApi } = await import('@/api/cart');
+//       const response = await cartApi.addCourseToCart(courseId);
 
-      if (!courseId) {
-        alert('课程ID无效');
-        return;
-      }
+//       if (response.status === 1302) {
+//         alert('添加至购物车成功！');
+//         showCart.value = true;
+//       } else {
+//         alert('添加至购物车失败，请重试');
+//       }
+//     } catch (error: any) {
+//       if (error === "商品已在购物车中") {
+//         alert('该课程已在购物车中');
+//       } else {
+//         console.error('添加至购物车失败:', error);
+//         alert('添加至购物车失败，请重试');
+//       }
+//     }
+//   };
 
-      // 调用购物车API
-      const { cartApi } = await import('@/api/cart');
-      const response = await cartApi.addCourseToCart(courseId);
-
-      if (response.status === 1302) {
-        alert('添加至购物车成功！');
-        showCart.value = true;
-      } else {
-        alert('添加至购物车失败，请重试');
-      }
-    } catch (error: any) {
-      if (error === "商品已在购物车中") {
-        alert('该课程已在购物车中');
-      } else {
-        console.error('添加至购物车失败:', error);
-        alert('添加至购物车失败，请重试');
-      }
-    }
-  };
-
-  const goToCheckout = (course: { courseId: number; title: string; coverImgUrl: string; currentPrice: number; originalPrice: number; }) => {
-    const buyNowData = {
-      courses: [
-        {
-          image: course.coverImgUrl,
-          title: course.title,
-          price: course.currentPrice,
-          originalPrice: course.originalPrice,
-          courseId: course.courseId
-        }
-      ],
-      total: course.currentPrice,
-      originalTotal: course.originalPrice,
-      saved: Number((course.originalPrice - course.currentPrice).toFixed(2)),
-    };
-
-    localStorage.setItem('buyCourseNow', JSON.stringify(buyNowData));
-    window.location.href = '/checkout.html';
-  };
-
-  return {
-    showCart,
-    cartTitle,
-    addToCart,
-    goToCheckout
-  };
-}
+//   const goToCheckout = (course: { courseId: number; title: string; coverImgUrl: string; currentPrice: number; originalPrice: number; }) => {
+//     const buyNowData = {
+//       courses: [
+//         {
+//           image: course.coverImgUrl,
+//           title: course.title,
+//           price: course.currentPrice,
+//           originalPrice: course.originalPrice,
+//           courseId: course.courseId
+//         }
+//       ],
+//       total: course.currentPrice,
+//       originalTotal: course.originalPrice,
+//       saved: Number((course.originalPrice - course.currentPrice).toFixed(2)),
+//     };
+//     localStorage.setItem('buyCourseNow', JSON.stringify(buyNowData));
+//     window.location.href = '/checkout.html';
+//   };
+//   return {
+//     showCart,
+//     cartTitle,
+//     addToCart,
+//     goToCheckout
+//   };
+// }
 
 
 // 推荐产品和相关主题
