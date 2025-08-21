@@ -30,35 +30,42 @@ export function useCart() {
   };
 
   // 添加课程到购物车
-  const addToCart = async (courseId: number, courseName?: string) => {
+  const addToCart = async (userId: string, courseId: number) => {
+
+    loading.value = true;
     try {
-      const isPurchased = await checkIfCoursePurchased(courseId);
-      console.log(isPurchased)
-      checking.value = true;
-      if (isPurchased) {
-        return {
-          success: false,
-          message: `加购失败：您已购买课程 "${courseName || '该课程'}"`,
-          alreadyPurchased: true
-        };
-      }
-      // 如果未购买，正常添加到购物车
       const response = await cartApi.addCourseToCart(courseId);
-      console.log(response)
-      if (response.status === 1302) {
-        console.log('添加至购物车成功！')
-        return true;
-      } else {
-        console.log('添加至购物车失败，请重试')
-        return false;
-      }
+      alert(`✅ 课程已成功添加到购物车！`);
 
     } catch (err: any) {
-      alert("添加失败," + err);
+      if (err === "课程已在购物车中") {
+        alert('该课程已在购物车中');
+      } else if (err === "课程已被购买") {
+        alert('课程已被购买');
+      }
+      // console.error('添加课程到购物车失败:', err);
+
+      let errorMessage = '添加课程到购物车失败';
+      let errorType = 'unknown';
+      emit('course-added', {
+        courseId: courseId,
+        courseName: title,
+        userId: userId,
+        success: false,
+        error: err,
+        errorMessage: errorMessage,
+        errorType: errorType
+      });
+
+      if (errorType === 'database_error') {
+        console.log("加入购物车失败");
+      } else {
+        // alert(errorMessage);
+      }
+    } finally {
+      loading.value = false;
     }
-
   };
-
 
   // 从购物车移除课程
   const removeFromCart = async (courseId: number) => {

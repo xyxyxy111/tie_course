@@ -352,13 +352,11 @@ async function createWechatPayment() {
 
     if (res?.status === 1202 && res?.data) {
       currentOrderId.value = res.data.orderId;
-
       // 处理支付链接
       const payUrl = res.data.formHtml;
       if (!payUrl) {
         throw new Error("未获取到支付链接");
       }
-
       // 生成二维码
       qrCodeImage.value = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payUrl)}`;
       showWechatModal.value = true;
@@ -399,9 +397,8 @@ async function queryOrderStatus() {
 
 // 自动查询订单状态
 let isChecking = false;
-let maxRetries = 15;
-let retryInterval = 2000;
-
+let maxRetries = 30;
+let retryInterval = 1000;
 async function checkOrderStatus() {
   if (!currentOrderId) {
     alert('请先创建订单');
@@ -415,26 +412,43 @@ async function checkOrderStatus() {
   try {
     while (retryCount < maxRetries) {
       const response = await queryOrderStatus();
-      console.log(response)
-      if (response && response.status) {
-        switch (response.status) {
-          case 1:
+      console.log(response?.data.tradeState)
+      if (response && response.status && response.data.tradeState) {
+        switch (response.data.tradeState) {
+          case 'SUCCESS':
             alert('支付成功！');
             isChecking = false;
-            confirmPayment();
-            return; // 成功状态退出函数
-          case 2:
+            return;
+          case 'REFUND':
+            alert('支付已退款');
+            isChecking = false;
+            return;
+          case 'NOTPAY':
+            console.log('订单未支付');
+            break;
+          case 'CLOSED':
+            alert('订单已关闭');
+            isChecking = false;
+            return;
+          case 'REVOKED':
+            alert('支付已撤销');
+            isChecking = false;
+            return;
+          case 'USERPAYING':
+            console.log('用户支付中');
+            break;
+          case 'PAYERROR':
             alert('支付失败！');
             isChecking = false;
-            return; // 失败状态退出函数
+            return;
+          default:
+            console.log('未知支付状态:', response.data.tradeState);
+            break;
         }
       }
-      // 非最终状态则继续轮询
       retryCount++;
       await new Promise(resolve => setTimeout(resolve, retryInterval));
     }
-    // 轮询超时处理
-    alert('订单状态查询超时，请手动刷新页面查看最新状态');
   } catch (error) {
     console.error('自动查询失败:', error);
     alert('查询过程中发生错误');

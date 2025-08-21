@@ -93,7 +93,7 @@ export interface ChangePhoneParams {
 }
 
 export interface ChangePasswordParams {
-  phone: string;
+  account: string;
   newPassword: string;
   captcha: string;
 }

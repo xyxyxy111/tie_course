@@ -1,13 +1,13 @@
 import { orderApi, type Order, type OrderVO } from '@/api/order';
 import { ref } from 'vue'
 
-const myOrdersCourseId = ref<number[]>([1081]);
+const myOrdersCourseId = ref<number[]>([]);
 
 /*检查用户是否已购买指定课程 */
 const checkIfCoursePurchased = async (courseId: number): Promise<boolean> => {
   try {
     await getPurchasedCourseIds();
-    alert(myOrdersCourseId.value)
+
     console.log(myOrdersCourseId.value.includes(courseId))
     return myOrdersCourseId.value.includes(courseId);
   } catch (error) {
