@@ -1,11 +1,11 @@
 <template>
+  <div>
   <div class="course-page">
-
     <div class="video-container">
       <VideoPlayer />
     </div>
 
-    <div class="course-sidebar">
+    <!-- <div class="course-sidebar">
       <div class="course-container">
         <h1 class="course-title">课程内容</h1>
         
@@ -30,7 +30,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
   <div class="course-info">
     <div class="course-header">
@@ -92,6 +92,8 @@
       </div>
     </div>
   </div>
+  </div>
+
 
 
 </template>
@@ -104,7 +106,7 @@ import { getCurrentUserId, getValidToken } from '@/utils/request'
 
 import videojs from 'video.js';
 import 'video.js/dist/video-js.min.css'
-import 'videojs-contrib-quality-levels';
+// import 'videojs-contrib-quality-levels';
 
 
 import VideoPlayer from '../components/VideoPlayer.vue';
@@ -136,17 +138,17 @@ export default {
     }
   },
   methods: {
-    toggleChapter(index: number) {
-      const chapterIndex = this.openChapters.indexOf(index);
-      if (chapterIndex > -1) {
-        this.openChapters.splice(chapterIndex, 1);
-      } else {
-        this.openChapters.push(index);
-      }
-    },
-    isChapterOpen(index: number) {
-      return this.openChapters.includes(index);
-    },
+    // toggleChapter(index: number) {
+    //   const chapterIndex = this.openChapters.indexOf(index);
+    //   if (chapterIndex > -1) {
+    //     this.openChapters.splice(chapterIndex, 1);
+    //   } else {
+    //     this.openChapters.push(index);
+    //   }
+    // },
+    // isChapterOpen(index: number) {
+    //   return this.openChapters.includes(index);
+    // },
     selectLesson(chapter: any, lesson: any) {
       this.currentLesson = lesson;
       // 这里可以添加视频播放逻辑
