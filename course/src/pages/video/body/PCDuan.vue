@@ -1,5 +1,5 @@
 <template>
-  <Header />
+  <!-- <Header /> -->
   <div>
     <div class="course-page">
       <div class="video-container">
@@ -14,8 +14,7 @@
             <div class="chapter-header" @click="toggleChapter(index)">
               <div class="chapter">
                 <h2 class="chapter-title">{{ chapter.title }}</h2>
-                <div class="chapter-progress">{{ chapter.completed }}/{{ chapter.lessons.length }} | {{ chapter.duration
-                }}</div>
+                <div class="chapter-progress">{{ chapter.completed }}/{{ chapter.lessons.length }}</div>
               </div>
               <span class="arrow" :class="{ open: openChapters.includes(index) }"></span>
             </div>
@@ -143,6 +142,26 @@
 </template>
 
 <script lang="ts">
+
+// import type { CourseVO, Chapter, Lesson } from '@/api/course';
+// interface Props {
+//   completed: boolean;
+// }
+// type ChapterType = Chapter & Props;
+// type LessonType = Lesson & Props;
+
+// // 获取userId - 从token中获取而不是URL
+// const userId = ref<string | null>(null)
+
+// // 当前选中的课程
+// const currentLesson = ref<LessonType | null>(null)
+
+// // 打开的章节索引数组
+// const openChapters = ref<number[]>([])
+
+// // 响应式数据
+// const chapters = ref<ChapterType[]>([])
+
 import { useWindowSize } from '@/useWindowSize'
 import { ref, onMounted, computed } from 'vue'
 import { getCurrentUserId, getValidToken } from '@/utils/request'
