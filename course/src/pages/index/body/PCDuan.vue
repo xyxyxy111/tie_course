@@ -18,6 +18,7 @@ import {
 import Footer from '@/components/common/Footer.vue';
 import Swiper from '../components/Swiper.vue'
 import { goToVideo } from '@/components/common/header';
+import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
 
 const { width, height } = useWindowSize()
 
@@ -194,7 +195,6 @@ const goToVideoPage = (courseId :number) => {
                   </svg>
                 </div>
               </span>
-              <!-- <img :src="course.coverImgUrl" /> -->
             </div>
             <div class="mylearn-course-info">
               <div class="mylearn-course-title">
@@ -250,10 +250,10 @@ const goToVideoPage = (courseId :number) => {
 
             <div class="recommend-card-meta-label">讲师：iClass</div>
             <div class="recommend-card-meta">
-              <span class="recommend-card-meta-link">上次更新日期：{{ hottestCourseList[0]?.updateTime }}</span>
-              <span class="recommend-card-meta-label">总时长：</span>{{ hottestCourseList[0]?.totalMinutes }}
-              <span class="recommend-card-meta-label">24个章节</span>
-              <span class="recommend-card-meta-label">213个讲解</span>
+              <span class="recommend-card-meta-link">上次更新日期：{{ formatDateToYearMonth(hottestCourseList[0]?.updateTime!) }}</span>
+              <span class="recommend-card-meta-label">总时长：</span>{{ convertMinutesToHours(hottestCourseList[0]?.totalMinutes) }}个小时
+              <span class="recommend-card-meta-label">{{ hottestCourseList[0]?.chapterNum }}个章节</span>
+              <span class="recommend-card-meta-label">{{ hottestCourseList[0]?.lessonNum }}个讲解</span>
             </div>
             <div class="recommend-card-rating">
               <span class="recommend-card-score">4.9</span>

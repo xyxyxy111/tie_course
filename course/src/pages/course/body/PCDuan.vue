@@ -21,6 +21,9 @@ import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from
 import type { CourseVO, Chapter, Lesson } from '@/api/course';
 import { convertMinutesToHoursAndMinutes } from '@/utils/common';
 import { addToCart, goToCheckout, showCart } from '../components/content'
+import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
+
+
 const courseVo = ref<CourseVO | null>(null);
 const chapters = ref<Chapter[]>([]);
 
@@ -65,7 +68,7 @@ onMounted(async () => {
     console.warn("No chapters found");
   }
 
-  lastUpdateTime.value = (formatTime(courseVo.value?.updateTime));
+  lastUpdateTime.value = (formatDateToYearMonth(courseVo.value?.updateTime!));
 });
 
 const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
@@ -143,21 +146,6 @@ const handleBuyNow = async () => {
     alert('购买失败，请重试');
 
   }
-}
-function formatTime(updateTime: string | undefined) {
-  if (!updateTime) return ''; // 处理undefined或空值情况
-
-  const date = new Date(updateTime);
-
-  if (isNaN(date.getTime())) return '无效日期';
-
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-
-  return `${year}年${month}月${day}日 ${hours}:${minutes}`;
 }
 </script>
 
@@ -241,7 +229,7 @@ function formatTime(updateTime: string | undefined) {
     <h1>课程内容</h1>
     <div class="course-content">
       <div class="course-content-header">
-        <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟</h3>
+        <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ convertMinutesToHours(courseVo?.totalMinutes!) }}个小时</h3>
         <span class="open-all" @click="chaptersState === '展开' ? openAllChapter() : closeAllChapter()">
           {{ chaptersState }}所有章节
         </span>

@@ -288,12 +288,16 @@ export function convertMinutesToHoursAndMinutes(totalMinutes: number): { hours: 
     console.warn("输入必须是一个有效的数字。");
     return { hours: 0, minutes: 0 }; // 或者抛出错误
   }
-
-  // 确保输入是正数，如果需要处理负数，则需要额外的逻辑
   const absMinutes = Math.abs(totalMinutes);
-
   const hours = Math.floor(absMinutes / 60);
   const minutes = absMinutes % 60;
 
   return { hours, minutes };
+}
+
+export function formatDateToYearMonth(isoDateString: string): string {
+  const date = new Date(isoDateString);
+  const year = date.getFullYear().toString();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  return `${year}-${month}`;
 }

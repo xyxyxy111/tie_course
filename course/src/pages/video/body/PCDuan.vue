@@ -148,7 +148,6 @@ import { ref, onMounted, computed } from 'vue'
 import { getCurrentUserId, getValidToken } from '@/utils/request'
 import videojs from 'video.js';
 import 'video.js/dist/video-js.min.css'
-import 'videojs-contrib-quality-levels';
 import Header from '../components/Header.vue';
 import VideoPlayer from '../components/VideoPlayer.vue';
 const { width, height } = useWindowSize()
