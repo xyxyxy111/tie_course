@@ -1,7 +1,7 @@
 <template>
   <div class="Header">
     <div class="header-left">
-      <div id="logo">
+      <div id="logo" @click="goToIndex()">
         <img src="/src/images/iclass_dark.png" alt="">
       </div>
       <span id="copyright">
@@ -79,7 +79,7 @@ export default defineComponent({
   setup(props, { emit }) {
 
     return {
-
+      goToIndex
     };
   }
 });
