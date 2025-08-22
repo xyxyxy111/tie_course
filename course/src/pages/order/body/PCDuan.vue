@@ -74,11 +74,7 @@ onMounted(() => {
             <p class="amount">支付金额：<span>¥{{ finalPrice.toFixed(2) }}</span></p>
             <p class="order-id">订单号：{{ currentOrderId }}</p>
           </div>
-          <button 
-            class="confirm-btn" 
-            @click="confirmPayment" 
-            :disabled="isConfirmingPayment"
-          >
+          <button class="confirm-btn" @click="confirmPayment" :disabled="isConfirmingPayment">
             <SvgIcon v-if="isConfirmingPayment" name="loading" spin width="16" height="16" />
             {{ isConfirmingPayment ? "支付确认中..." : "已完成支付" }}
           </button>
@@ -175,7 +171,9 @@ onMounted(() => {
 
 .payment-container {
   display: flex;
-  max-width: 800px;
+  width: 1200px;
+  max-width: 100%;
+  min-width: 800px;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -192,7 +190,7 @@ label {
 }
 
 .section {
-  flex: 2
+  flex: 2;
 }
 
 
@@ -404,6 +402,7 @@ label {
   background-color: #f7f9fa;
   border-radius: 4px;
 }
+
 /* 遮罩层样式 */
 .wechat-modal-overlay {
   position: fixed;
@@ -564,11 +563,10 @@ label {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
   }
 }
-
-
 </style>

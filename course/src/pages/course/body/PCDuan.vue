@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import '../course.css'
 import { RouterView, RouterLink } from 'vue-router';
-import { toRef, ref, onMounted, computed } from 'vue';
+import { toRef, ref, onMounted, computed, nextTick } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
@@ -11,28 +11,30 @@ import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
 import { goToCart, goToLogin } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
-import { useCourseDescription, useCart } from '../components/content';
-import { wishlistApi } from '@/api/user';
-import { getCurrentUserId, getValidToken } from '@/utils/request';
+import { useCourseDescription } from '../components/content';
+import { useWishlist } from '@/composables/useWishlist';
 
+const { fetchWishlist, addToWishlist } = useWishlist();
+
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
 import type { CourseVO, Chapter, Lesson } from '@/api/course';
 import { convertMinutesToHoursAndMinutes } from '@/utils/common';
-
+import { addToCart, goToCheckout, showCart } from '../components/content'
 const courseVo = ref<CourseVO | null>(null);
 const chapters = ref<Chapter[]>([]);
 
 const { width, height } = useWindowSize()
-const { CourseDescriptionFlag, CourseDescription } = useCourseDescription();
-const { showCart, cartTitle, addToCart, goToCheckout } = useCart();
+const { CourseDescription } = useCourseDescription();
 // 获取userId
 const userId = ref<string | null>(null);
-
+const isExpanded = ref(false);
 // 展开章节的id集合
 const expandedChapters = ref<number[]>([]);
-
+const lastUpdateTime = ref('年月日')
 // 调用头部组件的引用
 const headerRef = ref<InstanceType<typeof PCHeader> | null>(null);
+
 
 onMounted(async () => {
   const token = getValidToken();
@@ -44,10 +46,7 @@ onMounted(async () => {
 
   const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
   courseVo.value = courseVoResponse.data;
-  console.log(courseVoResponse);
-
   const chaptersResponse = await courseApi.getChapterListById(courseId);
-  console.log(chaptersResponse);
 
   chapters.value = chaptersResponse.data;
   chapters.value.forEach(chapter => { // 注意：这里是 users.value
@@ -55,7 +54,6 @@ onMounted(async () => {
     chapter.hours = result.hours;
     chapter.minutes = result.minutes;
   });
-  console.log(chapters.value);
 
   //session to make great
   const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
@@ -66,7 +64,8 @@ onMounted(async () => {
   } else {
     console.warn("No chapters found");
   }
-  getLessonListBySortOrder
+
+  lastUpdateTime.value = (formatTime(courseVo.value?.updateTime));
 });
 
 const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
@@ -110,73 +109,18 @@ const closeAllChapter = () => {
 };
 
 const CourseDescriptionStyle = computed(() => ({
-  height: CourseDescriptionFlag.value ? 'fit-content' : '400px'
+  height: isExpanded.value ? 'fit-content' : '400px',
+  maxHeight: 'fit-content'
 }));
 
+const searchParams = new URLSearchParams(window.location.search);
+const courseId = parseInt(searchParams.get('courseId') || '0');
 
-// 加入心愿单
-const handleAddToWishlist = async (courseId: number) => {
-  try {
-    const searchParams = new URLSearchParams(window.location.search);
-    const courseId = parseInt(searchParams.get('courseId') || '0');
-
-    console.log('正在添加课程到心愿单，courseId:', courseId);
-    const response = await wishlistApi.addToWishlist(courseId);
-    console.log('添加心愿单成功:', response);
-    alert('课程已添加到心愿单');
-  } catch (error: any) {
-    console.error('添加心愿单失败:', error);
-    let errorMessage = '添加失败，请重试';
-    if (error.response) {
-      const { status, data } = error.response;
-      if (status === 401) {
-        errorMessage = '请先登录';
-      } else if (status === 409) {
-        errorMessage = '课程已在心愿单中';
-      } else if (data && data.message) {
-        errorMessage = data.message;
-      }
-    }
-    alert(errorMessage);
-  }
-};
 
 
 const handleAddToCart = async () => {
-  try {
-    // 从URL获取courseId
-    const searchParams = new URLSearchParams(window.location.search);
-    const courseId = parseInt(searchParams.get('courseId') || '0');
-
-    if (!courseId) {
-      alert('课程ID无效');
-      return;
-    }
-    // console.log("调用添加api")
-
-    // 调用购物车API
-    const { cartApi } = await import('@/api/cart');
-    const response = await cartApi.addCourseToCart(courseId);
-    console.log(response)
-
-    console.log(response);
-    if (response.status === 1302) {
-      alert('添加至购物车成功！');
-      // Element
-      if (headerRef.value && typeof headerRef.value.fetchCart === 'function') {
-        headerRef.value.fetchCart();
-        console.log('成功调用了 PCHeader 的 fetchCart 方法');
-      } else {
-        console.error('无法找到 PCHeader 组件的引用');
-      }
-
-      showCart.value = true;
-    } else {
-      alert('添加至购物车失败，请重试');
-    }
-  } catch (error: any) {
-    alert('该课程已在购物车中');
-  }
+  const response = await addToCart(courseId);
+  if (response.success) { showCart.value = true; }
 };
 
 
@@ -200,9 +144,21 @@ const handleBuyNow = async () => {
 
   }
 }
-/*
+function formatTime(updateTime: string | undefined) {
+  if (!updateTime) return ''; // 处理undefined或空值情况
 
-*/
+  const date = new Date(updateTime);
+
+  if (isNaN(date.getTime())) return '无效日期';
+
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+
+  return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+}
 </script>
 
 <template>
@@ -212,7 +168,7 @@ const handleBuyNow = async () => {
   <PCHeader ref="headerRef" :userId="userId" />
   <FloatingBox v-if="courseVo" :courseId="courseVo.courseId" :courseVideo="courseVo?.coverImgUrl"
     :currentPrice="courseVo?.currentPrice" :originalPrice="courseVo?.originalPrice" :discount="courseVo?.discountValue"
-    @addToWishlist="handleAddToWishlist" @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
+    @addToWishlist="addToWishlist" @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
 
   <div id="top-container">
     <div class="content">
@@ -262,7 +218,7 @@ const handleBuyNow = async () => {
             <path d="M10 5v5l3 3" stroke="#fff" stroke-width="2" stroke-linecap="round" />
           </svg>
         </span>
-        <span>上次更新时间：{{ courseVo?.updateTime }}</span>
+        <span>上次更新时间：{{ lastUpdateTime }}</span>
       </div>
 
     </div>
@@ -332,18 +288,17 @@ const handleBuyNow = async () => {
       <li>有一台电脑就可以轻松上手</li>
     </ul>
 
-    <h1>描述</h1>
-    <div class="course-descrpition" :style="CourseDescriptionStyle">
-
-
-      <h4>
-        {{ courseVo?.description }}
-      </h4>
+    <div class="course-description-container">
+      <h1>描述</h1>
+      <div class="course-description">
+        <h4>{{ courseVo?.description }}</h4>
+      </div>
+      <!-- <button @click="isExpanded = !isExpanded" class="course-description-btn">
+        {{ isExpanded ? '收起' : '显示更多' }}
+      </button> -->
     </div>
-    <button @click="CourseDescriptionFlag = !CourseDescriptionFlag" class="course-descrpitionbtn">显示更多</button>
-
     <!-- 讲师 -->
-    <div class="section-block teacher-block">
+    <!-- <div class="section-block teacher-block">
       <h1>讲师</h1>
       <div class="teacher-info">
         <img class="teacher-avatar" src="@/images/userPic.png" alt="讲师头像" />
@@ -361,9 +316,13 @@ const handleBuyNow = async () => {
           Python实战、2028 Python数据分析、2029 Python深度学习）带你系统掌握Python技能。
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
+
+<!-- 
+<template>
+   -->
 
 <style scoped>
 @import "@/assets/rem.css";
@@ -572,6 +531,41 @@ const handleBuyNow = async () => {
   font-size: 1rem;
   line-height: 1.7;
 }
+
+
+.course-description {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin: 15px 0;
+  line-height: 1.6em;
+}
+
+.course-description h4 {
+  margin: 0;
+  color: #333;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+/* 
+.course-description-btn {
+  display: block;
+  padding: 8px 16px;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.course-description-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+} */
 
 .section-desc {
   font-size: 1rem;

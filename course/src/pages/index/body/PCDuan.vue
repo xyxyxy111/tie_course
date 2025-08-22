@@ -492,7 +492,6 @@ const goToVideoPage = (courseId :number) => {
   align-items: center;
   gap: 20px;
   padding-inline: 15px;
-  margin: 0 auto;
   width: fit-content;
   max-width: 100%;
   transition: all 0.3s;

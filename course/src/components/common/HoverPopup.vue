@@ -40,10 +40,11 @@
 import { defineComponent, ref, computed, watch, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import { cartApi } from '@/api/cart';
-import type {CourseVO} from '@/api/course';
+import type { CourseVO } from '@/api/course';
 import { courseApi } from '@/api/course';
 import { convertMinutesToHours } from '@/utils/common';
 import { wishlistApi } from '@/api/user';
+import { goToCart, goToLogin } from './header';
 
 type Position = 'right' | 'left' | 'top' | 'bottom';
 type TransitionType = 'fade' | 'slide' | 'scale';
@@ -168,7 +169,8 @@ export default defineComponent({
     const addToCart = async () => {
       if (!props.userId || !courseInfo.value?.courseId) {
         console.warn('缺少用户ID或课程ID');
-        alert('系统错误：缺少必要参数');
+        alert('请先登录');
+        goToLogin();
         return;
       }
       loading.value = true;
@@ -183,8 +185,10 @@ export default defineComponent({
         alert(`✅ 课程 "${courseInfo.value.title}" 已成功添加到购物车！`);
 
       } catch (err: any) {
-        if(err === "商品已在购物车中") {
+        if (err === "课程已在购物车中") {
           alert('该课程已在购物车中');
+        } else if (err === "课程已被购买") {
+          alert('课程已被购买');
         }
         // console.error('添加课程到购物车失败:', err);
 
@@ -203,7 +207,7 @@ export default defineComponent({
         if (errorType === 'database_error') {
           console.log("加入购物车失败");
         } else {
-          alert(errorMessage);
+          // alert(errorMessage);
         }
       } finally {
         loading.value = false;

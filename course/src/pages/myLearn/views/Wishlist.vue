@@ -150,17 +150,10 @@ export default defineComponent({
         alert('课程ID无效，无法移除');
         return;
       }
-
       try {
-        console.log('正在移除课程，courseId:', courseId);
-        console.log('courseId类型:', typeof courseId);
         const response = await wishlistApi.removeFromWishlist(courseId);
         console.log('移除课程成功:', response);
-
-        // 显示成功提示
         alert('课程已从愿望单移除');
-
-        // 重新获取愿望单数据
         await fetchWishlist();
       } catch (error: any) {
         console.error('移除课程失败:', error);
@@ -172,21 +165,9 @@ export default defineComponent({
           const { status, data } = error.response;
           console.error('服务器错误状态:', status);
           console.error('服务器错误数据:', data);
-
-          if (status === 401) {
-            errorMessage = '请先登录';
-          } else if (status === 404) {
-            errorMessage = '课程不存在或已被移除';
-          } else if (status === 500) {
-            errorMessage = '服务器内部错误，请稍后重试';
-          } else if (data && data.message) {
-            errorMessage = data.message;
-          }
         } else if (error.request) {
-          // 请求已发出但没有收到响应
           errorMessage = '网络连接失败，请检查网络';
         } else {
-          // 其他错误
           errorMessage = error.message || '未知错误';
         }
         alert(errorMessage);

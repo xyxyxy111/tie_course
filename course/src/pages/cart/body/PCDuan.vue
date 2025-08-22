@@ -3,8 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useWindowSize } from '@/useWindowSize';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import PCHeader from '@/components/common/PCHeader.vue';
-
-// 导入共享的数据和逻辑
+import { useWishlist } from '@/composables/useWishlist';
 import { useCartLogic, useCartUtils } from '../components/content';
 import { wishlistApi } from '@/api/user';
 import '../cart.css';
@@ -19,6 +18,8 @@ import {
 } from '@/pages/order/content';
 const { width, height } = useWindowSize();
 
+const { fetchWishlist, addToWishlist } = useWishlist();
+
 // 使用共享的数据和逻辑
 const {
   cart,
@@ -30,7 +31,6 @@ const {
   totalOriginalPrice,
   savedAmount,
   fetchCart,
-  addCourseToCart,
   removeCourseFromCart,
   clearCart,
   goToCheckout
@@ -63,29 +63,6 @@ onMounted(() => {
   }
 });
 
-// 加入心愿单
-const addToWishlist = async (courseId: number) => {
-  try {
-    console.log('正在添加课程到心愿单，courseId:', courseId);
-    const response = await wishlistApi.addToWishlist(courseId);
-    console.log('添加心愿单成功:', response);
-    alert('课程已添加到心愿单');
-  } catch (error: any) {
-    console.error('添加心愿单失败:', error);
-    let errorMessage = '添加失败，请重试';
-    if (error.response) {
-      const { status, data } = error.response;
-      if (status === 401) {
-        errorMessage = '请先登录';
-      } else if (status === 409) {
-        errorMessage = '课程已在心愿单中';
-      } else if (data && data.message) {
-        errorMessage = data.message;
-      }
-    }
-    alert(errorMessage);
-  }
-};
 
 // 从购物车删除
 const removeFromCart = async (courseId: number) => {

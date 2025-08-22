@@ -26,8 +26,8 @@
       <button class="add-to-cart" @click="emit('addToCart')">添加至购物车</button>
       <button class="buy-now" @click="emit('buyNow')">立即购买</button>
     </div>
-
-    <div class="divider"></div>
+    <!-- 
+    <div class="divider"></div> -->
     <!-- 
     <div class="features" v-if="features.length > 0">
       <h3>{{ featuresTitle }}</h3>
@@ -39,10 +39,10 @@
       </ul>
     </div> -->
 
-    <div class="action-links">
+    <!-- <div class="action-links">
       <a href="#" @click.prevent="emit('share')">{{ shareText }}</a>
       <a href="#" @click.prevent="emit('gift')">{{ giftText }}</a>
-    </div>
+    </div> -->
 
   </div>
 </template>
