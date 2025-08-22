@@ -9,7 +9,7 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
-import { goToCart, goToLogin } from '@/components/common/header';
+import { goToCart, goToLogin, goToVideo,goToVideoWithLessonId } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription } from '../components/content';
 import { useWishlist } from '@/composables/useWishlist';
@@ -76,6 +76,7 @@ const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => 
   if (!chooseChapter?.hasLoadedLessons) {
     //true
     const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
+    console.log(lessonsResponse);
     console.log("lessonsResponse" + lessonsResponse.data.map(lesson => lesson.title));
     if (chooseChapter) {
       chooseChapter.lessons! = lessonsResponse.data;
@@ -122,8 +123,8 @@ const courseId = parseInt(searchParams.get('courseId') || '0');
 
 
 const handleAddToCart = async () => {
-  const response = await addToCart(courseId);
-  if (response.success) { showCart.value = true; }
+  // const response = await addToCart(courseId);
+  // if (response.success) { showCart.value = true; }
 };
 
 
@@ -147,6 +148,9 @@ const handleBuyNow = async () => {
 
   }
 }
+
+
+
 </script>
 
 <template>
@@ -260,6 +264,9 @@ const handleBuyNow = async () => {
                   <use href="#bx--file" />
                 </svg>
                 <span class="lesson-title"> {{ lesson.title }} </span>
+                <div style="text-align: right;">
+                  <a href="#" v-if="lesson.previewable" @click="goToVideoWithLessonId(lesson.lessonId)">预览</a>
+                </div>
               </li>
             </ul>
 

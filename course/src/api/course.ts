@@ -92,7 +92,7 @@ export interface Lesson {
   chapterSortOrder: number;
   lessonSortOrder: number;
   title: string;
-  isPreviewable: boolean;
+  previewable: boolean;
   totalSeconds: number;
   coverImgUrl: string;
   videoUrl: string;
