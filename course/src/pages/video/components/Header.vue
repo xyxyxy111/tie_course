@@ -59,6 +59,7 @@
 <script lang="ts">
 import { useWindowSize } from '@/useWindowSize'
 import { ref, computed, defineComponent, } from 'vue'
+import { goToIndex } from '@/components/common/header'
 const { width, height } = useWindowSize()
 
 
