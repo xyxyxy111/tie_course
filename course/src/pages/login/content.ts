@@ -105,11 +105,11 @@ const useLoginData = () => {
         return;
       }
     } else if (loginMethod.value === 'email') {
-      if (!validateEmail(loginForm.phone)) {
+      if (!validateEmail(loginForm.email)) {
         loginStatus.value.error = '请输入正确的电子邮箱！';
         return;
       }
-      if (!validatePassword(loginForm.email)) {
+      if (!validatePassword(loginForm.captcha)) {
         loginStatus.value.error = '请输入正确的密码！';
         return;
       }
@@ -121,7 +121,8 @@ const useLoginData = () => {
     } else if (loginMethod.value === 'password') {
       await handlePasswordLogin();
     } else if (loginMethod.value === 'email') {
-      // 邮箱登录逻辑（如有）
+      console.log("email!!!!!!!!" + loginForm.email + loginForm.captcha)
+      await handleEmailLogin();
     } else if (loginMethod.value === 'wechat') {
       await getWxLoginStatus();
     }
@@ -137,11 +138,11 @@ const useLoginData = () => {
     error.value = null;
     success.value = null;
     try {
-      // const response = await authApi.loginByCaptcha({
-      //   phone: loginForm.phone,
-      //   captcha: loginForm.captcha
-      // });
-      const response = await authApi.loginTest();//后门登陆 数据库要有电话为17727096201的user
+      const response = await authApi.loginByCaptcha({
+        phone: loginForm.phone,
+        captcha: loginForm.captcha
+      });
+
       if (response.data) {
         localStorage.setItem('token', response.data);
         if (loginForm.rememberMe) {
@@ -166,6 +167,46 @@ const useLoginData = () => {
       loginStatus.value.loading = false;
     }
   };
+
+
+  const handleEmailLogin = async () => {
+    if (!loginForm.email || !loginForm.captcha) {
+      error.value = '请填写邮箱和验证码';
+      return;
+    }
+    loading.value = true;
+    error.value = null;
+    success.value = null;
+    try {
+      const response = await authApi.loginByEmail({
+        email: loginForm.email,
+        captcha: loginForm.captcha
+      });
+      if (response.data) {
+        localStorage.setItem('token', response.data);
+        if (loginForm.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        success.value = '登录成功！';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } else {
+        error.value = response.message || '登录失败';
+        alert('服务器繁忙，请稍后再试');
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '登录失败，请检查网络连接';
+      alert('服务器繁忙，请稍后再试');
+      console.error('登录失败:', err);
+      loginStatus.value.loading = false;
+    } finally {
+      loading.value = false;
+      loginStatus.value.loading = false;
+    }
+  };
+
 
   // 密码登录
   const handlePasswordLogin = async () => {
@@ -264,6 +305,7 @@ const useLoginData = () => {
     handleCaptchaLogin,
     handlePasswordLogin,
     handleWechatLogin,
+    handleEmailLogin,
     getWxLoginStatus,
     isLoggedIn,
     redirectIfLoggedIn

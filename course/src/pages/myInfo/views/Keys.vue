@@ -15,21 +15,22 @@
 
         <!-- 手机号修改表单 -->
         <div v-if="activeForm === 'phone' && item.key === 'phone'" class="form-section">
-          <h3>更换手机号</h3>
-          <div class="form-group">
+          <h3>{{ bindItems[0].value == '未绑定电话' ? '设置' : '更换' }}手机号 </h3>
+
+          <div class="form-group" v-if="bindItems[0].value !== '未绑定电话'">
             <label>原手机号：</label>
             <input v-model="changePhoneForm.phone" type="text" placeholder="原手机号" class="captcha-input">
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="bindItems[0].value !== '未绑定电话'">
             <label>原手机验证码：</label>
             <input v-model="changePhoneForm.captcha" type="text" placeholder="原手机验证码" class="captcha-input">
-            <button @click="sendSmsCaptcha(form.phone, 'old')" class="send-captcha" :disabled="!form.phone">
+            <button @click="sendSmsCaptcha(form.phone)" class="send-captcha" :disabled="!form.phone">
               发送验证码
             </button>
           </div>
           <div class="form-group">
             <label>新手机号：</label>
-            <input v-model="changePhoneForm.newPhone" type="text" placeholder="请输入新手机号">
+            <input v-model="changePhoneForm.newPhone" type="text" placeholder="请输入新手机号" class="captcha-input">
           </div>
           <div class="form-group">
             <label>新手机验证码：</label>
@@ -43,36 +44,28 @@
         </div>
 
         <!-- 邮箱修改表单 -->
-        <!-- 
-       
+
+
         <div v-if="activeForm === 'email' && item.key === 'email'" class="form-section">
           <h3>更换邮箱</h3>
           <div class="form-group">
             <label>原邮箱：</label>
-            <input v-model="changeemailForm.email" type="text" placeholder="原邮箱" class="captcha-input">
+            <input v-model="changeEmailForm.email" type="text" placeholder="原邮箱" class="captcha-input">
           </div>
           <div class="form-group">
-            <label>原手机验证码：</label>
-            <input v-model="changeemailForm.captcha" type="text" placeholder="原手机验证码" class="captcha-input">
-            <button @click="sendSmsCaptcha(form.email, 'old')" class="send-captcha" :disabled="!form.email">
+            <label>验证码：</label>
+            <input v-model="changeEmailForm.captcha" type="text" placeholder="原邮箱验证码" class="captcha-input">
+            <button @click="sendSmsCaptcha(form.email)" class="send-captcha" :disabled="!form.email">
               发送验证码
             </button>
           </div>
           <div class="form-group">
             <label>新邮箱：</label>
-            <input v-model="changeemailForm.newemail" type="text" placeholder="请输入新手机号">
+            <input v-model="changeEmailForm.newEmail" type="text" placeholder="请输入新邮箱" class="captcha-input">
           </div>
-          <div class="form-group">
-            <label>新手机验证码：</label>
-            <input v-model="changeemailForm.newCaptcha" type="text" placeholder="新手机验证码" class="captcha-input">
-            <button @click="sendSmsCaptcha(changeemailForm.newemail)" class="send-captcha"
-              :disabled="!changeEmailForm.newemail">
-              发送验证码
-            </button>
-          </div>
-          <button @click="changeemail" class="save-btn">确认更换</button>
-        </div> 
-      -->
+          <button @click="changeEmail" class="save-btn">确认更换</button>
+        </div>
+
 
 
         <!-- 密码修改表单  -->
@@ -93,7 +86,8 @@
             </div>
             <div class="form-group">
               <label>新密码：</label>
-              <input v-model="changePasswordByPhoneForm.newPassword" type="password" placeholder="8-20位，包含字母和数字">
+              <input v-model="changePasswordByPhoneForm.newPassword" type="password" placeholder="8-20位，包含字母和数字"
+                class="captcha-input">
             </div>
             <button @click="changePassword" class="save-btn">确认{{ form.passwordSet ? '修改' : '设置' }}</button>
             <button type='button' @click="changePasswordMethod = 'email'" class="save-btn">使用邮箱{{ form.passwordSet ?
@@ -129,16 +123,16 @@
         </div>
 
         <!-- 微信绑定表单 -->
-        <div v-if="activeForm === 'wxInfo' && item.key === 'wxInfo'" class="form-section">
+        <!-- <div v-if="activeForm === 'wxInfo' && item.key === 'wxInfo'" class="form-section">
           <h3>更换微信</h3>
           <div class="form-group">
             <p>请扫描下方二维码绑定微信</p>
             <button @click="bindWechat" class="save-btn">生成二维码</button>
           </div>
-        </div>
+        </div> -->
 
         <!-- 邮箱和QQ的占位表单 -->
-        <div v-if="(activeForm === 'email' && item.key === 'email') ||
+        <div v-if="(activeForm === 'wxInfo' && item.key === 'wxInfo') ||
           (activeForm === 'qqInfo' && item.key === 'qqInfo')" class="form-section">
           <h3>更换{{ item.type }}</h3>
           <div class="form-group">
@@ -211,6 +205,12 @@ export default defineComponent({
       newPhone: '',
       newCaptcha: ''
     });
+
+    const changeEmailForm = reactive({
+      email: '',
+      captcha: '',
+      newEmail: ''
+    })
 
     const changePasswordByPhoneForm = reactive({
       account: '',
@@ -351,7 +351,6 @@ export default defineComponent({
         alert('请输入新手机号');
         return;
       }
-
       try {
         // 根据是否有原手机号决定参数
         const params: any = form.phone ? {
@@ -380,43 +379,89 @@ export default defineComponent({
       }
     };
 
-    // 修改密码
-    const changePassword = async () => {
-      if (!changePasswordByPhoneForm.newPassword) {
-        alert('请输入新密码');
+    // 修改邮箱
+    const changeEmail = async () => {
+      if (!changeEmailForm.newEmail) {
+        alert('请输入新手机号');
         return;
       }
-
       try {
-        const params = {
-          account: changePasswordByPhoneForm.account, // 使用当前绑定的手机号
-          captcha: changePasswordByPhoneForm.captcha,
-          newPassword: changePasswordByPhoneForm.newPassword
+        // 根据是否有原手机号决定参数
+        const params: any = form.email ? {
+          email: changeEmailForm.email,
+          captcha: changeEmailForm.captcha,
+          newEmail: changeEmailForm.newEmail
+        } : {
+          email: null,
+          captcha: null,
+          newEmail: changeEmailForm.newEmail
         };
-        const response = await userApi.changePasswordByPhone(params);
-        alert('密码修改成功');
+
+        const response = await userApi.changeEmail(params)
+        alert('手机号修改成功');
         await fetchUserInfo();
         activeForm.value = '';
         // 重置表单
-        changePasswordByPhoneForm.captcha = '';
-        changePasswordByPhoneForm.newPassword = '';
+        changeEmailForm.captcha = '';
+        changeEmailForm.newEmail = '';
+      } catch (error: any) {
+        alert(error.message || '修改邮箱失败');
+      }
+    };
+
+    // 修改密码
+    const changePassword = async () => {
+      console.log(changePasswordByPhoneForm.newPassword, changePasswordByEmailForm.newPassword + "email phone")
+      if (!changePasswordByPhoneForm.newPassword && !changePasswordByEmailForm.newPassword) {
+        alert('请输入新密码');
+        return;
+      }
+      try {
+        if (changePasswordMethod.value === 'phone') {
+          const params = {
+            account: changePasswordByPhoneForm.account, // 使用当前绑定的手机号
+            captcha: changePasswordByPhoneForm.captcha,
+            newPassword: changePasswordByPhoneForm.newPassword
+          };
+          const response = await userApi.changePasswordByPhone(params);
+          alert('密码修改成功');
+          await fetchUserInfo();
+          activeForm.value = '';
+          // 重置表单
+          changePasswordByPhoneForm.captcha = '';
+          changePasswordByPhoneForm.newPassword = '';
+        }
+        else if (changePasswordMethod.value === 'email') {
+          const params = {
+            account: changePasswordByEmailForm.email,
+            captcha: changePasswordByEmailForm.captcha,
+            newPassword: changePasswordByEmailForm.newPassword
+          };
+          const response = await userApi.changePasswordByEmail(params);
+          alert('密码修改成功');
+          await fetchUserInfo();
+          activeForm.value = '';
+          // 重置表单
+          changePasswordByEmailForm.captcha = '';
+          changePasswordByEmailForm.newPassword = '';
+        }
       } catch (error: any) {
         alert(error.message || '修改密码失败');
       }
     };
 
     // 微信绑定
-    const bindWechat = async () => {
-      showWechatModal.value = true;
-      try {
-        const response = await userApi.getWxBindQrcode();
-        const blob = new Blob([response.data], { type: 'image/png' });
-        wxQrcode.value = URL.createObjectURL(blob);
-      } catch (error) {
-        console.error('获取微信二维码失败:', error);
-        alert('获取微信绑定二维码失败');
-      }
-    };
+    // const bindWechat = async () => {
+    //   showWechatModal.value = true;
+    //   try {
+    //     const response = await userApi.getWxBindQrcode();
+    //     const blob = new Blob([response.data], { type: 'image/png' });
+    //     wxQrcode.value = URL.createObjectURL(blob);
+    //   } catch (error) {
+    //     console.error('获取微信二维码失败:', error);
+    //     alert('获取微信绑定二维码失败');
+    //   }
+    // };
 
     const closeWechatModal = () => {
       showWechatModal.value = false;
@@ -435,6 +480,7 @@ export default defineComponent({
       showWechatModal,
       wxQrcode,
       changePhoneForm,
+      changeEmailForm,
       changePasswordByPhoneForm,
       changePasswordByEmailForm,
       toggleForm,
@@ -443,7 +489,8 @@ export default defineComponent({
       sendPasswordCaptcha,
       changePhone,
       changePassword,
-      bindWechat,
+      changeEmail,
+      // bindWechat,
       closeWechatModal
     };
   }
@@ -545,18 +592,18 @@ h1 {
 
 .form-group label {
   font-weight: bold;
-  min-width: 100px;
+  min-width: 120px;
   margin-right: 15px;
   color: #333;
 }
 
-input {
+.form-group input {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
-  max-width: 200px;
+  width: 240px;
 }
 
 .current-phone {
@@ -568,7 +615,7 @@ input {
 .captcha-input {
   flex: 1;
   margin-right: 10px;
-  max-width: 150px;
+  max-width: 240px;
 }
 
 .send-captcha {

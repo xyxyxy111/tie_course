@@ -4,6 +4,11 @@ export interface LoginByCaptchaParams {
   captcha: string;
 }
 
+export interface LoginByEmailParams {
+  email: string;
+  captcha: string;
+}
+
 export interface LoginByPasswordParams {
   account: string;
   password: string;
@@ -35,14 +40,6 @@ export interface UserProfile {
   avatarUrl: string;
   allowEmailNotify?: boolean;
   allowSMSNotify?: boolean;
-}
-
-interface UserBindInfo {
-  phone: string;
-  email: string;
-  passwordSet: boolean;
-  wxInfo: string;
-  qqInfo: string;
 }
 
 export interface UploadAvatarResponse {
@@ -92,6 +89,13 @@ export interface ChangePhoneParams {
   newCaptcha: string;
 }
 
+
+export interface ChangeEmailParams {
+  email: string;
+  captcha: string;
+  newEmail: string;
+}
+
 export interface ChangePasswordParams {
   account: string;
   newPassword: string;
@@ -133,6 +137,14 @@ export const authApi = {
     return request<string>({
       method: 'POST',
       url: '/auth/sessions/by-captcha',
+      data
+    });
+  },
+
+  loginByEmail: (data: LoginByEmailParams) => {
+    return request<string>({
+      method: 'POST',
+      url: '/auth/sessions/by-email',
       data
     });
   },
@@ -201,6 +213,26 @@ export const authApi = {
 
 // 用户相关API（需要认证）
 export const userApi = {
+
+  getAccountInfo: () => {
+    return request({
+      method: 'GET',
+      url: '/account/user'
+    });
+  },
+  // {
+  // "code": 1016,
+  // "message": "获取⽤⼾认证信息成功",
+  // "data": {
+  //   "phone": "⼿机号",
+  //   "email": "邮箱",
+  //   "passwordSet": "是否设置密码(boolen)",
+  //   "wxInfo": "微信信息",
+  //   "qqInfo": "QQ信息"
+  // }
+  //}
+
+
   // 修改手机号
   changePhone: (data: ChangePhoneParams) => {
     return request({
@@ -227,13 +259,6 @@ export const userApi = {
     });
   },
 
-  getAccountInfo: () => {
-    return request({
-      method: 'GET',
-      url: '/account/user'
-    });
-  },
-
   // 获取微信绑定二维码
   getWxBindQrcode: () => {
     return request({
@@ -252,12 +277,16 @@ export const userApi = {
     });
   },
 
-  getBindInfo: () => {
+  // 修改邮箱
+  changeEmail: (data: ChangeEmailParams) => {
     return request({
-      method: 'GET',
-      url: '/account/user'
-    })
-  }
+      method: 'PUT',
+      url: '/account/user/email',
+      data
+    });
+  },
+
+
 };
 
 export const profileApi = {
