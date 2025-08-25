@@ -19,13 +19,18 @@ const { fetchWishlist, addToWishlist } = useWishlist();
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
 import type { CourseVO, Chapter, Lesson } from '@/api/course';
-import { convertMinutesToHoursAndMinutes } from '@/utils/common';
-import { addToCart, goToCheckout, showCart } from '../components/content'
+import { 
+  addToCart, goToCheckout, showCart,
+  courseVo,
+  chapters,
+  getCourseMessage,
+  getLessonListBySortOrder,
+} from '../components/content'
 import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
 
 
-const courseVo = ref<CourseVO | null>(null);
-const chapters = ref<Chapter[]>([]);
+// const courseVo = ref<CourseVO | null>(null);
+// const chapters = ref<Chapter[]>([]);
 
 const { width, height } = useWindowSize()
 const { CourseDescription } = useCourseDescription();
@@ -44,48 +49,10 @@ onMounted(async () => {
   if (token) {
     userId.value = getCurrentUserId();
   }
-  const searchParams = new URLSearchParams(window.location.search);
-  const courseId = parseInt(searchParams.get('courseId')!);
-
-  const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
-  courseVo.value = courseVoResponse.data;
-  const chaptersResponse = await courseApi.getChapterListById(courseId);
-
-  chapters.value = chaptersResponse.data;
-  chapters.value.forEach(chapter => { // 注意：这里是 users.value
-    let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
-    chapter.hours = result.hours;
-    chapter.minutes = result.minutes;
-  });
-
-  //session to make great
-  const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
-  const firstChapter = chapters.value.find(chapter => chapter.chapterSortOrder === 1);
-  if (firstChapter) {
-    firstChapter.lessons! = lessonsResponse.data;
-    firstChapter.hasLoadedLessons = true;
-  } else {
-    console.warn("No chapters found");
-  }
-
+  getCourseMessage();
   lastUpdateTime.value = (formatDateToYearMonth(courseVo.value?.updateTime!));
 });
 
-const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
-  const chooseChapter = chapters.value.find(chapter => chapter.chapterSortOrder === sortOrder);
-  if (!chooseChapter?.hasLoadedLessons) {
-    //true
-    const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
-    console.log(lessonsResponse);
-    console.log("lessonsResponse" + lessonsResponse.data.map(lesson => lesson.title));
-    if (chooseChapter) {
-      chooseChapter.lessons! = lessonsResponse.data;
-      chooseChapter.hasLoadedLessons = true;
-    } else {
-      console.warn("No chapters found");
-    }
-  }
-}
 
 const chaptersState = ref('展开');
 
@@ -123,8 +90,8 @@ const courseId = parseInt(searchParams.get('courseId') || '0');
 
 
 const handleAddToCart = async () => {
-  // const response = await addToCart(courseId);
-  // if (response.success) { showCart.value = true; }
+  const response = await addToCart(userId.value!,courseId);
+  if (response as any) { showCart.value = true; }
 };
 
 
@@ -265,7 +232,7 @@ const handleBuyNow = async () => {
                 </svg>
                 <span class="lesson-title"> {{ lesson.title }} </span>
                 <div style="text-align: right;">
-                  <a href="#" v-if="lesson.previewable" @click="goToVideoWithLessonId(lesson.lessonId)">预览</a>
+                  <a href="#" v-if="lesson.previewable" @click="goToVideoWithLessonId(courseCurriculum.courseId,lesson.lessonId)">预览</a>
                 </div>
               </li>
             </ul>
@@ -278,9 +245,10 @@ const handleBuyNow = async () => {
     <!-- 要求 -->
     <h1>要求</h1>
     <ul class="section-list">
-      <li>准备好学习Python课程</li>
+      <li>认真学习！</li>
+      <!-- <li>准备好学习Python课程</li>
       <li>不用担心学不会，也不需要在任何程式语言背景或知识</li>
-      <li>有一台电脑就可以轻松上手</li>
+      <li>有一台电脑就可以轻松上手</li> -->
     </ul>
 
     <div class="course-description-container">

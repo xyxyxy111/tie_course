@@ -276,6 +276,7 @@ export async function retry<T>(
 } 
 
 export function convertMinutesToHours(minutes: number): number {
+  // console.log(minutes);
   if (typeof minutes !== 'number' || isNaN(minutes)) {
     console.warn("输入必须是一个有效的数字。");
     return 0;
@@ -301,3 +302,38 @@ export function formatDateToYearMonth(isoDateString: string): string {
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   return `${year}-${month}`;
 }
+
+export function convertSecondsToMinutesAndSeconds(totalSeconds: number): { minutes: number; seconds: number } {
+  if (typeof totalSeconds !== 'number' || isNaN(totalSeconds)) {
+    console.warn("输入必须是一个有效的数字。");
+    return { minutes: 0, seconds: 0 }; // 或者抛出错误
+  }
+  const absMinutes = Math.abs(totalSeconds);
+  const minutes = Math.floor(absMinutes / 60);
+  const seconds = absMinutes % 60;
+
+  return { minutes, seconds };
+}
+
+export const getFormattedDuration = (totalSeconds: number): string => {
+  const { minutes, seconds } = convertSecondsToMinutesAndSeconds(totalSeconds);
+
+  let result = '';
+
+  if (minutes > 0) {
+    result += `${minutes}'`;
+  }
+
+  if (seconds > 0) {
+    if (result.length > 0) {
+      result += '';
+    }
+    result += `${seconds}"`;
+  }
+  
+  if (result.length === 0) {
+    return '0 "'; 
+  }
+
+  return result;
+};

@@ -101,6 +101,10 @@ export interface Lesson {
   deleteTime?: string;
   unused?: string;
 }
+export interface VideoMsg{
+  courseId:number,
+  lessonId:number
+}
 
 
 export const courseApi = {
@@ -109,6 +113,24 @@ export const courseApi = {
       method: 'GET',
       url: `/tags/${tagId}/courses`
     });
+  },
+
+  getHottestCourse: () => {
+    return request<CourseListVO[]>({
+      method: 'GET',
+      url: 'courses/hottest'
+    })
+  },
+
+  getCourseTogetherBuy: (tagId: string, courseId: string) => {
+    return request<CourseListVO>({
+      method: 'GET',
+      url: '/courses/togetherBuy',
+      params: {
+        tagId: tagId,
+        courseId: courseId
+      }
+    })
   },
 
   getSingleCourseDetail: (courseId: number) => {
@@ -131,24 +153,29 @@ export const courseApi = {
       url: `/courses/${courseId}/lessons/${sortOrder}`
     });
   },
-
-  getHottestCourse: () => {
-    return request<CourseListVO[]>({
+  
+  getChapterOrderByLessonId: (lessonId: number) => {
+    return request<number>({
       method: 'GET',
-      url: 'courses/hottest'
-    })
+      url: `/lessons/getChapterOrder/${lessonId}`
+    });
   },
-
-  getCourseTogetherBuy: (tagId: string, courseId: string) => {
-    return request<CourseListVO>({
+  getPreviewStatusByLessonId: (lessonId: number) => {
+    return request<boolean>({
       method: 'GET',
-      url: '/courses/togetherBuy',
+      url: `/lessons/getPreviewStatus/${lessonId}`
+    });
+  },
+  getCoursePayStatusByLessonId: (userId:string,courseId: number) => {
+    return request<boolean>({
+      method: 'GET',
+      url: `/courses/getPayStatus`,
       params: {
-        tagId: tagId,
+        userId: userId,
         courseId: courseId
       }
-    })
-  }
+    });
+  },
 };
 
 export const categoryApi = {
@@ -170,21 +197,17 @@ export const categoryApi = {
       url: `/categories/${categoryId}/tags`
     });
   },
+  
 }
 
 export const videoApi = {
-  getLessonVideoOssSignatureUrl: (fileName: string) => {
+  getLessonVideoOssSignatureUrl: (videoMsg: VideoMsg) => {
     return request<String>({
       method: 'GET',
-      url: `/videos/lessons/signature-url/${fileName}`
+      url: `/videos/lessons/signature-url`,
+      params:videoMsg,
     });
   },
-  // getCoverVideoOssSignatureUrl: () => {
-  //   return request<String>({
-  //     method: 'GET',
-  //     url: '/categories'
-  //   });
-  // },
 }
 
 export const courseSuccessCodes = [
