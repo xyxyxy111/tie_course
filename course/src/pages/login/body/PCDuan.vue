@@ -152,7 +152,6 @@ onMounted(() => {
                   loginStatus.error }}</div>
               </div>
               <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('验证码') }]">
-
                 <div class="captcha-input-group">
                   <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
                   <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendSmsCaptcha">
@@ -184,14 +183,18 @@ onMounted(() => {
             <div v-if="loginMethod === 'email'" class="email-wrapper">
               <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('邮箱') }]">
 
-                <input v-model="loginForm.phone" placeholder="邮箱" class="email" />
+                <input v-model="loginForm.email" placeholder="邮箱" class="email" />
                 <div v-if="loginStatus.error && loginStatus.error.includes('邮箱')" class="error-message">{{
                   loginStatus.error }}</div>
               </div>
-              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('密码') }]">
-
-                <input v-model="loginForm.email" type="email" placeholder="密码" class="password" />
-                <div v-if="loginStatus.error && loginStatus.error.includes('密码')" class="error-message">{{
+              <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('验证码') }]">
+                <div class="captcha-input-group">
+                  <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
+                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendEmailCaptcha">
+                    {{ captchaBtn.text }}
+                  </button>
+                </div>
+                <div v-if="loginStatus.error && loginStatus.error.includes('验证码')" class="error-message">{{
                   loginStatus.error }}</div>
               </div>
             </div>
