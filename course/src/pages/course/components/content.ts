@@ -2,9 +2,15 @@
 import { ref, computed } from 'vue';
 import { getValidToken } from '@/utils/request';
 import { useCart } from '@/composables/useCart'
+import type { CourseVO, Chapter, Lesson } from '@/api/course';
+import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
+import { convertMinutesToHoursAndMinutes,formatDateToYearMonth } from '@/utils/common';
+
+
+
 
 const searchParams = new URLSearchParams(window.location.search);
-const courseId = parseInt(searchParams.get('courseId') || '0');
+const courseId = parseInt(searchParams.get('courseId') || '1001');
 export const showCart = ref(false);
 export const { addToCart, goToCheckout } = useCart();
 // 课程描述相关逻辑
@@ -115,3 +121,45 @@ export {
   recommendedProducts,
   relatedTopics
 };
+
+
+export const chapters = ref<Chapter[]>([]);
+export const courseVo = ref<CourseVO | null>(null);
+
+export const getCourseMessage = async () => {
+    const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
+    courseVo.value = courseVoResponse.data;
+    const chaptersResponse = await courseApi.getChapterListById(courseId);
+    
+    chapters.value = chaptersResponse.data;
+    chapters.value.forEach(chapter => { // 注意：这里是 users.value
+      let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
+      chapter.hours = result.hours;
+      chapter.minutes = result.minutes;
+    });
+
+    //session to make great
+    const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
+    const firstChapter = chapters.value.find(chapter => chapter.chapterSortOrder === 1);
+    if (firstChapter) {
+      firstChapter.lessons! = lessonsResponse.data;
+      firstChapter.hasLoadedLessons = true;
+    } else {
+      console.warn("No chapters found");
+  }
+}
+export const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
+  const chooseChapter = chapters.value.find(chapter => chapter.chapterSortOrder === sortOrder);
+  if (!chooseChapter?.hasLoadedLessons) {
+    //true
+    const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, sortOrder);
+    console.log(lessonsResponse);
+    console.log("lessonsResponse" + lessonsResponse.data.map(lesson => lesson.title));
+    if (chooseChapter) {
+      chooseChapter.lessons! = lessonsResponse.data;
+      chooseChapter.hasLoadedLessons = true;
+    } else {
+      console.warn("No chapters found");
+    }
+  }
+}

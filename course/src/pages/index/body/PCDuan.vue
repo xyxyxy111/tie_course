@@ -17,6 +17,9 @@ import {
 } from '../components/content.ts';
 import Footer from '@/components/common/Footer.vue';
 import Swiper from '../components/Swiper.vue'
+import { goToVideo } from '@/components/common/header';
+import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
+
 const { width, height } = useWindowSize()
 
 const {
@@ -78,6 +81,14 @@ const courseSliderStyle = computed(() => ({
   left: `calc(${currentIndex.value} * -320px)`
 }));
 
+//控制hover
+const hovered = ref(false);  // 控制hover状态
+const goToVideoPage = (courseId :number) => {
+  console.log("go to video")
+  if (courseId) {
+    goToVideo(courseId);
+  }
+};
 
 </script>
 
@@ -175,7 +186,15 @@ const courseSliderStyle = computed(() => ({
           </div>
           <div v-for="course in mylist" :key="course.courseId" class="mylearn-course-item">
             <div class="mylearn-course-cover">
-              <img :src="course.coverImgUrl" />
+              <span class="video-pictrue" @mouseover="hovered = true" @mouseleave="hovered = false"
+                :class="{ hovered: hovered }" @click="goToVideoPage(course.courseId)" title="点击播放">
+                <img :src="course.coverImgUrl" alt="">
+                <div class="overlay">
+                  <svg width="50" height="50" viewBox="0 0 16 16" fill="#eee">
+                    <use href="#solar--play-broken" />
+                  </svg>
+                </div>
+              </span>
             </div>
             <div class="mylearn-course-info">
               <div class="mylearn-course-title">
@@ -191,8 +210,8 @@ const courseSliderStyle = computed(() => ({
         </div>
       </div>
 
-      <!-- 
-      <div v-if="userId" class="next-section">
+      
+      <!-- <div v-if="userId" class="next-section">
         <h2 class="next-title">下一步要学习什么</h2>
         <div class="next-cards-row">
           <div class="next-card" v-for="(course, idx) in courseList" :key="idx">
@@ -231,10 +250,10 @@ const courseSliderStyle = computed(() => ({
 
             <div class="recommend-card-meta-label">讲师：iClass</div>
             <div class="recommend-card-meta">
-              <span class="recommend-card-meta-link">上次更新日期：{{ hottestCourseList[0]?.updateTime }}</span>
-              <span class="recommend-card-meta-label">总时长：</span>{{ hottestCourseList[0]?.totalMinutes }}
-              <span class="recommend-card-meta-label">24个章节</span>
-              <span class="recommend-card-meta-label">213个讲解</span>
+              <span class="recommend-card-meta-link">上次更新日期：{{ formatDateToYearMonth(hottestCourseList[0]?.updateTime!) }}</span>
+              <span class="recommend-card-meta-label">总时长：</span>{{ convertMinutesToHours(hottestCourseList[0]?.totalMinutes) }}个小时
+              <span class="recommend-card-meta-label">{{ hottestCourseList[0]?.chapterNum }}个章节</span>
+              <span class="recommend-card-meta-label">{{ hottestCourseList[0]?.lessonNum }}个讲解</span>
             </div>
             <div class="recommend-card-rating">
               <span class="recommend-card-score">4.9</span>
@@ -1021,4 +1040,47 @@ const courseSliderStyle = computed(() => ({
   background: #215496;
   color: #fff;
 }
+
+
+/* 播放器样式 */
+.video-pictrue {
+  display: block;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-pictrue:hover img {
+  transform: scale(1.03);
+  transition: transform 0.2s ease-in-out;
+}
+
+.video-pictrue {
+  position: relative;
+}
+
+.video-pictrue .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.2s;
+}
+
+.video-pictrue.hovered .overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 </style>

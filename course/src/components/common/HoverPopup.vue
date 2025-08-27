@@ -12,7 +12,7 @@
           <div class="course-info">
             <div class="course-title">{{ courseInfo?.title || courseName }}</div>
             <div>
-              <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025年3月' }}</span>|
+              <span class="course-update">更新日期 {{ courseInfo?.updateDate || '2025-03' }}</span>|
               <span class="course-duration">
                 总共{{ courseInfo?.duration || '0' }}小时
               </span>
@@ -42,7 +42,7 @@ import type { PropType } from 'vue';
 import { cartApi } from '@/api/cart';
 import type { CourseVO } from '@/api/course';
 import { courseApi } from '@/api/course';
-import { convertMinutesToHours } from '@/utils/common';
+import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
 import { wishlistApi } from '@/api/user';
 import { goToCart, goToLogin } from './header';
 
@@ -153,7 +153,7 @@ export default defineComponent({
           title: courseVoResponse.data.title,
           description: courseVoResponse.data.description,
           whatYouWillLearn: courseVoResponse.data.whatYouWillLearn,
-          updateDate: courseVoResponse.data.updateTime!,
+          updateDate: formatDateToYearMonth(courseVoResponse.data.updateTime!),
           duration: convertMinutesToHours(courseVoResponse.data.totalMinutes!),
           courseId: courseVoResponse.data.courseId!,
           price: courseVoResponse.data.originalPrice,
