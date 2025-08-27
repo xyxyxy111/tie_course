@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRef, ref, onMounted } from 'vue';
+import { toRef, ref, onMounted, computed } from 'vue';
 import { defineComponent } from 'vue'
 import IconSprite from '@/components/Icon/IconSprite.vue'
 import SvgIcon from '@/components/Icon/SvgIcon.vue'
@@ -8,12 +8,12 @@ import '../order.css'
 // 导入共享的数据和逻辑
 import {
   cartCourses,
+  orderCourseIds,
   cartTotal,
   cartOriginalTotal,
   cartSaved,
   selectedPayment,
   couponCode,
-  applyCoupon,
   discountAmount,
   finalPrice,
   payAmount,
@@ -40,14 +40,85 @@ import {
   confirmPayment
 } from '../content';
 import PCHeader from '@/components/common/PCHeader.vue'
-
+import { type UserCouponVO, type PriceDetailVO, CouponStatus, CouponType } from '@/api/coupon'
+import { useCoupon } from '@/composables/useCoupon'
 const { width, height } = useWindowSize()
+const {
+  coupons,
+  loading: couponLoading,
+  error: couponError,
+  fetchMyCoupons,
+  applyCoupon,
+  getAvailableCoupons,
+  CouponStatus: CouponStatusEnum,
+  CouponType: CouponTypeEnum
+} = useCoupon()
 
+import { getCurrentUserId, getValidToken } from '@/utils/request';
 
-// 组件挂载时加载购物车数据
+// 优惠券相关状态
+const selectedCouponId = ref<number | null>(null)
+const priceDetail = ref<PriceDetailVO | null>(null)
+const showCouponList = ref(false)
+const filterStatus = ref<string | null>(null)
+const filterType = ref<string | null>(null)
+const userId = ref<string | null>(null)
+
 onMounted(() => {
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
+  }
   initializeData();
+  fetchCoupons();
 });
+
+async function fetchCoupons() {
+  try {
+    await fetchMyCoupons();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
+
+// 输入优惠券ID并应用优惠券
+const applyCoupons = async () => {
+  try {
+    const courseIds = cartCourses.value.map(course => course.coureseId);
+    console.log(cartCourses.value[0] + "---===" + courseIds)
+    const result = await applyCoupon(couponCode.value, orderCourseIds.value, finalPrice.value);
+    discountAmount.value = 0;
+    // 更新价格
+    priceDetail.value = result.data;
+    discountAmount.value = result.data.discountPrice;
+    console.log(discountAmount.value)
+    finalPrice.value = result.data.finalPrice;
+    // couponCode.value = result.data.couponIds || "优惠券";
+
+    console.log('优惠券已应用:', result);
+  } catch (err) {
+    console.error('应用优惠券失败:', err);
+  }
+}
+
+// 移除已使用的优惠券
+const removeCoupon = () => {
+  selectedCouponId.value = null;
+  couponCode.value = 0;
+  priceDetail.value = null;
+  discountAmount.value = 0;
+  finalPrice.value = cartTotal.value; // 恢复为未应用优惠券时的原始总价
+}
+
 </script>
 
 <!-- html -->
@@ -129,7 +200,7 @@ onMounted(() => {
     <div class="total-section">
       <!-- 价格明细 -->
       <div class="price-breakdown">
-        <h3>价格明细</h3>
+        <h3>订单概要</h3>
         <div class="price-item" v-if="cartOriginalTotal > cartTotal">
           <span>原价:</span>
           <span class="original-price">¥{{ cartOriginalTotal.toFixed(2) }}</span>
@@ -155,8 +226,55 @@ onMounted(() => {
         <h3>优惠券</h3>
         <div class="coupon-input">
           <input type="text" v-model="couponCode" placeholder="输入优惠券码" class="coupon-code-input">
-          <button @click="applyCoupon" class="apply-coupon-btn">应用</button>
+          <button @click="applyCoupons()" class="apply-coupon-btn">应用</button>
         </div>
+        <div class="coupon-list-container">
+
+          <div v-if="showCouponList" class="coupon-list-content">
+            <div v-if="couponLoading" class="coupon-loading">
+              加载中...
+            </div>
+            <div v-else-if="couponError" class="coupon-error">
+              {{ couponError }}
+            </div>
+            <div v-else-if="coupons.length === 0" class="coupon-empty">
+              暂无优惠券
+            </div>
+            <!-- 优惠券列表 -->
+            <div v-else class="coupon-items">
+              <div v-for="coupon in coupons" :v-if="coupon.status == 'unused'" :key="coupon.userCouponId"
+                class="coupon-item">
+                <div class="coupon-content">
+                  <div class="coupon-discount">
+                    <span class="coupon-type">{{ coupon.couponType == 'fixed' ? '折扣券' : '满减券' }} </span>
+                    <span v-if="coupon.couponType !== 'fixed'">满¥{{ coupon.minOrderAmount || 0 }}减{{
+                      coupon.discountValue ? `${coupon.discountValue}` :
+                        '无' }}元</span>
+                    <span v-if="coupon.couponType === 'fixed' && coupon.discountValue && coupon.minOrderAmount">
+                      满¥{{ coupon.minOrderAmount || 0 }}享{{ (10 - (coupon.discountValue / coupon.minOrderAmount * 10))
+                      }}折</span>
+                  </div>
+                  <div class="coupon-field">
+                    <span class="field-label">优惠券ID:</span> <span>{{ coupon.userCouponId }}</span>
+                  </div>
+                  <div class="coupon-field">
+                    <span class="field-label">有效期至:</span> <span>{{ formatDate(coupon.expireTime) }}</span>
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="coupon-list-header">
+            <button class="toggle-coupon-list" @click="showCouponList = !showCouponList">
+              {{ showCouponList ? '收起' : '可用优惠券' }}
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -193,6 +311,14 @@ label {
   flex: 2;
 }
 
+.section h2 {
+  height: 60px;
+  margin-bottom: 50px;
+  color: rgba(16, 16, 16, 1);
+  font-size: 48px;
+  text-align: left;
+  font-family: PingFangSC-bold;
+}
 
 .payment-methods {
   margin-bottom: 20px;
@@ -239,8 +365,17 @@ label {
 
 .order-summary {
   padding: 20px;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
+  width: 700px;
+}
+
+.order-summary h3 {
+  border-bottom: 1px solid #e0e0e0;
+  height: 40px;
+  color: rgba(16, 16, 16, 1);
+  font-size: 16px;
+  text-align: left;
+  font-family: PingFangSC-bold;
 }
 
 .course-list {
@@ -253,24 +388,28 @@ label {
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
   font-size: 1.6rem;
 }
 
 .course-item img {
-  width: 200px;
-  height: 120px;
-  border-radius: 6px;
+  width: 100px;
+  height: 58px;
+  border: 1px solid #e0e0e0;
 }
 
 .title {
-  width: calc(100% - 260px);
+  width: calc(100% - 100px);
   padding-left: 1rem;
+  color: #010101;
+  font-size: 18px;
+  text-align: left;
+  font-family: PingFangSC-bold;
 }
 
 .price {
+  text-align: right;
   width: 60px;
-  font-weight: bold;
+  font-family: PingFangSC-regular;
 }
 
 
@@ -279,6 +418,7 @@ label {
   flex: 1;
   text-align: right;
   margin: 20px 0;
+  border: none;
   padding-left: 20px;
 }
 
@@ -337,24 +477,30 @@ label {
 .price-breakdown {
   margin-bottom: 20px;
   padding: 15px;
-  border: 1px solid #e0e0e0;
+  border: none;
   border-radius: 8px;
   background-color: white;
 }
 
 .price-breakdown h3 {
   margin-bottom: 15px;
-  font-size: 1.6rem;
-  color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  width: 156px;
+  height: 40px;
+  line-height: 39px;
+  color: rgba(69, 69, 69, 1);
+  font-size: 28px;
+  text-align: left;
+  font-family: PingFangSC-bold;
 }
 
 .price-item {
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
-  font-size: 1.4rem;
+  color: #010101;
+  font-size: 16px;
+  text-align: left;
+  font-family: PingFangSC-regular;
 }
 
 .price-item.total {
@@ -362,21 +508,20 @@ label {
   padding-top: 8px;
   margin-top: 8px;
   font-weight: bold;
-  font-size: 1.6rem;
+  font-size: 2rem;
+  font-family: PingFangSC-bold;
 }
 
-.discount {
-  color: #dc3545;
-}
-
-.saved {
-  color: #28a745;
+.discount,
+.saved,
+.final-price {
+  color: rgba(16, 16, 16, 1);
 }
 
 .final-price {
-  color: #165c91;
-  font-weight: bold;
+  color: #010101;
 }
+
 
 .pay-button {
   background-color: #215496;
@@ -568,5 +713,100 @@ label {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.coupon-list-container {
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.coupon-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toggle-coupon-list {
+  background-color: #215496;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toggle-coupon-list:hover {
+  background-color: #0056b3;
+}
+
+
+.coupon-loading {
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+}
+
+.coupon-error {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}
+
+.coupon-empty {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+}
+
+.coupon-items {
+  margin-top: 20px;
+}
+
+.coupon-item {
+  background-color: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.coupon-item:hover {
+  transform: scale(1.02);
+  background-color: #e7edf931;
+}
+
+.coupon-content {
+  display: flex;
+  flex-direction: column;
+  /* 垂直排列 */
+}
+
+.coupon-discount {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+
+.coupon-discount span {
+  font-size: 18px;
+  font-weight: bolder;
+}
+
+.coupon-discount .coupon-type {
+  color: #133c71;
+}
+
+.coupon-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+  font-size: 14px;
 }
 </style>

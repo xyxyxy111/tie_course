@@ -1,9 +1,7 @@
 html {
   font-size: 10px;
 }
-
-/* PC默认 */
-
+/* 
 @media (max-width: 4800px) {
   html {
     font-size: 13px;
@@ -46,4 +44,4 @@ html {
   html {
     font-size: 6px;
   }
-}
+} */

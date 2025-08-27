@@ -30,7 +30,7 @@ export function useCart() {
   };
 
   // 添加课程到购物车
-  const addToCart = async (userId: string, courseId: number) => {
+  const addToCart = async (userId: string | null, courseId: number) => {
 
     loading.value = true;
     try {
@@ -43,20 +43,8 @@ export function useCart() {
       } else if (err === "课程已被购买") {
         alert('课程已被购买');
       }
-      // console.error('添加课程到购物车失败:', err);
-
       let errorMessage = '添加课程到购物车失败';
       let errorType = 'unknown';
-      emit('course-added', {
-        courseId: courseId,
-        courseName: title,
-        userId: userId,
-        success: false,
-        error: err,
-        errorMessage: errorMessage,
-        errorType: errorType
-      });
-
       if (errorType === 'database_error') {
         console.log("加入购物车失败");
       } else {

@@ -136,7 +136,7 @@ export const authApi = {
   loginByCaptcha: (data: LoginByCaptchaParams) => {
     return request<string>({
       method: 'POST',
-      url: '/auth/sessions/by-captcha',
+      url: '/auth/sessions/by-phone',
       data
     });
   },

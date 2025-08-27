@@ -529,7 +529,7 @@ defineExpose({
   margin-bottom: 1rem;
   height: 7.2rem;
   width: 100vw;
-  min-width: 1400px;
+  min-width: 1920px;
 }
 
 

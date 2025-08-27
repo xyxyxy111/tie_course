@@ -26,16 +26,13 @@ const chapters = ref<Chapter[]>([]);
 
 const { width, height } = useWindowSize()
 const { CourseDescription } = useCourseDescription();
-// 获取userId
 const userId = ref<string | null>(null);
 const isExpanded = ref(false);
-// 展开章节的id集合
 const expandedChapters = ref<number[]>([]);
 const lastUpdateTime = ref('年月日')
-// 调用头部组件的引用
 const headerRef = ref<InstanceType<typeof PCHeader> | null>(null);
-
-
+const otherThemes = ['Python', 'Java']
+const requests = ['准备好学习Python课程', '不用担心学不会，也不需要在任何程式语言背景或知识', '有一台电脑就可以轻松上手']
 onMounted(async () => {
   const token = getValidToken();
   if (token) {
@@ -49,13 +46,12 @@ onMounted(async () => {
   const chaptersResponse = await courseApi.getChapterListById(courseId);
 
   chapters.value = chaptersResponse.data;
-  chapters.value.forEach(chapter => { // 注意：这里是 users.value
+  chapters.value.forEach(chapter => {
     let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
     chapter.hours = result.hours;
     chapter.minutes = result.minutes;
   });
 
-  //session to make great
   const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
   const firstChapter = chapters.value.find(chapter => chapter.chapterSortOrder === 1);
   if (firstChapter) {
@@ -113,16 +109,16 @@ const CourseDescriptionStyle = computed(() => ({
   maxHeight: 'fit-content'
 }));
 
-const searchParams = new URLSearchParams(window.location.search);
-const courseId = parseInt(searchParams.get('courseId') || '0');
-
-
-
 const handleAddToCart = async () => {
-  const response = await addToCart(courseId);
-  if (response.success) { showCart.value = true; }
+  const searchParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(searchParams.get('courseId')!);
+  try {
+    await addToCart(userId.value, courseId);
+    showCart.value = true;
+  } catch (error) {
+    console.log(error)
+  }
 };
-
 
 const handleBuyNow = async () => {
   try {
@@ -189,11 +185,11 @@ function formatTime(updateTime: string | undefined) {
         <span class="hot-tag">热门课程</span>
         <span class="rating-score">4.9</span>
         <span class="stars">
-          <svg v-for="i in 4" :key="i" class="star" viewBox="0 0 20 20" width="22" height="22" fill="#FFC800">
+          <svg v-for="i in 4" :key="i" class="star" viewBox="0 0 18 18" width="18" height="18" fill="#FFC800">
             <polygon points="10,1 12.5,7.5 19,7.5 14,12 16,19 10,15 4,19 6,12 1,7.5 7.5,7.5" />
           </svg>
           <!-- 半星 -->
-          <svg class="star" viewBox="0 0 20 20" width="22" height="22">
+          <svg class="star" viewBox="0 0 18 18" width="18" height="18">
             <defs>
               <linearGradient id="half">
                 <stop offset="50%" stop-color="#FFC800" />
@@ -230,18 +226,19 @@ function formatTime(updateTime: string | undefined) {
       <h2>您将会学到</h2>
       <p> <span class="checkmark">✔</span>{{ courseVo?.whatYouWillLearn }}</p>
     </div>
-    <h1>浏览相关主题</h1>
-    <div class="other-theme">
 
-      <!-- <button v-for="otherTheme in otherThemes">
-        {{ otherTheme.title }}
-      </button> -->
+    <div class="other-theme">
+      <h1>浏览相关主题</h1>
+      <button v-for="otherTheme in otherThemes">
+        {{ otherTheme }}
+      </button>
 
     </div>
+
     <h1>课程内容</h1>
     <div class="course-content">
       <div class="course-content-header">
-        <h3>{{ courseVo?.chapterNum }}个章节·{{ courseVo?.lessonNum }}个讲座·总时长{{ courseVo?.totalMinutes }}分钟</h3>
+        <h3>{{ courseVo?.chapterNum }}个章节 · {{ courseVo?.lessonNum }}个讲座 · 总时长{{ courseVo?.totalMinutes }}分钟</h3>
         <span class="open-all" @click="chaptersState === '展开' ? openAllChapter() : closeAllChapter()">
           {{ chaptersState }}所有章节
         </span>
@@ -255,7 +252,7 @@ function formatTime(updateTime: string | undefined) {
               第{{ courseCurriculum.chapterSortOrder }}章
               &nbsp; {{ courseCurriculum.title }}</span>
             <span class="lectrue-duration">
-              {{ courseCurriculum.lessonNum }}个讲座·
+              {{ courseCurriculum.lessonNum }}个讲座 ·
               <template v-if="courseCurriculum.hours !== 0">
                 {{ courseCurriculum.hours }}小时
               </template>
@@ -283,9 +280,14 @@ function formatTime(updateTime: string | undefined) {
     <!-- 要求 -->
     <h1>要求</h1>
     <ul class="section-list">
-      <li>准备好学习Python课程</li>
-      <li>不用担心学不会，也不需要在任何程式语言背景或知识</li>
-      <li>有一台电脑就可以轻松上手</li>
+      <li v-for="request in requests">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="#111">
+          <circle cx="10" cy="10" r="9" stroke="#fff" stroke-width="2" />
+          <use href="#icon-park-outline--dot" />
+        </svg><span class="request">{{ request }}</span>
+
+      </li>
+
     </ul>
 
     <div class="course-description-container">
@@ -297,32 +299,9 @@ function formatTime(updateTime: string | undefined) {
         {{ isExpanded ? '收起' : '显示更多' }}
       </button> -->
     </div>
-    <!-- 讲师 -->
-    <!-- <div class="section-block teacher-block">
-      <h1>讲师</h1>
-      <div class="teacher-info">
-        <img class="teacher-avatar" src="@/images/userPic.png" alt="讲师头像" />
-        <div class="teacher-meta">
-          <a class="teacher-name" href="#">iClass</a>
-          <div class="teacher-stats">
-            <span class="teacher-score">★ 4.8 讲师评分</span>
-            <span class="teacher-student">9713 学员</span>
-            <span class="teacher-course">2066 门课程</span>
-            <span class="teacher-comment">5 评价</span>
-          </div>
-        </div>
-        <div class="teacher-desc">
-          我是iClass，拥有超过五年的开发教学经验，致力于数据分析和人工智能领域。主讲Python、数据分析、机器学习等课程。分阶段（2025 Python全攻略、2026 Python进阶、2027
-          Python实战、2028 Python数据分析、2029 Python深度学习）带你系统掌握Python技能。
-        </div>
-      </div>
-    </div> -->
+
   </div>
 </template>
-
-<!-- 
-<template>
-   -->
 
 <style scoped>
 @import "@/assets/rem.css";
@@ -332,39 +311,47 @@ function formatTime(updateTime: string | undefined) {
   background-color: #101010;
   color: #fff;
   width: 100%;
-  padding: 20px 0px 20px 10px;
+  padding: 20px 0px;
   font-size: 2rem;
-  height: 400px;
+  height: 350px;
+  min-width: 1920px;
 }
 
-.content {
+.content,
+#course-detail {
   margin: 0 auto;
-  width: calc(30% + 660px);
-  padding: 20px;
-  padding-right: 340px;
+  width: 1494px;
+  padding-right: 342px;
 }
 
 .content .course-theme {
   color: #A3C7FD;
   font-weight: bold;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: PingFangSC-bold;
 }
 
 .content .course-title {
   color: #fff;
   font-weight: bold;
+  height: 68px;
+  font-weight: bold;
+  font-family: PingFangSC-bold;
   font-size: 3.2rem;
 }
 
 .content .course-introduction {
   color: #fff;
   font-size: 1.8rem;
-  height: 90px;
+  height: 85px;
   overflow: hidden;
+  font-family: PingFangSC-regular;
 }
 
 .course-meta-row {
-  margin: 15px 0px 0px;
-  height: 30px;
+  margin: 20px 0px 0px;
+  height: 20px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -374,32 +361,31 @@ function formatTime(updateTime: string | undefined) {
 }
 
 .hot-tag {
-  background: #eaf6ff;
-  color: #165c91;
+  background: #e2eff9;
+  color: #235e8f;
   font-size: 1.6rem;
   font-weight: bold;
   border-radius: 6px;
   padding: 2px 10px;
-
   margin-right: 8px;
   display: inline-block;
 }
 
 .rating-score {
-  color: #FFC800;
-  font-weight: bold;
-  font-size: 2rem;
+  color: #FcCa00;
+  font-size: 1.2rem;
   margin-right: 2px;
 }
 
 .stars {
   display: flex;
   align-items: center;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 
 .star {
-  margin-right: -2px;
+  width: 24px;
+  height: 20px;
 }
 
 .review-link {
@@ -417,8 +403,8 @@ function formatTime(updateTime: string | undefined) {
 }
 
 .creator-link {
-  color: #444;
-  font-size: 1.6rem;
+  color: #a3c7fd;
+  font-size: 1.2rem;
   margin-left: 4px;
   text-decoration: underline;
 }
@@ -430,18 +416,128 @@ function formatTime(updateTime: string | undefined) {
 }
 
 #course-detail {
-  margin: 0 auto;
-  height: fit-content;
-  padding: 20px;
-  width: calc(30% + 680px);
-  padding-right: 360px;
+  padding-top: 30px;
+}
+
+.what-you-will-learn {
+  border: 1px #e1e1e1 solid;
+  padding: 17px 22px;
+}
+
+.what-you-will-learn h2 {
+  font-size: 22px;
+  color: #010101;
+  font-weight: bold;
+  font-family: PingFangSC-bold;
+  margin-bottom: 14px;
+  ;
+}
+
+.what-you-will-learn .checkmark {
+  font-size: 16px;
+  margin-right: 16px;
+}
+
+.what-you-will-learn ul {
+  list-style: none;
+}
+
+h1 {
+  margin-top: 30px;
+  font-family: PingFangSC-bold;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.other-theme {
+  margin-top: 30px;
+}
+
+.other-theme button {
+  width: fit-content;
+  min-width: 80px;
+  height: 30px;
+  font-size: 12px;
+  background-color: white;
+  border-radius: 4px;
+  margin-top: 20px;
+  margin-right: 10px;
+  border: 1px #888 solid;
+  transition: all 0.3s;
+}
+
+.other-theme button:hover {
+  color: #010101;
+  background-color: #f2f2f2;
+}
+
+.course-content-header {
+  font-size: 12px;
+  margin-top: 25px;
+  display: flex;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.course-content-header .open-all {
+  position: absolute;
+  font-weight: bolder;
+  color: rgb(35, 94, 143);
+  right: 20px;
+  margin-left: auto;
+  text-align: right;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.course-content-header .open-all:hover {
+  background-color: #235e8f0a;
+}
+
+.course-content ul {
+  width: 100%;
+  padding-left: 0px;
+  border: 1px #e1e1e1 solid;
+  list-style: none
+}
+
+.course-content ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  height: 50px;
+  padding: 10px 20px;
+  background-color: #f2f2f2;
+  border-bottom: 0.5px #e1e1e1 solid;
+  transition: all 0.3s;
+
+}
+
+.lesson-list {
+  border: none;
+  list-style: circle;
+  cursor: default;
+  background-color: #fff;
+}
+
+.course-content .lesson-list li {
+  font-size: 12px;
+  background-color: #fff;
+  border: none;
+}
+
+.course-content .lesson-list li svg {
+  padding-top: 8px;
+  margin-right: 22px;
 }
 
 .arrow {
   display: inline-block;
   width: 16px;
   height: 16px;
-  margin-right: 8px;
+  margin-right: 32px;
+  margin-left: 24px;
   transition: transform 0.2s;
   position: relative;
 }
@@ -465,6 +561,51 @@ function formatTime(updateTime: string | undefined) {
   top: 5px;
 }
 
+.course-content .curriculum-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 1.4rem;
+  margin-top: 15px;
+  height: 30px;
+}
+
+.course-content .lectrue-duration {
+  right: 10px;
+  color: #888;
+  margin-left: auto;
+  text-align: right;
+  display: inline-block;
+  min-width: 120px;
+  height: 30px;
+  margin-top: 13px;
+}
+
+.course-descrpition {
+  margin-top: 40px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.course-descrpition button {
+  border: none;
+  padding: 10px;
+  color: #215496;
+}
+
+.course-descrpitionbtn {
+  width: fit-content;
+  border: none;
+  background-color: white;
+  color: #215496;
+  font-weight: 700;
+  padding: 10px 20px;
+  margin: 10px 20px;
+  border-radius: 8px;
+}
+
+.course-descrpitionbtn:hover {
+  background-color: rgba(200, 230, 255, 0.2);
+}
 
 .slide-lesson-enter-active,
 .slide-lesson-leave-active {
@@ -494,44 +635,33 @@ function formatTime(updateTime: string | undefined) {
   margin-left: 8px;
   text-align: left;
   flex-grow: 1;
-  /* Ensures the title takes up the available space */
-}
-
-
-.course-detail-section {
-  background: #fff;
-  border-radius: 10px;
-  padding: 32px 32px 24px 32px;
-  max-width: 900px;
-  margin: 0 auto;
-  font-family: "Inter", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-  color: #222;
-}
-
-.section-block {
-  margin-bottom: 32px;
-}
-
-.section-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 12px;
-  color: #222;
 }
 
 .section-list {
-  list-style: disc inside;
-  margin: 0 0 12px 0;
-  padding-left: 18px;
-  color: #222;
+  padding-top: 14px;
+  padding-left: 0px;
 }
+
 
 .section-list li {
-  margin-bottom: 6px;
-  font-size: 1rem;
-  line-height: 1.7;
+  list-style: none;
+  margin-bottom: 15px;
+  height: 16px;
+  align-items: center;
+  font-size: 12px;
 }
 
+.section-list li svg {
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.section-list li .request {
+  display: inline-block;
+  height: 16px;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
 
 .course-description {
   position: relative;
@@ -546,93 +676,32 @@ function formatTime(updateTime: string | undefined) {
   color: #333;
   white-space: pre-line;
   word-break: break-word;
+  font-size: 12px;
 }
 
-/* 
-.course-description-btn {
-  display: block;
-  padding: 8px 16px;
-  background: linear-gradient(to right, #6a11cb, #2575fc);
+
+.container-scroll-y {
+  overflow-y: auto;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e1e1e1;
+}
+
+.price {
+  font-size: 3.6rem;
+  font-weight: bold;
+  color: var(--error-color);
+  margin-bottom: 8px;
+}
+
+.discount {
+  background: var(--error-color);
   color: white;
-  border: none;
+  padding: 4px 8px;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-}
-
-.course-description-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-} */
-
-.section-desc {
-  font-size: 1rem;
-  color: #444;
-  line-height: 1.7;
-  margin-top: 8px;
-}
-
-.teacher-block {
-  border-top: 1px solid #eee;
-  padding-top: 24px;
-}
-
-.teacher-info {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  margin-top: 10px;
-}
-
-.teacher-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #f5f5f5;
-  border: 1px solid #eee;
-}
-
-.teacher-meta {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.teacher-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #215496;
-  text-decoration: none;
-  margin-bottom: 6px;
-  display: inline-block;
-}
-
-.teacher-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: 0.98rem;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-.teacher-score {
-  color: #e67c17;
+  font-size: 1.2rem;
   font-weight: 600;
 }
-
-.teacher-desc {
-  font-size: 0.98rem;
-  color: #444;
-  line-height: 1.7;
-  margin-top: 4px;
-  flex: 2 1 0;
-}
 </style>
-
-<!-- 
-<style scoped>
-</style>
--->

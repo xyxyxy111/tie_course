@@ -7,13 +7,14 @@ import type { OrderVO, Order } from '@/api/order';
 
 const cartData = ref<any>(null);
 const cartCourses = ref<any[]>([]);
+const orderCourseIds = ref<number[]>([])
 const cartTotal = ref(0);
 const cartOriginalTotal = ref(0);
 const cartSaved = ref(0);
 
 // 响应式数据
 const selectedPayment = ref('alipay'); // 默认选择支付宝
-const couponCode = ref(''); // 优惠券码
+const couponCode = ref(0); // 优惠券码
 const discountAmount = ref(0); // 优惠金额
 const finalPrice = ref(0);
 
@@ -52,13 +53,11 @@ const initializeData = async () => {
 
   //区分两种情况 一个course和一个courseList 主要是获取的时候设置这个course为一个项目了 这不对 
   console.log(userId.value)
-  console.log(cartCourses.value)
+  console.log("cartCourses" + cartCourses.value[0])
 
   calculateFinalPrice();
 };
 const useOrderData = () => {
-
-
   // const fetchOrders = async () => {
   //   loading.value = true;
   //   error.value = null;
@@ -266,14 +265,12 @@ const loadCartData = () => {
 
     // 回退读取购物车数据 tempCartData
     const storedData = localStorage.getItem('tempCartData');
-    console.log(storedData)
+
     if (storedData) {
       cartData.value = JSON.parse(storedData);
-      console.log(cartData.value)
-
       cartCourses.value = cartData.value.courses || [];
+      orderCourseIds.value = cartCourses.value.map(course => course.courseId);
       cartTotal.value = cartData.value.total || 0;
-
       //这两个数据是？
       cartOriginalTotal.value = cartData.value.originalTotal || 0;
       cartSaved.value = cartData.value.saved || 0;
@@ -288,26 +285,12 @@ const loadCartData = () => {
 
 // 计算最终价格
 const calculateFinalPrice = () => {
-  finalPrice.value = cartTotal.value - discountAmount.value;
+  Math.max(0, finalPrice.value = cartTotal.value - discountAmount.value);
 };
 
 // 处理付款方式选择
 const handlePaymentChange = (paymentMethod: string) => {
   selectedPayment.value = paymentMethod;
-};
-
-// 应用优惠券
-const applyCoupon = () => {
-  if (!couponCode.value.trim()) {
-    alert('请输入优惠券码');
-    return;
-  }
-  if (couponCode.value.toLowerCase() === 'discount10') {
-
-    calculateFinalPrice();
-  } else {
-    alert('无效的优惠券码');
-  }
 };
 
 // 处理支付
@@ -678,13 +661,13 @@ export {
   userId,
   cartData,
   cartCourses,
+  orderCourseIds,
   cartTotal,
   cartOriginalTotal,
   cartSaved,
   loadCartData,
   selectedPayment,
   couponCode,
-  applyCoupon,
   discountAmount,
   finalPrice,
   payAmount,

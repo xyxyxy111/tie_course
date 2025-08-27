@@ -13,29 +13,38 @@ import { goToIndex } from '@/components/common/header.ts';
 
 import {
   loginMethod,
-  registerMethod, registerForm,
-  captchaBtn, registerCaptchaBtn,
-  loginStatus, registerStatus,
-  switchLoginMethod, switchRegisterMethod,
-  qrCodeUrl, state,
-  useFormValidation, useLoginData,
-  sendSmsCaptcha, sendEmailCaptcha,
-  handleRegister, registerByPhone, registerByEmail
+  registerMethod,
+  qrCodeUrl,
+  state,
+  useLogin,
+  useRegister,
+  isLoggedIn,
+  redirectIfLoggedIn
 } from '../content';
 
 const {
-  loading,
-  error,
-  success,
   loginForm,
+  loginStatus,
+  phoneCaptchaBtn,
+  emailCaptchaBtn,
   handleLogin,
-  handleCaptchaLogin,
-  handlePasswordLogin,
   handleWechatLogin,
-  getWxLoginStatus,
-  isLoggedIn,
-  redirectIfLoggedIn
-} = useLoginData();
+  sendSmsCaptcha,
+  sendEmailCaptcha,
+  switchLoginMethod
+} = useLogin();
+
+const {
+  registerForm,
+  registerStatus,
+  registerPhoneCaptchaBtn,
+  registerEmailCaptchaBtn,
+  handleRegister,
+  sendRegisterPhoneCaptcha,
+  sendRegisterEmailCaptcha,
+  switchRegisterMethod
+} = useRegister();
+
 
 const { width, height } = useWindowSize()
 // 微信登录相关状态
@@ -53,43 +62,6 @@ const passwordError = ref("");
 let iconWidth = ref(26 + (width.value - 1920) / 100)
 iconWidth.value = (iconWidth.value > 26) ? iconWidth.value : 26;
 const signFlag = ref(false);
-
-function validatePhone() {
-  if (!loginForm.phone) {
-    phoneError.value = "请输入手机号";
-  } else if (!/^1[3-9]\d{9}$/.test(loginForm.phone)) {
-    phoneError.value = "请输入正确的手机号！";
-  } else {
-    phoneError.value = "";
-  }
-}
-function validateCaptcha() {
-  if (!loginForm.captcha) {
-    captchaError.value = "请输入验证码";
-  } else if (!/^\d{6}$/.test(loginForm.captcha)) {
-    captchaError.value = "请输入正确的验证码！";
-  } else {
-    captchaError.value = "";
-  }
-}
-function validateEmail() {
-  if (!loginForm.phone) {
-    emailError.value = "请输入电子邮箱";
-  } else if (!/^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(loginForm.phone)) {
-    emailError.value = "请输入正确的电子邮箱！";
-  } else {
-    emailError.value = "";
-  }
-}
-function validatePassword() {
-  if (!loginForm.password) {
-    passwordError.value = "请输入用户密码";
-  } else if (loginForm.password.length < 6) {
-    passwordError.value = "请输入正确的密码！";
-  } else {
-    passwordError.value = "";
-  }
-}
 
 
 const openWxLogin = async () => {
@@ -147,15 +119,15 @@ onMounted(() => {
             <!-- 验证码登录方式 -->
             <div v-if="loginMethod === 'captcha'" class="captcha-wrapper">
               <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('手机号') }]">
-                <input v-model="loginForm.phone" placeholder="手机号" class="phone" />
+                <input v-model="loginForm.phone" placeholder="输入手机号码" class="phone" />
                 <div v-if="loginStatus.error && loginStatus.error.includes('手机号')" class="error-message">{{
                   loginStatus.error }}</div>
               </div>
               <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('验证码') }]">
                 <div class="captcha-input-group">
                   <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
-                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendSmsCaptcha">
-                    {{ captchaBtn.text }}
+                  <button type="button" class="send-msg" :disabled="phoneCaptchaBtn.disabled" @click="sendSmsCaptcha">
+                    {{ phoneCaptchaBtn.text }}
                   </button>
                 </div>
                 <div v-if="loginStatus.error && loginStatus.error.includes('验证码')" class="error-message">{{
@@ -190,8 +162,8 @@ onMounted(() => {
               <div :class="['form-item', { 'has-error': loginStatus.error && loginStatus.error.includes('验证码') }]">
                 <div class="captcha-input-group">
                   <input v-model="loginForm.captcha" type="text" placeholder="验证码" class="captcha" />
-                  <button type="button" class="send-msg" :disabled="captchaBtn.disabled" @click="sendEmailCaptcha">
-                    {{ captchaBtn.text }}
+                  <button type="button" class="send-msg" :disabled="emailCaptchaBtn.disabled" @click="sendEmailCaptcha">
+                    {{ emailCaptchaBtn.text }}
                   </button>
                 </div>
                 <div v-if="loginStatus.error && loginStatus.error.includes('验证码')" class="error-message">{{
@@ -245,9 +217,9 @@ onMounted(() => {
                 :class="['form-item', { 'has-error': registerStatus.error && registerStatus.error.includes('验证码') }]">
                 <div class="captcha-input-group">
                   <input v-model="registerForm.captcha" type="text" placeholder="验证码" class="captcha" />
-                  <button type="button" class="send-msg" :disabled="registerCaptchaBtn.disabled"
-                    @click="sendSmsCaptcha">
-                    {{ captchaBtn.text }}
+                  <button type="button" class="send-msg" :disabled="registerPhoneCaptchaBtn.disabled"
+                    @click="sendRegisterPhoneCaptcha">
+                    {{ registerPhoneCaptchaBtn.text }}
                   </button>
                 </div>
                 <div v-if="registerStatus.error && registerStatus.error.includes('验证码')" class="error-message">
@@ -268,9 +240,9 @@ onMounted(() => {
                 :class="['form-item', { 'has-error': registerStatus.error && registerStatus.error.includes('验证码') }]">
                 <div class="captcha-input-group">
                   <input v-model="registerForm.captcha" type="text" placeholder="验证码" class="captcha" />
-                  <button type="button" class="send-msg" :disabled="registerCaptchaBtn.disabled"
-                    @click="sendEmailCaptcha">
-                    {{ captchaBtn.text }}
+                  <button type="button" class="send-msg" :disabled="registerEmailCaptchaBtn.disabled"
+                    @click="sendRegisterEmailCaptcha">
+                    {{ registerEmailCaptchaBtn.text }}
                   </button>
                 </div>
                 <div v-if="registerStatus.error && registerStatus.error.includes('验证码')" class="error-message">
@@ -300,18 +272,19 @@ onMounted(() => {
 
         <div class="login-icons">
           <button v-if="(loginMethod !== 'captcha' && !signFlag) || (registerMethod == 'email' && signFlag)"
-            class="login-icon-btn" @click="signFlag ? switchRegisterMethod('phone') : switchLoginMethod(0)">
+            class="login-icon-btn" @click="signFlag ? switchRegisterMethod('phone') : switchLoginMethod('captcha')">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#gridicons--phone" />
             </svg>
           </button>
-          <button v-if="loginMethod !== 'password' && !signFlag" class=" login-icon-btn" @click="switchLoginMethod(1)">
+          <button v-if="loginMethod !== 'password' && !signFlag" class=" login-icon-btn"
+            @click="switchLoginMethod('password')">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#solar--key-bold" />
             </svg>
           </button>
           <button v-if="(loginMethod !== 'email' && !signFlag) || (registerMethod == 'phone' && signFlag)"
-            class="login-icon-btn" @click="signFlag ? switchRegisterMethod('email') : switchLoginMethod(2)">
+            class="login-icon-btn" @click="signFlag ? switchRegisterMethod('email') : switchLoginMethod('email')">
             <svg :width="iconWidth" :height="iconWidth" viewBox="0 0 24 24" fill="none">
               <use href="#ic--outline-email" />
             </svg>

@@ -3,21 +3,15 @@ import type { CartItem, Cart } from '@/api/cart';
 import { cartApi } from '@/api/cart';
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 
-export const userId = ref<string | null>(null)
+const userId = ref<string | null>(null)
 const showCart = ref(false)
 // 获取当前URL的查询参数
 onMounted(() => {
-  const searchParams = new URLSearchParams(window.location.search)
-  const urlUserId = searchParams.get('userId')
-  if (urlUserId) {
-    userId.value = decodeURIComponent(urlUserId)
-  } else {
-    // 如果没有URL参数，尝试从token获取userId
-    const token = getValidToken();
-    if (token) {
-      userId.value = getCurrentUserId();
-    }
+  const token = getValidToken();
+  if (token) {
+    userId.value = getCurrentUserId();
   }
+
 })
 
 export function useCartLogic() {

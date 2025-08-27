@@ -311,5 +311,5 @@ export {
   userId, selectedCategoryTitle,
   courseQuickViews, communityVoices,
   fetchCategories, changeCategory,
-  changeTag, categoryTitles, tagTitles
+  changeTag, categoryTitles, tagTitles, fetchHottestCourse
 }

@@ -308,12 +308,14 @@ const courseSliderStyle = computed(() => ({
 #main-content {
   margin: 0 auto;
   padding-bottom: 100px;
-  width: 1400px;
+  width: 1920px;
   overflow: hidden;
 }
 
 #main-content .user {
+  margin: 10px auto;
   display: flex;
+  width: 1320px;
   padding-left: 50px;
 }
 
@@ -339,7 +341,7 @@ const courseSliderStyle = computed(() => ({
 
 .navigator {
   margin: 30px auto 0px;
-  max-width: 1300px;
+  max-width: 1320px;
 }
 
 .navigator h1 {
@@ -406,7 +408,7 @@ const courseSliderStyle = computed(() => ({
   background: #f7f7f7;
   padding: 32px 0 48px 0;
   margin: 0 auto;
-  max-width: 1300px;
+  max-width: 1320px;
 }
 
 .category-tabs {
@@ -421,7 +423,8 @@ const courseSliderStyle = computed(() => ({
   flex-direction: column;
   align-items: left;
   justify-content: center;
-  min-width: 120px;
+  width: 166px;
+  height: 70px;
   padding: 12px 32px;
   border-radius: 40px;
   background: #ededed;
@@ -434,19 +437,23 @@ const courseSliderStyle = computed(() => ({
   user-select: none;
 }
 
+.category-tab:hover {
+  background-color: #bbb;
+}
+
 .category-tab.active {
-  background: #222;
+  background: #454545;
   color: #fff;
 }
 
 .category-tab-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: bold;
   margin-bottom: 2px;
 }
 
 .category-tab-desc {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: #fff;
   opacity: 0.8;
   font-weight: normal;
@@ -461,13 +468,13 @@ const courseSliderStyle = computed(() => ({
 .watching-section {
   margin: 0 auto;
   padding-left: 5px;
-  width: 100%;
-  max-width: 100%;
+  width: 1320px;
   overflow: hidden;
 }
 
 .course-slider,
 .watching-cards-row {
+  margin-inline-start: 20px;
   position: relative;
   display: flex;
   align-items: center;
@@ -504,8 +511,9 @@ const courseSliderStyle = computed(() => ({
 }
 
 .course-card .course-title,
+.recommend-card-title,
 .watching-card .watching-card-title {
-  font-size: 1.8rem;
+  font-size: 2.3rem;
   font-weight: bold;
   margin: 6px 20px;
 }
@@ -579,8 +587,8 @@ const courseSliderStyle = computed(() => ({
 }
 
 .button-prev {
-  top: 212px;
-  left: -5px;
+  top: 200px;
+  left: 5px;
   padding-top: 12px;
   padding-right: 12px;
 }
@@ -589,7 +597,7 @@ const courseSliderStyle = computed(() => ({
   top: -198px;
   padding-top: 6px;
   padding-left: 10px;
-  left: 1245px;
+  left: 1265px;
 }
 
 .button-next:hover,
@@ -627,9 +635,9 @@ const courseSliderStyle = computed(() => ({
 .start-section,
 .watching-section,
 .recommend-section {
-  margin: 24px 30px;
-  max-width: 1300px;
-  padding: 12px 30px;
+  margin: 24px auto;
+  max-width: 1320px;
+  padding: 12px 10px;
 }
 
 .start-section .start-header {
@@ -845,11 +853,13 @@ const courseSliderStyle = computed(() => ({
   font-size: 1.3rem;
 }
 
-.recommend-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #111;
+.recommend-title,
+.watching-title {
+  font-size: 2.8rem;
+  font-weight: bolder;
+  color: #000;
   margin-bottom: 24px;
+  margin-left: 0px;
 }
 
 .recommend-card {
@@ -973,17 +983,6 @@ const courseSliderStyle = computed(() => ({
   border-radius: 6px;
   padding: 2px 10px;
   margin-left: 8px;
-}
-
-.watching-section {
-  margin: 32px 0 0 32px;
-}
-
-.watching-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 50px;
 }
 
 .cart-tag {

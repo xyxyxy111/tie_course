@@ -32,7 +32,7 @@ const { width, height } = useWindowSize()
 <style scoped>
 .bottom {
   width: 100vw;
-  min-width: 1400px;
+  min-width: 1920px;
   height: 60px;
   background-color: #101010;
   color: white;
