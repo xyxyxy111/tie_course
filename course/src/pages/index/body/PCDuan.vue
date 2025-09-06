@@ -18,7 +18,7 @@ import {
 import Footer from '@/components/common/Footer.vue';
 import Swiper from '../components/Swiper.vue'
 import { goToVideo } from '@/components/common/header';
-import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
+import { convertMinutesToHours, formatDateToYearMonth } from '@/utils/common';
 
 const { width, height } = useWindowSize()
 
@@ -83,7 +83,7 @@ const courseSliderStyle = computed(() => ({
 
 //控制hover
 const hovered = ref(false);  // 控制hover状态
-const goToVideoPage = (courseId :number) => {
+const goToVideoPage = (courseId: number) => {
   console.log("go to video")
   if (courseId) {
     goToVideo(courseId);
@@ -210,7 +210,7 @@ const goToVideoPage = (courseId :number) => {
         </div>
       </div>
 
-      
+
       <!-- <div v-if="userId" class="next-section">
         <h2 class="next-title">下一步要学习什么</h2>
         <div class="next-cards-row">
@@ -250,8 +250,11 @@ const goToVideoPage = (courseId :number) => {
 
             <div class="recommend-card-meta-label">讲师：iClass</div>
             <div class="recommend-card-meta">
-              <span class="recommend-card-meta-link">上次更新日期：{{ formatDateToYearMonth(hottestCourseList[0]?.updateTime!) }}</span>
-              <span class="recommend-card-meta-label">总时长：</span>{{ convertMinutesToHours(hottestCourseList[0]?.totalMinutes) }}个小时
+              <span class="recommend-card-meta-link">上次更新日期：{{ formatDateToYearMonth(hottestCourseList[0]?.updateTime!)
+                }}</span>
+              <span class="recommend-card-meta-label">总时长：</span>{{
+                convertMinutesToHours(hottestCourseList[0]?.totalMinutes)
+              }}个小时
               <span class="recommend-card-meta-label">{{ hottestCourseList[0]?.chapterNum }}个章节</span>
               <span class="recommend-card-meta-label">{{ hottestCourseList[0]?.lessonNum }}个讲解</span>
             </div>
@@ -563,7 +566,7 @@ const goToVideoPage = (courseId :number) => {
 .current-price {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #ff0000;
+  color: #101010;
 }
 
 .original-price {
@@ -1082,5 +1085,4 @@ const goToVideoPage = (courseId :number) => {
   opacity: 1;
   pointer-events: auto;
 }
-
 </style>

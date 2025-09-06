@@ -4,7 +4,7 @@ import { getValidToken } from '@/utils/request';
 import { useCart } from '@/composables/useCart'
 import type { CourseVO, Chapter, Lesson } from '@/api/course';
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
-import { convertMinutesToHoursAndMinutes,formatDateToYearMonth } from '@/utils/common';
+import { convertMinutesToHoursAndMinutes, formatDateToYearMonth } from '@/utils/common';
 
 
 
@@ -77,7 +77,6 @@ function useCourseDescription() {
 //   };
 // }
 
-
 // 推荐产品和相关主题
 const recommendedProducts = [
   {
@@ -125,29 +124,47 @@ export {
 
 export const chapters = ref<Chapter[]>([]);
 export const courseVo = ref<CourseVO | null>(null);
+export const lastUpdateTime = ref('年月日')
 
 export const getCourseMessage = async () => {
-    const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
-    courseVo.value = courseVoResponse.data;
-    const chaptersResponse = await courseApi.getChapterListById(courseId);
-    
-    chapters.value = chaptersResponse.data;
-    chapters.value.forEach(chapter => { // 注意：这里是 users.value
-      let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
-      chapter.hours = result.hours;
-      chapter.minutes = result.minutes;
-    });
-
-    //session to make great
-    const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
-    const firstChapter = chapters.value.find(chapter => chapter.chapterSortOrder === 1);
-    if (firstChapter) {
-      firstChapter.lessons! = lessonsResponse.data;
-      firstChapter.hasLoadedLessons = true;
-    } else {
-      console.warn("No chapters found");
+  const courseVoResponse = await courseApi.getSingleCourseDetail(courseId);
+  courseVo.value = courseVoResponse.data;
+  const chaptersResponse = await courseApi.getChapterListById(courseId);
+  chapters.value = chaptersResponse.data;
+  chapters.value.forEach(chapter => {
+    let result = convertMinutesToHoursAndMinutes(chapter.lessonTotalMinute);
+    chapter.hours = result.hours;
+    chapter.minutes = result.minutes;
+  });
+  lastUpdateTime.value = (formatDate(courseVo.value?.updateTime!));
+  const lessonsResponse = await courseApi.getLessonsByCourseIdAndSortOrder(courseId, 1);
+  const firstChapter = chapters.value.find(chapter => chapter.chapterSortOrder === 1);
+  if (firstChapter) {
+    firstChapter.lessons! = lessonsResponse.data;
+    firstChapter.hasLoadedLessons = true;
+  } else {
+    console.warn("No chapters found");
   }
 }
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+  } catch (error) {
+    console.error('时间格式化错误:', error);
+    return '无效的时间格式';
+  }
+}
+
+
 export const getLessonListBySortOrder = async (courseId: number, sortOrder: number) => {
   const chooseChapter = chapters.value.find(chapter => chapter.chapterSortOrder === sortOrder);
   if (!chooseChapter?.hasLoadedLessons) {

@@ -9,7 +9,7 @@ import PCHeader from '@/components/common/PCHeader.vue'
 import { useWindowSize } from '@/useWindowSize';
 import CartPopup from '@/components/common/CartPopup.vue';
 import FloatingBox from '../components/FloatingBox.vue';
-import { goToCart, goToLogin, goToVideo,goToVideoWithLessonId } from '@/components/common/header';
+import { goToCart, goToLogin, goToVideo, goToVideoWithLessonId } from '@/components/common/header';
 import { recommendedProducts, relatedTopics } from '../components/content';
 import { useCourseDescription } from '../components/content';
 import { useWishlist } from '@/composables/useWishlist';
@@ -19,25 +19,18 @@ const { fetchWishlist, addToWishlist } = useWishlist();
 import { getCurrentUserId, getValidToken } from '@/utils/request';
 import { categoryApi, courseApi, courseSuccessCodes, categorySuccessCodes } from '@/api/course';
 import type { CourseVO, Chapter, Lesson } from '@/api/course';
-import { 
+import {
   addToCart, goToCheckout, showCart,
   courseVo,
   chapters,
   getCourseMessage,
-  getLessonListBySortOrder,
+  getLessonListBySortOrder, lastUpdateTime
 } from '../components/content'
-import { convertMinutesToHours,formatDateToYearMonth } from '@/utils/common';
-
-
-// const courseVo = ref<CourseVO | null>(null);
-// const chapters = ref<Chapter[]>([]);
-
 const { width, height } = useWindowSize()
 const { CourseDescription } = useCourseDescription();
 const userId = ref<string | null>(null);
 const isExpanded = ref(false);
 const expandedChapters = ref<number[]>([]);
-const lastUpdateTime = ref('年月日')
 const headerRef = ref<InstanceType<typeof PCHeader> | null>(null);
 const otherThemes = ['Python', 'Java']
 const requests = ['准备好学习Python课程', '不用担心学不会，也不需要在任何程式语言背景或知识', '有一台电脑就可以轻松上手']
@@ -47,9 +40,7 @@ onMounted(async () => {
     userId.value = getCurrentUserId();
   }
   getCourseMessage();
-  lastUpdateTime.value = (formatDateToYearMonth(courseVo.value?.updateTime!));
 });
-
 
 const chaptersState = ref('展开');
 
@@ -82,7 +73,9 @@ const CourseDescriptionStyle = computed(() => ({
 }));
 
 const handleAddToCart = async () => {
-  const response = await addToCart(userId.value!,courseId);
+  const searchParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(searchParams.get('courseId') || '1001');
+  const response = await addToCart(userId.value!, courseId);
   if (response as any) { showCart.value = true; }
 };
 
@@ -224,7 +217,8 @@ const handleBuyNow = async () => {
                 </svg>
                 <span class="lesson-title"> {{ lesson.title }} </span>
                 <div style="text-align: right;">
-                  <a href="#" v-if="lesson.previewable" @click="goToVideoWithLessonId(courseCurriculum.courseId,lesson.lessonId)">预览</a>
+                  <a href="#" v-if="lesson.previewable"
+                    @click="goToVideoWithLessonId(courseCurriculum.courseId, lesson.lessonId)">预览</a>
                 </div>
               </li>
             </ul>
@@ -276,10 +270,37 @@ const handleBuyNow = async () => {
 
 .content,
 #course-detail {
-  margin: 0 auto;
+  margin: 0px 0px;
   width: 1494px;
   padding-right: 342px;
+  padding-left: 20px;
 }
+
+#course-detail {
+  width: 1920px;
+  padding-right: 362px;
+
+}
+
+
+@media (min-width: 1500px) {
+
+  .content,
+  #course-detail {
+    margin: 0 auto;
+    width: 1494px;
+    padding-right: 362px;
+    padding-left: 20px;
+  }
+
+  #course-detail {
+    width: 1920px;
+    padding-right: 555px;
+    padding-left: 233px;
+  }
+}
+
+
 
 .content .course-theme {
   color: #A3C7FD;

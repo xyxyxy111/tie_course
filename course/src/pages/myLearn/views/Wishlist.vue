@@ -7,10 +7,10 @@
 
   <!-- 空状态 -->
   <div v-else-if="wishlist.length === 0" class="empty-state">
-    <div class="empty-icon">💝</div>
+    <div class="empty-icon">♡</div>
     <h3>心愿单为空</h3>
     <p>您还没有添加任何课程到心愿单</p>
-    <button class="browse-btn" @click="goToCourse">浏览课程</button>
+    <button class="browse-btn" @click="goToIndex">浏览课程</button>
   </div>
 
   <!-- 课程列表 -->
@@ -75,6 +75,7 @@ import { wishlistApi } from '@/api/user';
 import type { WishListVO } from '@/api/user';
 import '../myLearn.css'
 import { useWindowSize } from '@/useWindowSize';
+import { goToIndex, goToCourse } from '@/components/common/header';
 
 
 export default defineComponent({
@@ -188,8 +189,8 @@ export default defineComponent({
     };
 
     // 跳转到课程页面
-    const goToCourse = () => {
-      window.location.href = '/course.html';
+    const goToIndex = () => {
+      window.location.href = '/index.html';
     };
 
     // 调试课程数据
@@ -216,7 +217,7 @@ export default defineComponent({
       formatTime,
       removeFromWishlist,
       clearWishlist,
-      goToCourse,
+      goToIndex,
       debugCourse,
       searchText,
       searchWishlist,

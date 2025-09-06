@@ -8,7 +8,7 @@
 
     <!-- 弹窗内容 -->
     <transition :name="transitionName">
-      <div class="popup-content">
+      <div class="popup-content" :style="'height: calc(330px + ' + (recommendedProducts.length * 100) + 'px)'">
         <div class="shopping-cart-container container-scroll-y">
           <!-- 添加成功提示 -->
           <h2>已添加至购物车</h2>
@@ -119,7 +119,6 @@ export default defineComponent({
       loading.value = true;
       error.value = null;
       try {
-        // 优先根据 courseId 获取详情
         if (props.courseId) {
           const detailResp = await courseApi.getSingleCourseDetail(props.courseId);
           const c = detailResp.data;
@@ -130,7 +129,6 @@ export default defineComponent({
             price: c.currentPrice,
             originalPrice: c.originalPrice
           };
-          // 基于 tagId 与 courseId 获取配套课程（接口返回单个或列表均做兼容）
           const togetherResp = await courseApi.getCourseTogetherBuy(String(c.tagId), String(c.courseId));
           const data: any = togetherResp.data as any;
           const list = Array.isArray(data) ? data : [data];
@@ -142,7 +140,6 @@ export default defineComponent({
             originalPrice: item.originalPrice
           }));
         } else {
-          // 仅有名称时，先展示基本信息占位
           courseInfo.value = {
             courseName: props.courseName,
             courseImage: '/src/images/image6.png',

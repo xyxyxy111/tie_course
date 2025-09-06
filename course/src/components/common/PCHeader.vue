@@ -33,8 +33,7 @@
       </div>
     </div>
 
-    <input v-model="searchQuery" type="text" placeholder="Find your course by skill,topic,or instructor"
-      :style="headerSearchInputStyle" @keyup.enter="Search">
+    <input v-model="searchQuery" type="text" placeholder="搜索任何内容" :style="headerSearchInputStyle" @keyup.enter="Search">
     <button>
       <div class="icon" @click="Search">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="#35495e">
@@ -330,7 +329,7 @@ const headerSpaceStyle = computed(() => ({
 }));
 
 const headerSearchInputStyle = computed(() => ({
-  width: `clamp(450px, calc(80% + 10vw * ${headerSearchInputWidth.value}), 90vw)`,
+  width: `clamp(450px, calc(80% + 10vw * ${headerSearchInputWidth.value}), 90%)`,
   transition: 'none'
 }));
 

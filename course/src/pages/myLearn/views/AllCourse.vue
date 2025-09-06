@@ -4,14 +4,15 @@
       <div class="summary-left">
         <div class="summary-title">开始每周坚持记录</div>
         <div class="summary-desc">完成了一个环！现在，请观看您的课程。</div>
-        <div class="summary-week">
-          <svg width="24" height="24" fill="#fbbf24" style="vertical-align: middle;">
-            <use href="#flame-icon" />
-          </svg>
-          <span class="summary-week-num">3</span>
-          <span class="summary-week-label">周</span>
-          <span class="summary-week-desc">当前坚持记录</span>
-        </div>
+
+      </div>
+      <div class="summary-week">
+        <svg width="40" height="40" fill="#fbbf24" style="vertical-align: middle;">
+          <use href="#solar--flame-broken" />
+        </svg>
+        <span class="summary-week-num">3</span>
+        <span class="summary-week-label">周</span>
+        <span class="summary-week-desc">当前坚持记录</span>
       </div>
       <div class="summary-right">
         <div class="summary-progress">
@@ -53,12 +54,12 @@
         <button class="cancel-btn">取消</button>
       </div>
     </div>
-
+    <div v-if="!mylist?.length" class="empty-state">
+      <p>您还没有任何课程，去探索课程开始学习吧！</p>
+    </div>
 
     <div class="mycourses-container">
-      <div v-if="!mylist?.length">
-        <p>您还没有任何课程，去探索课程开始学习吧！</p>
-      </div>
+
       <div class="course-card" v-for="(course, index) in mylist" :key="index" @mouseenter="hoverIndex = index"
         @mouseleave="hoverIndex = -1" @click="goToVideo(course.courseId)">
         <div class="img-wrapper" :class="{ 'hovered': hoverIndex === index }" @click.stop="goToVideo(course.courseId)">
@@ -136,6 +137,15 @@ export default defineComponent({
 .mycourses-container {
   border-radius: 8px;
   padding: 20px;
+  margin-bottom: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #666;
+  background-color: #f8f9fa;
+  border-radius: 12px;
   margin-bottom: 20px;
 }
 

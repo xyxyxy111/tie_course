@@ -158,10 +158,10 @@ const handleClearCart = async () => {
 
             </div>
           </div>
-          <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
+          <!-- <button class="clear-cart-btn" @click="handleClearCart" :disabled="clearing || loading"
             v-if="cart && cartList && cartList.length > 0">
             {{ clearing ? '清空中...' : '清空' }}
-          </button>
+          </button> -->
         </div>
 
         <div class="checkout-section">

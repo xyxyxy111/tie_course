@@ -143,7 +143,8 @@ const hovered = ref(false);  // 控制hover状态
 
 .floating-box {
   position: fixed;
-  left: 65%;
+  left: calc(50% + 440px);
+  right: 100%;
   width: 320px;
   background-color: white;
   border: 1px solid #e1e1e1;
@@ -153,6 +154,13 @@ const hovered = ref(false);  // 控制hover状态
   box-sizing: border-box;
   z-index: 100;
 }
+
+@media (max-width: 1920px) {
+  .floating-box {
+    left: calc(100% - 340px);
+  }
+}
+
 
 .floating-box img {
   width: 100%;

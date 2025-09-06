@@ -180,7 +180,6 @@ const removeCoupon = () => {
           <use href="#ic--baseline-wechat" />
         </svg>
         <label for="wechat">
-
           微信支付</label>
       </div>
 
