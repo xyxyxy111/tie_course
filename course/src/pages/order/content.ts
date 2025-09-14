@@ -49,12 +49,6 @@ const initializeData = async () => {
   }
   console.log(token)
   loadCartData();
-
-
-  //区分两种情况 一个course和一个courseList 主要是获取的时候设置这个course为一个项目了 这不对 
-  console.log(userId.value)
-  console.log("cartCourses" + cartCourses.value[0])
-
   calculateFinalPrice();
 };
 const useOrderData = () => {
@@ -249,7 +243,6 @@ const timeRangeOptions = [
 
 const loadCartData = () => {
   try {
-    // 优先读取 buyCourseNow
     const buyNowRaw = localStorage.getItem('buyCourseNow');
     if (buyNowRaw) {
       const buyNow = JSON.parse(buyNowRaw);
@@ -258,8 +251,6 @@ const loadCartData = () => {
       cartTotal.value = buyNow.total || 0;
       cartOriginalTotal.value = buyNow.originalTotal || 0;
       cartSaved.value = buyNow.saved || 0;
-      // 读取后清理，避免重复购买
-      localStorage.removeItem('buyCourseNow');
       return;
     }
 
@@ -467,7 +458,7 @@ async function createAliPayment() {
       courseDiscount: course.price / course.originalPrice
     }));
     const orderData = {
-      userId: 123,
+      userId: userId.value,
       paymentPrice: finalPrice.value,
       paymentType: "alipay",
       orderItemList: orderItemList

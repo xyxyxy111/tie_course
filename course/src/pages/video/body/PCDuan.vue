@@ -1,29 +1,29 @@
 <template>
-  <!-- <Header /> -->
+  <Header />
 
   <div>
     <div class="course-page">
       <div class="video-container">
         <div v-if="currentLessonPreviewStatus">
-          <VideoPlayer :video-message="videoMsg"/>
+          <VideoPlayer :video-message="videoMsg" />
         </div>
-        <div v-else-if="!currentLessonPreviewStatus&&!currentCoursePayStatus">
+        <div v-else-if="!currentLessonPreviewStatus && !currentCoursePayStatus">
           <a href="#" style="color: red;" @click="goToCourse(courseId)">该视频需要购买才能观看 点击跳转购买</a>
         </div>
-        <div v-else-if="!currentLessonPreviewStatus&&currentCoursePayStatus">
+        <div v-else-if="!currentLessonPreviewStatus && currentCoursePayStatus">
           <a href="#" style="color: red;" @click="goToCourse(courseId)">该视频已经购买 点击跳转观看</a>
         </div>
       </div>
 
       <div class="course-sidebar">
         <div class="course-container">
-          <h1 class="course-title">当前观看课程:第{{currentLesson?.lessonSortOrder}}讲 {{ currentLesson?.title }}</h1>
+          <h1 class="course-title">当前观看课程:第{{ currentLesson?.lessonSortOrder }}讲 {{ currentLesson?.title }}</h1>
           <br></br>
           <h1 class="course-title">课程内容</h1>
           <div v-for="(chapter, index) in chapters" :key="index">
-            <div class="chapter-header" @click="toggleChapter(index,chapter.chapterSortOrder)">
+            <div class="chapter-header" @click="toggleChapter(index, chapter.chapterSortOrder)">
               <div class="chapter">
-                <h2 class="chapter-title"> 第{{chapter.chapterSortOrder}}章 {{ chapter.title }}</h2>
+                <h2 class="chapter-title"> 第{{ chapter.chapterSortOrder }}章 {{ chapter.title }}</h2>
               </div>
               <span class="arrow" :class="{ open: openChapters.includes(index) }"></span>
             </div>
@@ -33,7 +33,7 @@
                 @click="selectLesson(chapter, lesson)">
 
                 <label :for="`lesson-${index}-${lessonIndex}`" class="lesson-label">
-                  <div class="lesson-title">第{{lesson.lessonSortOrder}}讲 {{ lesson.title }}</div>
+                  <div class="lesson-title">第{{ lesson.lessonSortOrder }}讲 {{ lesson.title }}</div>
                   <svg width="24" height="24" viewBox="0 -7 24 30" fill="#222">
                     <use href="#ph--video-fill" />
                   </svg>
@@ -61,7 +61,7 @@
             <h4>学生</h4>
           </div>
           <div class="column">
-            <h3>{{  convertMinutesToHours(courseVo?.totalMinutes!)  }}</h3>
+            <h3>{{ convertMinutesToHours(courseVo?.totalMinutes!) }}</h3>
             <h4>小时</h4>
           </div>
 
@@ -160,7 +160,7 @@ import { getCurrentUserId, getValidToken } from '@/utils/request'
 // import 'video.js/dist/video-js.min.css'
 import Header from '../components/Header.vue';
 import VideoPlayer from '../components/VideoPlayer.vue';
-import { 
+import {
   userId,
   courseVo,
   chapters,
@@ -177,19 +177,19 @@ import {
   getCoursePayStatus,
   currentCoursePayStatus,
 } from '../components/content';
-import { getFormattedDuration,convertMinutesToHours,convertSecondsToMinutesAndSeconds,formatDateToYearMonth } from '@/utils/common';
+import { getFormattedDuration, convertMinutesToHours, convertSecondsToMinutesAndSeconds, formatDateToYearMonth } from '@/utils/common';
 import { goToCourse } from '@/components/common/header';
 const { width, height } = useWindowSize()
 
 
 // 获取userId - 从token中获取而不是URL
 // 当前选中的课程
-const computedChapters= ref<Chapter[] | null>(null)
+const computedChapters = ref<Chapter[] | null>(null)
 // 打开的章节索引数组
 const openChapters = ref<number[]>([])
 
 // 切换章节展开/折叠状态
-function toggleChapter(index: number,chapterSortOrder:number) {
+function toggleChapter(index: number, chapterSortOrder: number) {
   const chapterIndex = openChapters.value.indexOf(index);
   if (chapterIndex > -1) {
     openChapters.value.splice(chapterIndex, 1);
@@ -211,14 +211,14 @@ function selectLesson(chapter: Chapter, lesson: Lesson) {
   getCoursePayStatus();
 }
 
-const init = async()=>{
+const init = async () => {
   getCourseMessage();
 
 }
 
 
 
-onMounted(async() => {
+onMounted(async () => {
   const token = getValidToken()
   if (token) {
     userId.value = getCurrentUserId()
@@ -226,7 +226,7 @@ onMounted(async() => {
 
   await init();
   chapters.value = computedChapters.value!;
-  openChapters.value.push(firstChapterOrder.value-1);
+  openChapters.value.push(firstChapterOrder.value - 1);
 
 })
 
@@ -259,9 +259,10 @@ onMounted(async() => {
 
 <style scoped>
 @import "@/assets/rem.css";
+
 .video-container {
   /* flex: 1; */
-  width: 100%; 
+  width: 100%;
   /* width: 1350px; */
   position: relative;
   background: #000;
@@ -319,8 +320,7 @@ onMounted(async() => {
   flex-direction: column;
 }
 
-.chapter-title
-{
+.chapter-title {
   font-size: 1.4rem;
   font-weight: bolder;
   color: #111;

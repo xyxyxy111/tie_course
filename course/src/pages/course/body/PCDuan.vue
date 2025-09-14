@@ -111,7 +111,7 @@ const handleBuyNow = async () => {
   <PCHeader ref="headerRef" :userId="userId" />
   <FloatingBox v-if="courseVo" :courseId="courseVo.courseId" :courseVideo="courseVo?.coverImgUrl"
     :currentPrice="courseVo?.currentPrice" :originalPrice="courseVo?.originalPrice" :discount="courseVo?.discountValue"
-    @addToWishlist="addToWishlist" @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
+    @addToWishlist="addToWishlist(courseVo?.courseId)" @addToCart="handleAddToCart" @buyNow="handleBuyNow" />
 
   <div id="top-container">
     <div class="content">
@@ -601,8 +601,8 @@ h1 {
   max-height: 500px;
 }
 
-.lesson-item {
-  padding-left: 32px;
+.course-content ul li.lesson-item {
+  padding-left: 36px;
   list-style: circle;
   cursor: default;
   display: flex;
