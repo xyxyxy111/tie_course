@@ -610,7 +610,7 @@ h1 {
 }
 
 .lesson-title {
-  margin-left: 8px;
+  margin-left: 5px;
   text-align: left;
   flex-grow: 1;
 }
